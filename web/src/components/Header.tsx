@@ -1,5 +1,5 @@
 import { Navbar, Nav, Container } from "react-bootstrap";
-import { User, ShoppingCart } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 
 export function Header() {
@@ -19,13 +19,19 @@ export function Header() {
                 to="/cart"
                 className="d-flex align-items-center text-white text-decoration-none"
               >
-                <ShoppingCart className="me-1" size="18" /> Cart
+                <Icon
+                  icon="fluent:shopping-bag-16-regular"
+                  width="24"
+                  height="24"
+                />
+                Cart
               </Link>
               <Link
                 to="/signin"
                 className="d-flex align-items-center text-white text-decoration-none"
               >
-                <User className="me-1" size="18" /> Sign in
+                <Icon icon="fluent:person-12-regular" width="24" height="24" />
+                Sign in
               </Link>
             </Nav>
           </Navbar.Collapse>

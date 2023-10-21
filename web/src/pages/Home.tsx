@@ -1,6 +1,8 @@
 import { Card, Col, Row } from "react-bootstrap";
-import { products } from "../initialData.js";
 import { Link } from "react-router-dom";
+import { Icon } from "@iconify/react";
+
+import { products } from "../initialData.js";
 
 export function Home() {
   return (
@@ -29,8 +31,41 @@ function Product(props: { product: (typeof products)[0] }) {
             <strong>{props.product.name}</strong>
           </Card.Title>
         </Link>
+        <Card.Text as="div">
+          <Rating
+            value={props.product.rating}
+            text={`${props.product.numReviews} reviews`}
+          />
+        </Card.Text>
         <Card.Text as={"h3"}>${props.product.price}</Card.Text>
       </Card.Body>
     </Card>
+  );
+}
+
+function Rating(props: { value: number; text: string }) {
+  return (
+    <div className="rating">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <RenderRatingIcon value={props.value} num={n} />
+      ))}
+      <span>{props.text ?? props.text}</span>
+    </div>
+  );
+}
+
+function RenderRatingIcon(props: { value: number; num: number }) {
+  return (
+    <>
+      <span>
+        {props.value >= props.num ? (
+          <Icon icon="fluent:star-12-filled" />
+        ) : props.value > props.num + 0.5 ? (
+          <Icon icon="fluent:star-half-12-filled" />
+        ) : (
+          <Icon icon="fluent:star-12-regular" />
+        )}
+      </span>
+    </>
   );
 }
