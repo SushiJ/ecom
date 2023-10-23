@@ -8,7 +8,7 @@ export function Home() {
   return (
     <>
       <h1>Latest Products</h1>
-      <Row>
+      <Row className="g-4">
         {products.map((p) => (
           <Col key={p._id} sm={12} md={6} lg={4} xl={3}>
             <Product product={p} />
@@ -21,7 +21,7 @@ export function Home() {
 
 function Product(props: { product: (typeof products)[0] }) {
   return (
-    <Card className="my-3 p-3 rounded">
+    <Card className="my-3 p-3 rounded h-100">
       <Link to={`/products/${props.product._id}`}>
         <Card.Img src={props.product.image} variant="top" />
       </Link>
@@ -46,24 +46,24 @@ function Product(props: { product: (typeof products)[0] }) {
 function Rating(props: { value: number; text: string }) {
   return (
     <div className="rating">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <RenderRatingIcon value={props.value} num={n} />
-      ))}
+      <RenderRatingIcon value={props.value} />
       <span>{props.text ?? props.text}</span>
     </div>
   );
 }
 
-function RenderRatingIcon(props: { value: number; num: number }) {
+function RenderRatingIcon(props: { value: number }) {
   return (
     <>
       <span>
-        {props.value >= props.num ? (
-          <Icon icon="fluent:star-12-filled" />
-        ) : props.value > props.num + 0.5 ? (
-          <Icon icon="fluent:star-half-12-filled" />
-        ) : (
-          <Icon icon="fluent:star-12-regular" />
+        {[1, 2, 3, 4, 5].map((num) =>
+          props.value >= num ? (
+            <Icon icon="fluent:star-12-filled" />
+          ) : props.value >= num - 0.5 ? (
+            <Icon icon="fluent:star-half-12-filled" />
+          ) : (
+            <Icon icon="fluent:star-12-regular" />
+          )
         )}
       </span>
     </>
