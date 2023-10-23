@@ -7,6 +7,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
+import "./assets/bootstrap.css";
 import "./assets/index.css";
 import App from "./App.tsx";
 
