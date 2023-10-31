@@ -1,0 +1,12 @@
+version: "3.3"
+services:
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    container_name: mongo-fs-shop
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=mongo
+    volumes:
+      - ./data:/data/db
