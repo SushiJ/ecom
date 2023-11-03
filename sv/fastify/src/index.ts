@@ -1,7 +1,7 @@
 import Fastify from "fastify";
-import type { FastifyReply, FastifyRequest } from "fastify";
 
-import { products } from "../initialData";
+import { getProducts, getProductsById } from "./controllers/products";
+import connect from "./utils/connection";
 
 const fastify = Fastify({
   logger: {
@@ -15,22 +15,11 @@ fastify.get("/check", function(_req, reply) {
   reply.send((reply.statusCode = 200));
 });
 
-fastify.get("/products", function(_req, reply: FastifyReply) {
-  reply.send(products);
-});
+fastify.get("/products", getProducts);
 
-fastify.get(
-  "/products/:id",
-  function(req: FastifyRequest, reply: FastifyReply) {
-    const { id } = req.params as { id: string };
-    const product = products.find((p) => p._id === +id);
-    if (!product) {
-      reply.status(404);
-      return;
-    }
-    reply.status(200).send(product);
-  },
-);
+// 6543e69b2cf3befc0f2c51a7
+
+fastify.get("/products/:id", getProductsById);
 
 fastify.listen({ port: 3000, host: "0.0.0.0" }, function(err, address) {
   if (err) {
@@ -38,6 +27,11 @@ fastify.listen({ port: 3000, host: "0.0.0.0" }, function(err, address) {
     process.exit(1);
   }
   fastify.log.info(`server listening on ${address}`);
+  connect()
+    .then(() => console.log("CONNECTED"))
+    .catch((e) => {
+      fastify.log.error(e);
+    });
 });
 
 ["SIGINT", "SIGTERM"].forEach((signal) => {
