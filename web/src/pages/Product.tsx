@@ -35,9 +35,6 @@ export function Product() {
                 text={`${product.numReviews} reviews`}
               />
             </ListGroup.Item>
-            {/*<ListGroup.Item>
-             <h3>${product.price}</h3>
-            </ListGroup.Item> */}
             <ListGroup.Item>{product.description}</ListGroup.Item>
           </ListGroup>
         </Col>
@@ -98,7 +95,7 @@ function RenderRatingIcon(props: { value: number }) {
             <Icon icon="fluent:star-half-12-regular" width="20" height="20" />
           ) : (
             <Icon icon="fluent:star-12-regular" width="20" height="20" />
-          )
+          ),
         )}
       </span>
     </>
