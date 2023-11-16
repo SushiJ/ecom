@@ -2,14 +2,43 @@ import { useParams, Link } from "react-router-dom";
 import { Col, Row, Image, ListGroup, Card, Button } from "react-bootstrap";
 import { Icon } from "@iconify/react";
 
-import { products } from "../initialData";
+import { type Product } from "./Home";
+import { useEffect, useState } from "react";
+
+const FETCH_URL = "http://localhost:3000/products";
 
 export function Product() {
   const { id } = useParams();
+  const [product, setProduct] = useState<Product>();
+  const [error, setError] = useState(false);
 
-  const product = products.find((p) => p._id === Number(id));
+  useEffect(() => {
+    fetch(`${FETCH_URL}/${id}`)
+      .then((res) => {
+        if (!res.ok) {
+          setError(true);
+          return;
+        }
+        res.json().then((data) => {
+          setProduct(data);
+        });
+      })
+      .catch((e) => {
+        setError(true);
+        console.error(e);
+      });
+  }, [id]);
+
+  if (error) {
+    return (
+      <>
+        <p>{error}</p>
+      </>
+    );
+  }
 
   if (!product) return <div>`No product found with ${id}`</div>;
+
   return (
     <>
       <Link className="my-3 btn btn-outline-primary" to="/">

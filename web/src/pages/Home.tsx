@@ -2,9 +2,61 @@ import { Card, Col, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
 
-import { products } from "../initialData.js";
+import { useEffect, useState } from "react";
+
+export type Product = {
+  _id: string;
+  name: string;
+  image: string;
+  description: string;
+  brand: string;
+  category: string;
+  price: number;
+  countInStock: number;
+  rating: number;
+  numReviews: number;
+};
+
+const FETCH_URL = "http://localhost:3000/products";
 
 export function Home() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [error, setError] = useState(false);
+  useEffect(() => {
+    fetch(FETCH_URL)
+      .then((res) => {
+        if (!res.ok) {
+          setError(true);
+          return;
+        }
+        res.json().then((data) => {
+          setProducts(data);
+        });
+      })
+      .catch((e) => {
+        setError(true);
+        console.error(e);
+      });
+  }, []);
+
+  if (error) {
+    return (
+      <>
+        <h1>Latest Products</h1>
+        <p>{error}</p>
+      </>
+    );
+  }
+
+  if (products.length < 1) {
+    return (
+      <>
+        <h1>Latest Products</h1>
+        <p>No Products found</p>
+      </>
+    );
+  }
+
   return (
     <>
       <h1>Latest Products</h1>
@@ -19,7 +71,7 @@ export function Home() {
   );
 }
 
-function Product(props: { product: (typeof products)[0] }) {
+function Product(props: { product: Product }) {
   return (
     <Card className="my-3 p-3 rounded">
       <Link to={`/products/${props.product._id}`}>
@@ -63,7 +115,7 @@ function RenderRatingIcon(props: { value: number }) {
             <Icon icon="fluent:star-half-12-regular" width="20" height="20" />
           ) : (
             <Icon icon="fluent:star-12-regular" width="20" height="20" />
-          )
+          ),
         )}
       </span>
     </>
