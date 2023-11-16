@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import cors from "@fastify/cors";
 
 import { getProducts, getProductsById } from "./controllers/products";
 import connect from "./utils/connection";
@@ -10,8 +11,11 @@ const fastify = Fastify({
     },
   },
 });
+fastify.register(cors, {
+  origin: "*",
+});
 
-fastify.get("/check", function(_req, reply) {
+fastify.get("/check", function (_req, reply) {
   reply.send((reply.statusCode = 200));
 });
 
@@ -21,7 +25,7 @@ fastify.get("/products", getProducts);
 
 fastify.get("/products/:id", getProductsById);
 
-fastify.listen({ port: 3000, host: "0.0.0.0" }, function(err, address) {
+fastify.listen({ port: 3000, host: "0.0.0.0" }, function (err, address) {
   if (err) {
     fastify.log.error(err);
     process.exit(1);

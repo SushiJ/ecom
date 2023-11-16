@@ -6,6 +6,7 @@ export async function getProducts(_req: FastifyRequest, reply: FastifyReply) {
     const products = await productModel.find();
     if (!products) reply.status(200).send([]);
     reply.status(200).send(products);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     reply.status(500).send();
   }
