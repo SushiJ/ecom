@@ -13,10 +13,14 @@ export async function getProducts(_req: FastifyRequest, reply: FastifyReply) {
 }
 
 export async function getProductsById(
-  req: FastifyRequest,
+  req: FastifyRequest<{
+    Params: {
+      id: string;
+    };
+  }>,
   reply: FastifyReply,
 ) {
-  const { id } = req.params as { id: string };
+  const { id } = req.params;
   try {
     // NOTE: May be {status, message} would be a better API? IDK
     const product = await productModel.findById(id);
