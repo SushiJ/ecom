@@ -1,54 +1,32 @@
-import { Card, Col, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { Card, Col, Row } from "react-bootstrap";
 import { Icon } from "@iconify/react";
 
-import { useEffect, useState } from "react";
-
-export type Product = {
-  _id: string;
-  name: string;
-  image: string;
-  description: string;
-  brand: string;
-  category: string;
-  price: number;
-  countInStock: number;
-  rating: number;
-  numReviews: number;
-};
-
-const FETCH_URL = "http://localhost:3000/products";
+import { Product } from "../types";
+import { useGetProductsQuery } from "../features/products/slice";
 
 export function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [error, setError] = useState(false);
-  useEffect(() => {
-    fetch(FETCH_URL)
-      .then((res) => {
-        if (!res.ok) {
-          setError(true);
-          return;
-        }
-        res.json().then((data) => {
-          setProducts(data);
-        });
-      })
-      .catch((e) => {
-        setError(true);
-        console.error(e);
-      });
-  }, []);
+  const { data, isError, isLoading } = useGetProductsQuery();
 
-  if (error) {
+  if (isLoading) {
     return (
       <>
         <h1>Latest Products</h1>
-        <p>{error}</p>
+        <p>Loading...</p>
       </>
     );
   }
 
-  if (products.length < 1) {
+  if ((!data || isError) && !isLoading) {
+    return (
+      <>
+        <h1>Latest Products</h1>
+        <p>Something went wrong</p>
+      </>
+    );
+  }
+
+  if (data.length < 1) {
     return (
       <>
         <h1>Latest Products</h1>
@@ -61,7 +39,7 @@ export function Home() {
     <>
       <h1>Latest Products</h1>
       <Row>
-        {products.map((p) => (
+        {data.map((p) => (
           <Col key={p._id} sm={12} md={6} lg={4} xl={3}>
             <Product product={p} />
           </Col>
