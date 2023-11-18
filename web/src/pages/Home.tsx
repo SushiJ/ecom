@@ -78,7 +78,7 @@ function Product(props: { product: Product }) {
         <Card.Img src={props.product.image} variant="top" className="rounded" />
       </Link>
       <Card.Body>
-        <Link to={`/product/${props.product._id}`}>
+        <Link to={`/products/${props.product._id}`}>
           <Card.Title as="div" className="product-title">
             <strong>{props.product.name}</strong>
           </Card.Title>
@@ -108,13 +108,28 @@ function RenderRatingIcon(props: { value: number }) {
   return (
     <>
       <span>
-        {[1, 2, 3, 4, 5].map((num) =>
+        {[1, 2, 3, 4, 5].map((num, idx) =>
           props.value >= num ? (
-            <Icon icon="fluent:star-12-filled" width="20" height="20" />
+            <Icon
+              key={idx}
+              icon="fluent:star-12-filled"
+              width="20"
+              height="20"
+            />
           ) : props.value >= num - 0.5 ? (
-            <Icon icon="fluent:star-half-12-regular" width="20" height="20" />
+            <Icon
+              key={idx}
+              icon="fluent:star-half-12-regular"
+              width="20"
+              height="20"
+            />
           ) : (
-            <Icon icon="fluent:star-12-regular" width="20" height="20" />
+            <Icon
+              key={idx}
+              icon="fluent:star-12-regular"
+              width="20"
+              height="20"
+            />
           ),
         )}
       </span>

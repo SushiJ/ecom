@@ -29,15 +29,7 @@ export function Product() {
       });
   }, [id]);
 
-  if (error) {
-    return (
-      <>
-        <p>{error}</p>
-      </>
-    );
-  }
-
-  if (!product) return <div>`No product found with ${id}`</div>;
+  if (!product || error) return <div>`No product found with ${id}`</div>;
 
   return (
     <>
@@ -117,13 +109,28 @@ function RenderRatingIcon(props: { value: number }) {
   return (
     <>
       <span>
-        {[1, 2, 3, 4, 5].map((num) =>
+        {[1, 2, 3, 4, 5].map((num, idx) =>
           props.value >= num ? (
-            <Icon icon="fluent:star-12-filled" width="20" height="20" />
+            <Icon
+              key={idx}
+              icon="fluent:star-12-filled"
+              width="20"
+              height="20"
+            />
           ) : props.value >= num - 0.5 ? (
-            <Icon icon="fluent:star-half-12-regular" width="20" height="20" />
+            <Icon
+              key={idx}
+              icon="fluent:star-half-12-regular"
+              width="20"
+              height="20"
+            />
           ) : (
-            <Icon icon="fluent:star-12-regular" width="20" height="20" />
+            <Icon
+              key={idx}
+              icon="fluent:star-12-regular"
+              width="20"
+              height="20"
+            />
           ),
         )}
       </span>
