@@ -6,28 +6,46 @@ import type { RootState } from "../../store";
 import { Product } from "../../types";
 
 type InitialState = {
-  items: Array<Product>;
+  products: Array<{
+    product: Product;
+    quantity: number;
+  }>;
+  totalAmount: number;
 };
+
 const cartItems = getLocalStorage("cart");
 
-const initialState: InitialState = cartItems ? cartItems : { items: [] };
+const initialState: InitialState = cartItems
+  ? cartItems
+  : { cart: [], totalAmount: 0 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
     addToCart: (state, action: PayloadAction<Product>) => {
-      const item = action.payload;
+      const newProduct = action.payload;
 
-      const existItem = state.items.find((p) => p._id === item._id);
-      if (!existItem) {
-        state.items.push(item);
+      const existingProduct = state.products.find(
+        ({ product }) => product._id === newProduct._id,
+      );
+
+      if (!existingProduct) {
+        state.products.push({ product: newProduct, quantity: 1 });
+        state.totalAmount += newProduct.price;
         return;
       }
+
+      state.products.map((p) => {
+        if (p.product._id === existingProduct.product._id) {
+          p.quantity += 1;
+        }
+      });
+      state.totalAmount += existingProduct.product.price;
     },
   },
 });
 
-export const selectCartItems = (state: RootState) => state.cart.items;
+export const selectCartItems = (state: RootState) => state.cart.products;
 
 export default cartSlice.reducer;
