@@ -9,6 +9,7 @@ type InitialState = {
   products: Array<{
     product: Product;
     quantity: number;
+    price: number;
   }>;
   totalAmount: number;
 };
@@ -31,7 +32,11 @@ const cartSlice = createSlice({
       );
 
       if (!existingProduct) {
-        state.products.push({ product: newProduct, quantity: 1 });
+        state.products.push({
+          product: newProduct,
+          quantity: 1,
+          price: newProduct.price,
+        });
         state.totalAmount += newProduct.price;
         return;
       }
@@ -39,6 +44,7 @@ const cartSlice = createSlice({
       state.products.map((p) => {
         if (p.product._id === existingProduct.product._id) {
           p.quantity += 1;
+          p.price += p.quantity * p.product.price;
         }
       });
       state.totalAmount += existingProduct.product.price;
