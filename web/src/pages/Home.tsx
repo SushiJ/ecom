@@ -5,7 +5,7 @@ import { Icon } from "@iconify/react";
 import { Product } from "../types";
 import { useGetProductsQuery } from "../features/products/slice";
 
-export function Home() {
+export default function Home() {
   const { data, isError, isLoading } = useGetProductsQuery();
 
   if (isLoading) {

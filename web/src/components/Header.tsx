@@ -1,8 +1,11 @@
-import { Navbar, Nav, Container } from "react-bootstrap";
-import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
+import { Navbar, Nav, Container, Badge } from "react-bootstrap";
+import { Icon } from "@iconify/react";
+
+import { useAppSelector } from "../hooks/redux";
 
 export function Header() {
+  const totalItems = useAppSelector((state) => state.cart.products.length);
   return (
     <header>
       <Navbar bg="primary" variant="dark" expand="md" collapseOnSelect>
@@ -25,6 +28,11 @@ export function Header() {
                   height="24"
                 />
                 Cart
+                {totalItems > 0 && (
+                  <Badge pill bg="success" style={{ marginLeft: "5px" }}>
+                    {totalItems}
+                  </Badge>
+                )}
               </Link>
               <Link
                 to="/signin"

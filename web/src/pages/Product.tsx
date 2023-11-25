@@ -15,7 +15,7 @@ import { useGetProductsByIdQuery } from "../features/products/slice";
 import { addToCart } from "../features/cart/slice";
 import { useAppDispatch } from "../hooks/redux";
 
-export function Product() {
+export default function Product() {
   const dispatch = useAppDispatch();
   const { id } = useParams() as { id: string };
   const [quantity, setQuantity] = useState(1);

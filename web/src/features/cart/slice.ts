@@ -44,15 +44,8 @@ const cartSlice = createSlice({
         return;
       }
 
-      //FIXME: Rethink about this += 1;
-      state.products.map((p) => {
-        if (p.product._id === existingProduct.product._id) {
-          p.quantity += 1;
-        }
-      });
-
-      state.totalAmount +=
-        existingProduct.product.price * existingProduct.quantity;
+      existingProduct.quantity += newProduct.quantity;
+      state.totalAmount += existingProduct.product.price * newProduct.quantity;
     },
   },
 });

@@ -13,14 +13,17 @@ import "./assets/index.css";
 import App from "./App.tsx";
 
 import { store } from "./store";
-import { Home } from "./pages/Home.tsx";
-import { Product } from "./pages/Product.tsx";
+
+import Home from "./pages/Home.tsx";
+import Product from "./pages/Product.tsx";
+import CartPage from "./pages/Cart.tsx";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
       <Route index={true} path="/" element={<Home />} />
       <Route path="/products/:id" element={<Product />} />
+      <Route path="/cart" element={<CartPage />} />
     </Route>,
   ),
 );
