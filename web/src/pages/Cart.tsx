@@ -7,12 +7,15 @@ import {
   Button,
   Card,
 } from "react-bootstrap";
-import { useAppSelector } from "../hooks/redux";
 import { Link } from "react-router-dom";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { Icon } from "@iconify/react";
+
+import { useAppDispatch, useAppSelector } from "../hooks/redux";
+import { removeFromCart } from "../features/cart/slice";
 
 export default function CartPage() {
   const { products, totalAmount } = useAppSelector((state) => state.cart);
+  const dispatch = useAppDispatch();
   if (products.length === 0) {
     return (
       <div>
@@ -66,7 +69,11 @@ export default function CartPage() {
                     </Form.Control>
                   </Col>
                   <Col md="2">
-                    <Button type="button" variant="light">
+                    <Button
+                      type="button"
+                      variant="light"
+                      onClick={() => dispatch(removeFromCart(product))}
+                    >
                       <Icon
                         icon="fluent:delete-16-regular"
                         style={{ color: "#d9534f" }}

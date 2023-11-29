@@ -47,11 +47,18 @@ const cartSlice = createSlice({
       existingProduct.quantity += newProduct.quantity;
       state.totalAmount += existingProduct.product.price * newProduct.quantity;
     },
+    // TODO: Ability to remove products 1 by 1;
+    removeFromCart: (state, action: PayloadAction<Product>) => {
+      const product = action.payload;
+      state.products = state.products.filter(
+        (p) => p.product._id !== product._id,
+      );
+    },
   },
 });
 
 export const selectCartItems = (state: RootState) => state.cart.products;
 
-export const { addToCart } = cartSlice.actions;
+export const { addToCart, removeFromCart } = cartSlice.actions;
 
 export default cartSlice.reducer;
