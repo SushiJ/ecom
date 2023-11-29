@@ -1,8 +1,9 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 
-import { getProducts, getProductsById } from "./controllers/products";
 import connect from "./utils/connection";
+import userRoutes from "./routes/user";
+import productRoutes from "./routes/product";
 
 const fastify = Fastify({
   logger: {
@@ -11,6 +12,7 @@ const fastify = Fastify({
     },
   },
 });
+
 fastify.register(cors, {
   origin: "*",
 });
@@ -19,20 +21,20 @@ fastify.get("/check", function (_req, reply) {
   reply.send((reply.statusCode = 200));
 });
 
-fastify.get("/products", getProducts);
+fastify.register(userRoutes);
+fastify.register(productRoutes, { prefix: "/products" });
 
-// 6543e69b2cf3befc0f2c51a7
-
-fastify.get("/products/:id", getProductsById);
-
+// TODO: Better Error handling
 fastify.listen({ port: 3000, host: "0.0.0.0" }, function (err, address) {
   if (err) {
     fastify.log.error(err);
     process.exit(1);
   }
-  fastify.log.info(`server listening on ${address}`);
   connect()
-    .then(() => console.log("CONNECTED"))
+    .then(() => {
+      console.log("CONNECTED");
+    })
+    .then(() => fastify.log.info(`server listening on ${address}`))
     .catch((e) => {
       fastify.log.error(e);
     });
