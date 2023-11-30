@@ -12,7 +12,7 @@ async function saveProduct(product: Product) {
 }
 
 async function populateProduct() {
-  for (let productData of products) {
+  for (const productData of products) {
     const product: Product = {
       name: productData["name"],
       image: productData["image"],
