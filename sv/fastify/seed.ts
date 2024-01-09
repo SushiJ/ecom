@@ -1,23 +1,23 @@
-import { MongoClient } from "mongodb";
 import { products, users } from "./initialData.js";
+import { MongoClient } from "mongodb";
 
 type Product = Omit<(typeof products)[0], "_id">;
 
 type User = (typeof users)[0];
 
-async function seedProducts() {
+async function _seedProducts() {
   const productsArr: Array<Product> = [];
   for (const productData of products) {
     const product: Product = {
-      name: productData.name,
-      image: productData.image,
-      price: productData.price,
-      brand: productData.brand,
-      rating: productData.rating,
-      category: productData.category,
-      description: productData.description,
-      countInStock: productData.countInStock,
-      numReviews: productData.numReviews,
+      name: productData["name"],
+      image: productData["image"],
+      price: productData["price"],
+      brand: productData["brand"],
+      rating: productData["rating"],
+      category: productData["category"],
+      description: productData["description"],
+      countInStock: productData["countInStock"],
+      numReviews: productData["numReviews"],
     };
     productsArr.push(product);
   }
@@ -27,6 +27,7 @@ const uri = "mongodb://mongo:mongo@localhost:27017/";
 const client = new MongoClient(uri);
 
 async function seedDB() {
+  // Connection URL
   await client.connect().catch((e) => console.error(e));
   console.log("Connected correctly to server");
 
@@ -40,10 +41,10 @@ async function seedDB() {
 
   for (const u of users) {
     const user: User = {
-      name: u.name,
-      password: u.password,
-      email: u.email,
-      isAdmin: u.isAdmin,
+      name: u["name"],
+      password: u["password"],
+      email: u["email"],
+      isAdmin: u["isAdmin"],
     };
     userArr.push(user);
   }
