@@ -1,9 +1,9 @@
-import Fastify from "fastify";
 import cors from "@fastify/cors";
+import Fastify from "fastify";
 
-import connect from "./utils/connection";
-import userRoutes from "./routes/user";
 import productRoutes from "./routes/product";
+import userRoutes from "./routes/user";
+import connect from "./utils/connection";
 
 const fastify = Fastify({
   logger: {
@@ -17,15 +17,24 @@ fastify.register(cors, {
   origin: "*",
 });
 
-fastify.get("/check", function (_req, reply) {
-  reply.send((reply.statusCode = 200));
+fastify.setErrorHandler((err, req, res) => {
+  req.log.error({ err }, err.message);
+  if (err.message) {
+    res.send({ status: res.statusCode, error: err.message.slice(7) });
+    return;
+  }
+  res.code(500).send({ status: 500, error: "Internal Server Error" });
 });
 
-fastify.register(userRoutes);
+fastify.get("/check", (_req, reply) => {
+  reply.statusCode = 200;
+  reply.send();
+});
+
+fastify.register(userRoutes, { prefix: "/users" });
 fastify.register(productRoutes, { prefix: "/products" });
 
-// TODO: Better Error handling
-fastify.listen({ port: 3000, host: "0.0.0.0" }, function (err, address) {
+fastify.listen({ port: 3000, host: "0.0.0.0" }, (err, address) => {
   if (err) {
     fastify.log.error(err);
     process.exit(1);
@@ -40,6 +49,7 @@ fastify.listen({ port: 3000, host: "0.0.0.0" }, function (err, address) {
     });
 });
 
+// biome-ignore lint/complexity/noForEach: <explanation>
 ["SIGINT", "SIGTERM"].forEach((signal) => {
   process.on(signal, async () => {
     await fastify.close();
