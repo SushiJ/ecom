@@ -1,4 +1,10 @@
-import { getModelForClass, prop, modelOptions } from "@typegoose/typegoose";
+import {
+  getModelForClass,
+  prop,
+  modelOptions,
+  DocumentType,
+} from "@typegoose/typegoose";
+import { matchPassword } from "../utils/pass";
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class User {
@@ -13,6 +19,10 @@ class User {
 
   @prop({ required: true, default: false })
   public isAdmin!: boolean;
+
+  public async matchPassword(this: DocumentType<User>, password: string) {
+    return matchPassword(this.password, password);
+  }
 }
 
 const userModel = getModelForClass(User);
