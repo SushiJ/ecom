@@ -4,7 +4,7 @@ import {
   modelOptions,
   DocumentType,
 } from "@typegoose/typegoose";
-import { matchPassword } from "../utils/pass";
+import { matchPassword, setPassword } from "../utils/pass";
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class User {
@@ -22,6 +22,10 @@ class User {
 
   public async matchPassword(this: DocumentType<User>, password: string) {
     return matchPassword(this.password, password);
+  }
+
+  public async hashPassword(this: DocumentType<User>, password: string) {
+    this.password = setPassword(password);
   }
 }
 

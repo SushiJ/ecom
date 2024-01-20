@@ -1,5 +1,8 @@
 import cors from "@fastify/cors";
 import Fastify from "fastify";
+import jwt from "@fastify/jwt";
+import cookie from "@fastify/cookie";
+import env from "@fastify/env";
 
 import productRoutes from "./routes/product";
 import userRoutes from "./routes/user";
@@ -10,6 +13,20 @@ const fastify = Fastify({
     transport: {
       target: "pino-pretty",
     },
+  },
+});
+
+fastify.register(env, {
+  dotenv: true,
+});
+
+fastify.register(cookie);
+
+fastify.register(jwt, {
+  secret: "supersecret",
+  sign: {
+    // TODO: Change this later
+    expiresIn: "30d",
   },
 });
 
@@ -27,8 +44,7 @@ fastify.setErrorHandler((err, req, res) => {
 });
 
 fastify.get("/check", (_req, reply) => {
-  reply.statusCode = 200;
-  reply.send();
+  return reply.status(200).send("OK");
 });
 
 fastify.register(userRoutes, { prefix: "/users" });
