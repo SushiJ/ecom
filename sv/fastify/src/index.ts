@@ -18,12 +18,16 @@ const fastify = Fastify({
 
 fastify.register(env, {
   dotenv: true,
+  schema: {},
 });
 
 fastify.register(cookie);
 
 fastify.register(jwt, {
   secret: "supersecret",
+  verify: {
+    extractToken: (request) => request.cookies.citrus,
+  },
   sign: {
     // TODO: Change this later
     expiresIn: "30d",
@@ -37,7 +41,7 @@ fastify.register(cors, {
 fastify.setErrorHandler((err, req, res) => {
   req.log.error({ err }, err.message);
   if (err.message) {
-    res.send({ status: res.statusCode, error: err.message.slice(7) });
+    res.send({ status: res.statusCode, error: err.message });
     return;
   }
   res.code(500).send({ status: 500, error: "Internal Server Error" });

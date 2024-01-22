@@ -5,13 +5,8 @@ import {
 } from "fastify";
 import userModel from "../models/User";
 
-export async function auth(
-  req: FastifyRequest<{
-    Body: {
-      email: string;
-      password: string;
-    };
-  }>,
+export async function protect(
+  req: FastifyRequest,
   rep: FastifyReply,
   done: DoneFuncWithErrOrRes,
 ) {
@@ -24,11 +19,13 @@ export async function auth(
   }
 
   try {
-    const decoded = await req.jwtVerify();
-    console.log("decoded:", decoded);
+    const decoded = await req.jwtDecode<{
+      userId: string;
+      iat: number;
+      exp: number;
+    }>();
 
-    const userId = decoded.toString();
-    console.log("User :", userId);
+    const { userId } = decoded;
 
     const user = await userModel.findById(userId).select("-password");
 
@@ -37,7 +34,6 @@ export async function auth(
       rep.status(401);
       throw new Error("User? Where");
     }
-
     req.user = user;
     done();
   } catch (e) {
@@ -47,12 +43,12 @@ export async function auth(
 }
 
 export function isAdmin(
-  request: FastifyRequest,
+  req: FastifyRequest,
   reply: FastifyReply,
   done: DoneFuncWithErrOrRes,
 ) {
   // @ts-expect-error no user or is not admin
-  if (!request.user || !request.user.isAdmin) {
+  if (!req.user || !req.user.isAdmin) {
     reply.status(401);
     throw new Error("Not Authorized");
   }
