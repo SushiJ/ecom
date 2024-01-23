@@ -3,30 +3,31 @@ import userModel from "../models/User";
 
 // biome-ignore lint/complexity/noStaticOnlyClass: <explanation>
 class User {
-  // TODO:
+  // TODO: Validation for request body thingy
   static async registerHandler(
     req: FastifyRequest<{
       Body: {
-        email: string;
         name: string;
+        email: string;
         password: string;
       };
     }>,
     reply: FastifyReply,
   ) {
+    const { name, email, password } = req.body;
+    const userExists = await userModel.findOne({ email }).select("-password");
+
+    if (userExists) {
+      reply.status(409);
+      throw new Error("User already exists");
+    }
+
     try {
-      const { name, email } = req.body;
-      const userExists = await User.getUserByEmail(email);
-
-      if (userExists) {
-        reply.status(400);
-        throw new Error("User already exists");
-      }
-
-      await userModel.create({ name, email });
+      await userModel.create({ name, email, password });
+      reply.status(201);
     } catch (e) {
       console.log(e);
-      reply.status(500).send("Internal server Error");
+      throw new Error();
     }
   }
 
@@ -44,7 +45,7 @@ class User {
 
       const user = await User.getUserByEmail(email);
 
-      if (!user || (await user.matchPassword(password))) {
+      if (!user || !user.passwordMatch(password)) {
         reply.status(401);
         throw new Error("Invalid credentials");
       }
@@ -53,7 +54,7 @@ class User {
         userId: user._id,
       });
 
-      return reply
+      reply
         .setCookie("citrus", token, {
           httpOnly: true,
           path: "/",
@@ -68,13 +69,24 @@ class User {
           email: user.email,
           isAdmin: user.isAdmin,
         });
+      return reply;
     } catch (e) {
+      console.log(e);
       throw new Error(e as string);
     }
   }
 
   static async logoutHandler(_req: FastifyRequest, reply: FastifyReply) {
-    reply.status(200);
+    reply
+      .setCookie("citrus", "", {
+        httpOnly: true,
+        path: "/",
+        sameSite: true,
+        maxAge: 0,
+      })
+      .status(200)
+      .send();
+    return reply;
   }
 
   static async getInfoHandler(req: FastifyRequest, reply: FastifyReply) {
@@ -102,16 +114,18 @@ class User {
   static async a_getUserById(req: FastifyRequest, reply: FastifyReply) {
     const { id } = req.params as { id: string };
     try {
-      const user = await userModel.findById({
-        id,
-      });
+      const user = await userModel
+        .findById({
+          id,
+        })
+        .select("-password");
 
       if (!user) {
         reply.status(400).send("Not Found");
         return reply;
       }
 
-      return reply.status(200).send(user);
+      return reply.status(200).send({ status: 200, data: user });
     } catch (e) {
       console.log(e);
       throw new Error("IDK YET");

@@ -3,9 +3,21 @@ import {
   prop,
   modelOptions,
   DocumentType,
+  pre,
 } from "@typegoose/typegoose";
 import { matchPassword, setPassword } from "../utils/pass";
 
+@pre<User>("save", async function () {
+  if (!this.isModified("password")) {
+    return;
+  }
+
+  const hash = setPassword(this.password);
+
+  this.password = hash;
+
+  return;
+})
 @modelOptions({ schemaOptions: { timestamps: true } })
 class User {
   @prop({ required: true })
@@ -20,12 +32,9 @@ class User {
   @prop({ required: true, default: false })
   public isAdmin!: boolean;
 
-  public async matchPassword(this: DocumentType<User>, password: string) {
-    return matchPassword(this.password, password);
-  }
-
-  public async hashPassword(this: DocumentType<User>, password: string) {
-    this.password = setPassword(password);
+  public passwordMatch(this: DocumentType<User>, password: string) {
+    const bool = matchPassword(this.password, password);
+    return bool;
   }
 }
 
