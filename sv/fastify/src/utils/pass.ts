@@ -1,6 +1,7 @@
 import crypto from "crypto";
 
-const salt = crypto.randomBytes(16).toString("hex");
+const salt = "ThisisSalt";
+
 export const setPassword = (password: string) => {
   const hash = crypto
     .pbkdf2Sync(password, salt, 1000, 64, "sha256")

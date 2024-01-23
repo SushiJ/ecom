@@ -1,8 +1,8 @@
-import cors from "@fastify/cors";
-import Fastify from "fastify";
-import jwt from "@fastify/jwt";
 import cookie from "@fastify/cookie";
+import cors from "@fastify/cors";
 import env from "@fastify/env";
+import jwt from "@fastify/jwt";
+import Fastify from "fastify";
 
 import productRoutes from "./routes/product";
 import userRoutes from "./routes/user";
@@ -40,11 +40,11 @@ fastify.register(cors, {
 
 fastify.setErrorHandler((err, req, res) => {
   req.log.error({ err }, err.message);
-  if (err.message) {
-    res.send({ status: res.statusCode, error: err.message });
-    return;
+  if (!err.message) {
+    res.status(500).send({ status: 500, error: "Internal Server Error" });
   }
-  res.code(500).send({ status: 500, error: "Internal Server Error" });
+  res.send({ status: res.statusCode, error: err.message });
+  return res;
 });
 
 fastify.get("/check", (_req, reply) => {
