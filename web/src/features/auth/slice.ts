@@ -1,9 +1,13 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { getLocalStorage } from "../../lib/localStorage";
-import { RootState } from "../../store";
 
 type initialState = {
-  userInfo: Record<string, string>;
+  userInfo: {
+    _id: string;
+    name: string;
+    email: string;
+    isAdmin: boolean;
+  };
 };
 
 const initialState: initialState = {
@@ -11,7 +15,10 @@ const initialState: initialState = {
 };
 
 type ActionType = {
-  userInfo: Record<string, string>;
+  _id: string;
+  name: string;
+  email: string;
+  isAdmin: boolean;
 };
 
 const authSlice = createSlice({
@@ -24,8 +31,6 @@ const authSlice = createSlice({
     },
   },
 });
-
-export const selectUserInfo = (state: RootState) => state.auth.userInfo;
 
 export const { setCredentials } = authSlice.actions;
 

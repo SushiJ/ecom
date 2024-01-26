@@ -1,31 +1,31 @@
+import {
+  LoginData,
+  Register,
+  loginMutationResponse,
+} from "../../types/user.ts";
 import { api } from "../api.ts";
-
-type LoginData = {
-  password: string;
-  email: string;
-};
-
-type Register = LoginData & {
-  name: string;
-};
 
 export const userApiSlice = api.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation({
-      query: (data: LoginData) => ({
+    login: builder.mutation<loginMutationResponse, LoginData>({
+      query: (data) => ({
         url: "users/login",
         method: "POST",
         body: data,
       }),
     }),
-    register: builder.mutation({
-      query: (data: Register) => ({
+    register: builder.mutation<void, Register>({
+      query: (data) => ({
         url: "users",
         method: "POST",
         body: data,
       }),
+      // TODO: Error response types
+
+      // transformErrorResponse: (response: Error) =>
+      //   response.error,
     }),
-    logout: builder.mutation({
+    logout: builder.mutation<void, void>({
       query: () => ({
         url: "users/logout",
         method: "POST",

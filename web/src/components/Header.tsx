@@ -35,11 +35,11 @@ export function Header() {
                 )}
               </Link>
               <Link
-                to="/signin"
+                to="/login"
                 className="d-flex align-items-center text-white text-decoration-none"
               >
                 <Icon icon="fluent:person-12-regular" width="24" height="24" />
-                Sign in
+                log in
               </Link>
             </Nav>
           </Navbar.Collapse>
