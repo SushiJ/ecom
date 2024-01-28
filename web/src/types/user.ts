@@ -1,4 +1,4 @@
-export type loginMutationResponse = {
+export type LoginMutationResponse = {
   _id: string;
   name: string;
   email: string;
