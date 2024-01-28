@@ -1,13 +1,13 @@
 import {
   LoginData,
   Register,
-  loginMutationResponse,
+  LoginMutationResponse,
 } from "../../types/user.ts";
 import { api } from "../api.ts";
 
 export const userApiSlice = api.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<loginMutationResponse, LoginData>({
+    login: builder.mutation<LoginMutationResponse, LoginData>({
       query: (data) => ({
         url: "users/login",
         method: "POST",

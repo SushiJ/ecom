@@ -1,10 +1,10 @@
 export function getLocalStorage(key: string) {
   const value = localStorage.getItem(key);
-  let cartItems = null;
-  if (!value) return cartItems;
+  let item = null;
+  if (!value) return item;
   try {
-    cartItems = JSON.parse(value);
-    return cartItems;
+    item = JSON.parse(value);
+    return item;
   } catch (e) {
     console.error(e);
     return null;
