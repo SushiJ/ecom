@@ -6,6 +6,7 @@ import { useAppSelector } from "../hooks/redux";
 
 export function Header() {
   const totalItems = useAppSelector((state) => state.cart.products.length);
+  const { userInfo } = useAppSelector((state) => state.auth);
   return (
     <header>
       <Navbar bg="primary" variant="dark" expand="md" collapseOnSelect>
@@ -34,13 +35,27 @@ export function Header() {
                   </Badge>
                 )}
               </Link>
-              <Link
-                to="/login"
-                className="d-flex align-items-center text-white text-decoration-none"
-              >
-                <Icon icon="fluent:person-12-regular" width="24" height="24" />
-                log in
-              </Link>
+              {userInfo ? (
+                <Link
+                  to="/profile"
+                  className="d-flex align-items-center text-white text-decoration-none"
+                >
+                  <Icon
+                    icon="fluent:person-12-regular"
+                    width="24"
+                    height="24"
+                  />
+                  profile
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  className="d-flex align-items-center text-white text-decoration-none"
+                >
+                  <Icon icon="uil:signin" width="22" height="22" />
+                  sign in / sign up
+                </Link>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>
