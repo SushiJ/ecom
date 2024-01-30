@@ -1,12 +1,38 @@
-import { Link } from "react-router-dom";
-import { Navbar, Nav, Container, Badge } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { Navbar, Nav, Container, Badge, NavDropdown } from "react-bootstrap";
 import { Icon } from "@iconify/react";
+import { toast } from "react-toastify";
 
-import { useAppSelector } from "../hooks/redux";
+import { useAppDispatch, useAppSelector } from "../hooks/redux";
+import { useLogoutMutation } from "../features/user/slice";
+import { resetCreds } from "../features/auth/slice";
+import { resetCart } from "../features/cart/slice";
 
 export function Header() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const totalItems = useAppSelector((state) => state.cart.products.length);
   const { userInfo } = useAppSelector((state) => state.auth);
+
+  const [logout] = useLogoutMutation();
+
+  async function handleLogout() {
+    try {
+      await logout().unwrap();
+      dispatch(resetCreds());
+      dispatch(resetCart());
+      navigate("/login");
+    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      console.log(e as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      toast(e as any, {
+        type: "error",
+      });
+    }
+  }
+
   return (
     <header>
       <Navbar bg="primary" variant="dark" expand="md" collapseOnSelect>
@@ -35,18 +61,25 @@ export function Header() {
                   </Badge>
                 )}
               </Link>
-              {userInfo ? (
-                <Link
-                  to="/profile"
-                  className="d-flex align-items-center text-white text-decoration-none"
-                >
-                  <Icon
-                    icon="fluent:person-12-regular"
-                    width="24"
-                    height="24"
-                  />
-                  profile
-                </Link>
+              {/* INFO: There's a bug where the menu is still after the user logs out, checking for name property fixes it */}
+              {userInfo && userInfo.name ? (
+                <NavDropdown title={userInfo.name} id="username">
+                  <NavDropdown.Item onClick={() => navigate("/profile")}>
+                    Profile
+                  </NavDropdown.Item>
+                  <NavDropdown.Item
+                    as="button"
+                    onClick={() =>
+                      handleLogout().then(() =>
+                        navigate("/login", {
+                          replace: true,
+                        }),
+                      )
+                    }
+                  >
+                    Logout
+                  </NavDropdown.Item>
+                </NavDropdown>
               ) : (
                 <Link
                   to="/login"
@@ -55,6 +88,25 @@ export function Header() {
                   <Icon icon="uil:signin" width="22" height="22" />
                   sign in / sign up
                 </Link>
+              )}
+
+              {/* Admin Links */}
+              {userInfo && userInfo.isAdmin && (
+                <NavDropdown title="Admin" id="adminmenu">
+                  <NavDropdown.Item
+                    onClick={() => navigate("/admin/productlist")}
+                  >
+                    Products
+                  </NavDropdown.Item>
+                  <NavDropdown.Item
+                    onClick={() => navigate("/admin/orderlist")}
+                  >
+                    Orders
+                  </NavDropdown.Item>
+                  <NavDropdown.Item onClick={() => navigate("/admin/userlist")}>
+                    Users
+                  </NavDropdown.Item>
+                </NavDropdown>
               )}
             </Nav>
           </Navbar.Collapse>

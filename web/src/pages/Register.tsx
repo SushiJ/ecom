@@ -43,6 +43,7 @@ const Register = () => {
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -51,6 +52,7 @@ const Register = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
     setFocus,
   } = useForm({
@@ -64,6 +66,13 @@ const Register = () => {
   }, [setFocus]);
 
   const onSubmit = async (values: typeof initialState) => {
+    if (values.password !== values.confirmPassword) {
+      setError("confirmPassword", {
+        message: "Password do not match",
+        type: "onBlur",
+      });
+      return;
+    }
     try {
       await registerMutation({
         name: values.name,
@@ -129,6 +138,22 @@ const Register = () => {
               )}
             </Form.Group>
 
+            <Form.Group className="my-2" controlId="confirm">
+              <Form.Label>Confirm Password</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Enter password..."
+                {...register("confirmPassword", {
+                  required: "password is required",
+                })}
+              ></Form.Control>
+              {errors.confirmPassword && (
+                <Form.Text className="text-danger">
+                  {errors.confirmPassword.message}
+                </Form.Text>
+              )}
+            </Form.Group>
+
             <Button disabled={isLoading} type="submit" variant="primary">
               Sign up
             </Button>
@@ -139,7 +164,7 @@ const Register = () => {
           <Col>
             Already have an account?
             <Link to="/login" className="ms-1">
-              sign in
+              Sign in
             </Link>
           </Col>
         </Row>
