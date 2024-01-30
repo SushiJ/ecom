@@ -5,7 +5,7 @@ import { isAdmin, protect } from "../utils/auth";
 async function userRoutes(fastify: FastifyInstance) {
   //TODO: Add schema validation
   fastify.post("/login", User.loginHandler);
-  fastify.get("/logout", User.logoutHandler);
+  fastify.post("/logout", User.logoutHandler);
 
   fastify
     .get("/profile", { onRequest: protect }, User.getInfoHandler)
