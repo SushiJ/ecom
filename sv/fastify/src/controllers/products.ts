@@ -2,7 +2,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { productModel } from "../models/Product";
 
 class Product {
-  static async getProducts(_req: FastifyRequest, reply: FastifyReply) {
+  async getProducts(_req: FastifyRequest, reply: FastifyReply) {
     try {
       const products = await productModel.find();
       if (!products) reply.status(200).send([]);
@@ -12,7 +12,7 @@ class Product {
     }
   }
 
-  static async getProductsById(
+  async getProductsById(
     req: FastifyRequest<{
       Params: {
         id: string;

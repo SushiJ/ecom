@@ -2,26 +2,27 @@ import { type FastifyInstance } from "fastify";
 import User from "../controllers/user";
 import { isAdmin, protect } from "../utils/auth";
 
+const user = new User();
 async function userRoutes(fastify: FastifyInstance) {
   //TODO: Add schema validation
-  fastify.post("/login", User.loginHandler);
-  fastify.post("/logout", User.logoutHandler);
+  fastify.post("/login", user.loginHandler);
+  fastify.post("/logout", user.logoutHandler);
 
   fastify
-    .get("/profile", { onRequest: protect }, User.getInfoHandler)
-    .put("/profile", { preHandler: protect }, User.updateInfoHandler);
+    .get("/profile", { onRequest: protect }, user.getInfoHandler)
+    .put("/profile", { preHandler: protect }, user.updateInfoHandler);
 
   fastify
-    .post("/", User.registerHandler)
-    .get("/", { onRequest: [protect, isAdmin] }, User.a_getAllUsers);
+    .post("/", user.registerHandler)
+    .get("/", { onRequest: [protect, isAdmin] }, user.a_getAllUsers);
   fastify
-    .get("/:id", { onRequest: [protect, isAdmin] }, User.a_getUserById)
+    .get("/:id", { onRequest: [protect, isAdmin] }, user.a_getUserById)
     .put(
       "/:id",
       { onRequest: [protect, isAdmin] },
-      User.a_updateUserInfoHandler,
+      user.a_updateUserInfoHandler,
     )
-    .delete("/:id", { onRequest: [protect, isAdmin] }, User.a_deleteUser);
+    .delete("/:id", { onRequest: [protect, isAdmin] }, user.a_deleteUser);
 
   fastify.log.info("User routes registered");
 }

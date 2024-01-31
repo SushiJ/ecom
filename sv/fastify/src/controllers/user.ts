@@ -4,7 +4,7 @@ import userModel from "../models/User";
 // biome-ignore lint/complexity/noStaticOnlyClass: <explanation>
 class User {
   // TODO: Validation for request body thingy
-  static async registerHandler(
+  async registerHandler(
     req: FastifyRequest<{
       Body: {
         name: string;
@@ -31,7 +31,7 @@ class User {
     }
   }
 
-  static async loginHandler(
+  async loginHandler(
     req: FastifyRequest<{
       Body: {
         email: string;
@@ -76,7 +76,7 @@ class User {
     }
   }
 
-  static async logoutHandler(_req: FastifyRequest, reply: FastifyReply) {
+  async logoutHandler(_req: FastifyRequest, reply: FastifyReply) {
     reply
       .setCookie("citrus", "", {
         httpOnly: true,
@@ -89,12 +89,12 @@ class User {
     return reply;
   }
 
-  static async getInfoHandler(req: FastifyRequest, reply: FastifyReply) {
+  async getInfoHandler(req: FastifyRequest, reply: FastifyReply) {
     const user = req.user;
     return reply.status(200).send(user);
   }
 
-  static async updateInfoHandler(_req: FastifyRequest, reply: FastifyReply) {
+  async updateInfoHandler(_req: FastifyRequest, reply: FastifyReply) {
     reply.status(200);
   }
 
@@ -104,14 +104,14 @@ class User {
   }
 
   // Admin actions
-  static async a_getAllUsers(_req: FastifyRequest, reply: FastifyReply) {
+  async a_getAllUsers(_req: FastifyRequest, reply: FastifyReply) {
     const users = await userModel.find();
     reply.status(200).send(users);
     return reply;
   }
 
   // FIXME: This "as" business IDK But it works for now
-  static async a_getUserById(req: FastifyRequest, reply: FastifyReply) {
+  async a_getUserById(req: FastifyRequest, reply: FastifyReply) {
     const { id } = req.params as { id: string };
     try {
       const user = await userModel
@@ -132,15 +132,12 @@ class User {
     }
   }
 
-  static async a_deleteUser(_req: FastifyRequest, reply: FastifyReply) {
+  async a_deleteUser(_req: FastifyRequest, reply: FastifyReply) {
     reply.status(200);
     return reply;
   }
 
-  static async a_updateUserInfoHandler(
-    _req: FastifyRequest,
-    reply: FastifyReply,
-  ) {
+  async a_updateUserInfoHandler(_req: FastifyRequest, reply: FastifyReply) {
     reply.status(200);
     return;
   }
