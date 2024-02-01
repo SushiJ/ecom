@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { Form, Button, Row, Col, Container } from "react-bootstrap";
+import { Form, Button, Row, Col } from "react-bootstrap";
 
 import { useAppDispatch } from "../hooks/redux";
 import { useAppSelector } from "../hooks/redux";
@@ -9,18 +9,7 @@ import { useLoginMutation } from "../features/user/slice";
 import { setCredentials } from "../features/auth/slice";
 import { toast } from "react-toastify";
 import Loader from "../components/Loader";
-
-const FormContainer = ({ children }: { children: JSX.Element }) => {
-  return (
-    <Container>
-      <Row className="justify-content-md-center">
-        <Col xs={12} md={6}>
-          {children}
-        </Col>
-      </Row>
-    </Container>
-  );
-};
+import FormContainer from "../components/FormContainer";
 
 const Login = () => {
   const dispatch = useAppDispatch();

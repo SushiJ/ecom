@@ -5,9 +5,16 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../store";
 import { Product } from "../../types";
 
-type ActionType = {
+type AddToCart = {
   data: Product;
   quantity: number;
+};
+
+type ShippingAddress = {
+  address: string;
+  city: string;
+  postalCode: string;
+  country: string;
 };
 
 type InitialState = {
@@ -16,21 +23,27 @@ type InitialState = {
     quantity: number;
   }>;
   totalAmount: number;
-  shippingAddres: object;
+  shippingAddress: ShippingAddress;
   paymentMethod: string;
 };
 
 const cartItems = getLocalStorage("cart");
 
+// TODO: add more payment providers
 const initialState: InitialState = cartItems
   ? cartItems
-  : { products: [], totalAmount: 0, shippingAddres: {}, paymentMethod: "" };
+  : {
+      products: [],
+      totalAmount: 0,
+      shippingAddress: {},
+      paymentMethod: "PayPal",
+    };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    addToCart: (state, action: PayloadAction<ActionType>) => {
+    addToCart: (state, action: PayloadAction<AddToCart>) => {
       const newProduct = action.payload;
 
       const existingProduct = state.products.find(
@@ -69,11 +82,16 @@ const cartSlice = createSlice({
       state.totalAmount = 0;
       (state.paymentMethod = ""), (state.shippingAddres = {});
     },
+    saveShippingAddress: (state, action: PayloadAction<ShippingAddress>) => {
+      state.shippingAddress = action.payload;
+      localStorage.setItem("cart", JSON.stringify(state));
+    },
   },
 });
 
 export const selectCartItems = (state: RootState) => state.cart.products;
 
-export const { addToCart, removeFromCart, resetCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, resetCart, saveShippingAddress } =
+  cartSlice.actions;
 
 export default cartSlice.reducer;

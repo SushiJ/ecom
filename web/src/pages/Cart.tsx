@@ -48,7 +48,7 @@ export default function CartPage() {
                     />
                   </Col>
                   <Col md="3">
-                    <Link to={`/product/${product._id}`}>{product.name}</Link>
+                    <Link to={`/products/${product._id}`}>{product.name}</Link>
                   </Col>
                   <Col md="2">
                     <p>${product.price}</p>
@@ -96,13 +96,13 @@ export default function CartPage() {
               {totalAmount.toFixed(2)}
             </ListGroup.Item>
             <ListGroup.Item>
-              <Button
-                type="button"
-                className="btn-block"
+              <Link
+                to="/shipping"
                 disabled={products.length === 0}
+                className="btn btn-outline-primary"
               >
                 Proceed to Checkout
-              </Button>
+              </Link>
             </ListGroup.Item>
           </ListGroup>
         </Card>
