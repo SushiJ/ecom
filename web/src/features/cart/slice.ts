@@ -16,13 +16,15 @@ type InitialState = {
     quantity: number;
   }>;
   totalAmount: number;
+  shippingAddres: object;
+  paymentMethod: string;
 };
 
 const cartItems = getLocalStorage("cart");
 
 const initialState: InitialState = cartItems
   ? cartItems
-  : { products: [], totalAmount: 0 };
+  : { products: [], totalAmount: 0, shippingAddres: {}, paymentMethod: "" };
 
 const cartSlice = createSlice({
   name: "cart",
@@ -41,22 +43,31 @@ const cartSlice = createSlice({
           quantity: newProduct.quantity,
         });
         state.totalAmount += newProduct.data.price * newProduct.quantity;
+        localStorage.setItem("cart", JSON.stringify(state));
         return;
       }
 
       existingProduct.quantity += newProduct.quantity;
       state.totalAmount += existingProduct.product.price * newProduct.quantity;
+      localStorage.setItem("cart", JSON.stringify(state));
     },
     // TODO: Ability to remove products 1 by 1;
     removeFromCart: (state, action: PayloadAction<Product>) => {
       const product = action.payload;
-      state.products = state.products.filter(
-        (p) => p.product._id !== product._id,
-      );
+      let productQuantity: number | null = null;
+      state.products = state.products.filter((p) => {
+        productQuantity = p.quantity;
+        return p.product._id !== product._id;
+      });
+      if (productQuantity) {
+        state.totalAmount -= product.price * productQuantity;
+        localStorage.setItem("cart", JSON.stringify(state));
+      }
     },
     resetCart: (state) => {
       state.products = [];
       state.totalAmount = 0;
+      (state.paymentMethod = ""), (state.shippingAddres = {});
     },
   },
 });
