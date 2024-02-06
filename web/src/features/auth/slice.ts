@@ -30,7 +30,12 @@ const authSlice = createSlice({
       localStorage.setItem("user", JSON.stringify(action.payload));
     },
     resetCreds: (state) => {
-      state.userInfo = {};
+      state.userInfo = {
+        isAdmin: false,
+        _id: "",
+        name: "",
+        email: "",
+      };
       localStorage.setItem("user", "");
     },
   },

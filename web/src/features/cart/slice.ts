@@ -27,6 +27,12 @@ type InitialState = {
   paymentMethod: string;
 };
 
+// TODO: need different way than an enum
+enum PaymentEnum {
+  PAYPAL = "paypal",
+  RAZORPAY = "razorpay",
+}
+
 const cartItems = getLocalStorage("cart");
 
 // TODO: add more payment providers
@@ -80,10 +86,20 @@ const cartSlice = createSlice({
     resetCart: (state) => {
       state.products = [];
       state.totalAmount = 0;
-      (state.paymentMethod = ""), (state.shippingAddres = {});
+      state.shippingAddress = {
+        city: "",
+        address: "",
+        country: "",
+        postalCode: "",
+      };
+      localStorage.setItem("cart", "");
     },
     saveShippingAddress: (state, action: PayloadAction<ShippingAddress>) => {
       state.shippingAddress = action.payload;
+      localStorage.setItem("cart", JSON.stringify(state));
+    },
+    savePaymentMethod: (state, action: PayloadAction<PaymentEnum>) => {
+      state.paymentMethod = action.payload;
       localStorage.setItem("cart", JSON.stringify(state));
     },
   },
@@ -91,7 +107,12 @@ const cartSlice = createSlice({
 
 export const selectCartItems = (state: RootState) => state.cart.products;
 
-export const { addToCart, removeFromCart, resetCart, saveShippingAddress } =
-  cartSlice.actions;
+export const {
+  addToCart,
+  removeFromCart,
+  resetCart,
+  saveShippingAddress,
+  savePaymentMethod,
+} = cartSlice.actions;
 
 export default cartSlice.reducer;
