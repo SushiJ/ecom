@@ -61,35 +61,6 @@ export function Header() {
                   </Badge>
                 )}
               </Link>
-              {/* INFO: There's a bug where the menu is still after the user logs out, checking for name property fixes it */}
-              {userInfo && userInfo.name ? (
-                <NavDropdown title={userInfo.name} id="username">
-                  <NavDropdown.Item onClick={() => navigate("/profile")}>
-                    Profile
-                  </NavDropdown.Item>
-                  <NavDropdown.Item
-                    as="button"
-                    onClick={() =>
-                      handleLogout().then(() =>
-                        navigate("/login", {
-                          replace: true,
-                        }),
-                      )
-                    }
-                  >
-                    Logout
-                  </NavDropdown.Item>
-                </NavDropdown>
-              ) : (
-                <Link
-                  to="/login"
-                  className="d-flex align-items-center text-white text-decoration-none"
-                >
-                  <Icon icon="uil:signin" width="22" height="22" />
-                  sign in / sign up
-                </Link>
-              )}
-
               {/* Admin Links */}
               {userInfo && userInfo.isAdmin && (
                 <NavDropdown title="Admin" id="adminmenu">
@@ -107,6 +78,25 @@ export function Header() {
                     Users
                   </NavDropdown.Item>
                 </NavDropdown>
+              )}
+              {/* INFO: There's a bug where the menu is still after the user logs out, checking for name property fixes it */}
+              {userInfo && userInfo.name ? (
+                <NavDropdown title={userInfo.name} id="username">
+                  <NavDropdown.Item onClick={() => navigate("/profile")}>
+                    Profile
+                  </NavDropdown.Item>
+                  <NavDropdown.Item as="button" onClick={handleLogout}>
+                    Logout
+                  </NavDropdown.Item>
+                </NavDropdown>
+              ) : (
+                <Link
+                  to="/login"
+                  className="d-flex align-items-center text-white text-decoration-none"
+                >
+                  <Icon icon="uil:signin" width="22" height="22" />
+                  sign in / sign up
+                </Link>
               )}
             </Nav>
           </Navbar.Collapse>

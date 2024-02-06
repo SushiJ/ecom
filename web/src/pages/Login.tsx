@@ -25,35 +25,30 @@ const Login = () => {
   const redirect = sp.get("redirect") || "/";
 
   useEffect(() => {
-    if (userInfo) {
+    if (userInfo && userInfo.name) {
       navigate(redirect);
     }
   }, [navigate, redirect, userInfo]);
 
-  const initialState = {
-    email: "",
-    password: "",
+  type FormValues = {
+    email: string;
+    password: string;
   };
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [initialValues, _] = useState(initialState);
-
   const {
     register,
     handleSubmit,
     formState: { errors },
     setFocus,
-  } = useForm({
+  } = useForm<FormValues>({
     mode: "onSubmit",
     reValidateMode: "onSubmit",
-    defaultValues: initialValues,
   });
 
   useEffect(() => {
     setFocus("email");
   }, [setFocus]);
 
-  const onSubmit = async (values: typeof initialState) => {
+  const onSubmit = async (values: FormValues) => {
     try {
       const res = await login({
         email: values.email,
