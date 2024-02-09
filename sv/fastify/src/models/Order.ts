@@ -5,8 +5,8 @@ import {
   modelOptions,
   Ref,
 } from "@typegoose/typegoose";
-import User from "../controllers/user";
-import Product from "../controllers/products";
+import { User } from "./User";
+import { Product } from "./Product";
 
 class OrderItems {
   @prop({ required: true })
@@ -86,6 +86,4 @@ class Order {
   public deliveredAt?: Date;
 }
 
-const orderModel = getModelForClass(Order);
-
-export default orderModel;
+export const orderModel = getModelForClass(Order);

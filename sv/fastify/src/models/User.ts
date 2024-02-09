@@ -19,7 +19,7 @@ import { matchPassword, setPassword } from "../utils/pass";
   return;
 })
 @modelOptions({ schemaOptions: { timestamps: true } })
-class User {
+export class User {
   @prop({ required: true })
   public name!: string;
 
