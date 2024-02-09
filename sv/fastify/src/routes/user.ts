@@ -2,8 +2,8 @@ import { type FastifyInstance } from "fastify";
 import User from "../controllers/user";
 import { isAdmin, protect } from "../utils/auth";
 
-const user = new User();
 async function userRoutes(fastify: FastifyInstance) {
+  const user = new User();
   //TODO: Add schema validation
   fastify.post("/login", user.loginHandler);
   fastify.post("/logout", user.logoutHandler);
