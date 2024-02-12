@@ -71,7 +71,7 @@ class Order {
   public shippingPrice!: number;
 
   @prop({ required: true, default: 0 })
-  public totalPrice!: number;
+  public totalAmount!: number;
 
   @prop({ required: true, default: false })
   public isPaid!: boolean;

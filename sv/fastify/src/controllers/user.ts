@@ -105,7 +105,7 @@ class User {
 
   // Admin actions
   async a_getAllUsers(_req: FastifyRequest, reply: FastifyReply) {
-    const users = await userModel.find();
+    const users = await userModel.find().select("-password");
     reply.status(200).send(users);
     return reply;
   }
