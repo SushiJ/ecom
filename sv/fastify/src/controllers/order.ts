@@ -1,11 +1,32 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { orderModel } from "../models/Order";
+// import { productModel } from "../models/Product";
+
+type Product = {
+  _id: string;
+  name: string;
+  image: string;
+  description: string;
+  brand: string;
+  category: string;
+  price: number;
+  countInStock: number;
+  rating: number;
+  numReviews: number;
+};
+
+type OrderItems = {
+  products: Array<{
+    product: Product;
+    quantity: number;
+  }>;
+};
 
 class Order {
   async addOrderItems(request: FastifyRequest, reply: FastifyReply) {
     // TODO: seek better type, body as {} ???
     const { orderItems, shippingAddress, paymentMethod } = request.body as {
-      orderItems: Array<string>;
+      orderItems: Array<OrderItems>;
       shippingAddress: string;
       paymentMethod: string;
     };
@@ -25,46 +46,100 @@ class Order {
       shippingAddress,
       paymentMethod,
     });
-  }
-  // get the ordered items from our database
-  // const itemsFromDB = await productModel.find({
-  //   _id: { $in: orderItems.map((x) => x._id) },
-  // });
-  //
-  // // map over the order items and use the price from our items from database
-  // const dbOrderItems = orderItems.map((itemFromClient) => {
-  //   const matchingItemFromDB = itemsFromDB.find(
-  //     (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id,
-  //   );
-  //   return {
-  //     ...itemFromClient,
-  //     product: itemFromClient._id,
-  //     price: matchingItemFromDB.price,
-  //     _id: undefined,
-  //   };
-  // });
+    // orderItems: cart.cartItems,
+    // shippingAddress: cart.shippingAddress,
+    // paymentMethod: cart.paymentMethod,
+    // itemsPrice: cart.itemsPrice,
+    // shippingPrice: cart.shippingPrice,
+    // taxPrice: cart.taxPrice,
+    // totalAmount: cart.totalPrice,
+    //
+    // products: [],
+    // totalAmount: 0,
+    // shippingAddress: {},
+    // paymentMethod: "PayPal",
+    // };
 
-  // calculate prices
-  // const { itemsPrice, taxPrice, shippingPrice, totalPrice } =
-  //   calcPrices(dbOrderItems);
+    // const createdOrder = await order.save();
+    //
+    // reply.status(201).send(createdOrder);
+
+    // get the ordered items from our database
+    // const orderedItemsFromDb = await productModel.find({
+    //   _id: { $in: orderItems.map((x) => x._id) },
+    // });
+    //
+    // const user = request.user as {
+    //   _id: string;
+    // };
+
+    // map over the order items and use the price from our items from database
+    // const dbOrderItems = orderItems.map((itemFromClient) => {
+    //   const matchingItemFromDB = itemsFromDB.find(
+    //     (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id,
+    //   );
+    //
+    //   return {
+    //     ...itemFromClient,
+    //     product: itemFromClient._id,
+    //     price: matchingItemFromDB!.price,
+    //     _id: undefined,
+    //   };
+    // });
+
+    // const { itemsPrice, taxPrice, shippingPrice, totalPrice } =
+    //   calcPrices(dbOrderItems);
+
+    // const createdOrder = new orderModel({
+    //   orderItems: orderedItemsFromDb,
+    //   user: user._id,
+    //   shippingAddress,
+    //   paymentMethod,
+    //   itemsPrice,
+    //   taxPrice,
+    //   shippingPrice,
+    //   totalPrice,
+    // });
+  }
+
+  // static toFixedDecimal(item: number) {
+  //   return (Math.round(item * 100) / 100).toFixed(2);
+  // }
   //
-  // const order = new Order({
-  //   orderItems: dbOrderItems,
-  //   user: req.user._id,
-  //   shippingAddress,
-  //   paymentMethod,
-  //   itemsPrice,
-  //   taxPrice,
-  //   shippingPrice,
-  //   totalPrice,
-  // });
+  // static calcPrices(orderItems: Array<OrderItems>) {
+  //   // Calculate the items price in whole number (pennies) to avoid issues with
+  //   // floating point number calculations
+  //   const itemsPrice = orderItems.reduce(
+  //     (acc, item) => acc + (item.price * 100 * item.qty) / 100,
+  //     0,
+  //   );
   //
-  // const createdOrder = await order.save();
+  //   // Calculate the shipping price
+  //   const shippingPrice = itemsPrice > 100 ? 0 : 10;
   //
-  // reply.status(201).send(createdOrder);
+  //   // Calculate the tax price
+  //   const taxPrice = 0.15 * itemsPrice;
+  //
+  //   // Calculate the total price
+  //   const totalPrice = itemsPrice + shippingPrice + taxPrice;
+  //
+  //   // return prices as strings fixed to 2 decimal places
+  //   return {
+  //     itemsPrice: Order.toFixedDecimal(itemsPrice),
+  //     shippingPrice: Order.toFixedDecimal(shippingPrice),
+  //     taxPrice: Order.toFixedDecimal(taxPrice),
+  //     totalPrice: Order.toFixedDecimal(totalPrice),
+  //   };
+  // }
 
   async getMyOrders(req: FastifyRequest, reply: FastifyReply) {
-    const orders = await orderModel.find({ user: req.user._id });
+    const user = req.user as {
+      _id: string;
+      name: string;
+      email: string;
+      isAdmin: boolean;
+    };
+    const orders = await orderModel.find({ user: user._id });
     reply.send(orders);
   }
 

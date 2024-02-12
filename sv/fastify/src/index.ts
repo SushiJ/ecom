@@ -7,6 +7,7 @@ import Fastify from "fastify";
 import productRoutes from "./routes/product";
 import userRoutes from "./routes/user";
 import connect from "./utils/connection";
+import orderRoutes from "./routes/order";
 
 const fastify = Fastify({
   logger: {
@@ -53,6 +54,7 @@ fastify.get("/check", (_req, reply) => {
 
 fastify.register(userRoutes, { prefix: "/users" });
 fastify.register(productRoutes, { prefix: "/products" });
+fastify.register(orderRoutes, { prefix: "/orders" });
 
 fastify.listen({ port: 3000, host: "0.0.0.0" }, (err, address) => {
   if (err) {
