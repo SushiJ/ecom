@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { orderModel } from "../models/Order";
-// import { productModel } from "../models/Product";
+import { productModel } from "../models/Product";
 
 type Product = {
   _id: string;
@@ -15,25 +15,58 @@ type Product = {
   numReviews: number;
 };
 
-type OrderItems = {
+type OrderedProducts = {
   products: Array<{
     product: Product;
     quantity: number;
   }>;
 };
 
+interface IProduct extends Product {
+  quantity: number;
+}
+
 class Order {
+  static toFixedDecimal(item: number) {
+    return (Math.round(item * 100) / 100).toFixed(2);
+  }
+
+  static calcPrices(products: Array<IProduct>) {
+    // Calculate the items price in whole number (pennies) to avoid issues with
+    // floating point number calculations
+    let itemsPrice: number = 0;
+    products.map(({ price, quantity }) => (itemsPrice += price * quantity));
+
+    // Calculate the shipping price
+    const shippingPrice = itemsPrice > 100 ? 0 : 10;
+
+    // Calculate the tax price
+    const taxPrice = 0.15 * itemsPrice;
+
+    // Calculate the total price
+    const totalAmount = itemsPrice + shippingPrice + taxPrice;
+
+    // return prices as strings fixed to 2 decimal places
+    return {
+      itemsPrice: Order.toFixedDecimal(itemsPrice),
+      shippingPrice: Order.toFixedDecimal(shippingPrice),
+      taxPrice: Order.toFixedDecimal(taxPrice),
+      totalAmount: Order.toFixedDecimal(totalAmount),
+    };
+  }
+
   async addOrderItems(request: FastifyRequest, reply: FastifyReply) {
     // TODO: seek better type, body as {} ???
-    const { orderItems, shippingAddress, paymentMethod } = request.body as {
-      orderItems: Array<OrderItems>;
-      shippingAddress: string;
-      paymentMethod: string;
-    };
+    const { orderedProducts, shippingAddress, paymentMethod } =
+      request.body as {
+        orderedProducts: OrderedProducts;
+        shippingAddress: string;
+        paymentMethod: string;
+      };
 
     if (
-      !orderItems ||
-      orderItems.length === 0 ||
+      !orderedProducts ||
+      orderedProducts.products.length === 0 ||
       !shippingAddress ||
       !paymentMethod
     ) {
@@ -41,96 +74,48 @@ class Order {
       throw new Error("No order items");
     }
 
-    reply.status(200).send({
-      orderItems,
-      shippingAddress,
-      paymentMethod,
-    });
-    // orderItems: cart.cartItems,
-    // shippingAddress: cart.shippingAddress,
-    // paymentMethod: cart.paymentMethod,
-    // itemsPrice: cart.itemsPrice,
-    // shippingPrice: cart.shippingPrice,
-    // taxPrice: cart.taxPrice,
-    // totalAmount: cart.totalPrice,
-    //
-    // products: [],
-    // totalAmount: 0,
-    // shippingAddress: {},
-    // paymentMethod: "PayPal",
-    // };
-
-    // const createdOrder = await order.save();
-    //
-    // reply.status(201).send(createdOrder);
-
     // get the ordered items from our database
-    // const orderedItemsFromDb = await productModel.find({
-    //   _id: { $in: orderItems.map((x) => x._id) },
-    // });
-    //
-    // const user = request.user as {
-    //   _id: string;
-    // };
+    const { products } = orderedProducts;
+
+    const orderedProductsFromDB = await productModel.find({
+      _id: { $in: products.map(({ product }) => product._id) },
+    });
+
+    const user = request.user as {
+      _id: string;
+    };
 
     // map over the order items and use the price from our items from database
-    // const dbOrderItems = orderItems.map((itemFromClient) => {
-    //   const matchingItemFromDB = itemsFromDB.find(
-    //     (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id,
-    //   );
-    //
-    //   return {
-    //     ...itemFromClient,
-    //     product: itemFromClient._id,
-    //     price: matchingItemFromDB!.price,
-    //     _id: undefined,
-    //   };
-    // });
+    const priceCorrectedProducts = products.map(({ product, quantity }) => {
+      const matchingProductFromDB = orderedProductsFromDB.find(
+        (itemFromDB) => itemFromDB._id.toString() === product._id,
+      );
+      const sanitisedProduct = {
+        ...product,
+        price: Number(matchingProductFromDB!.price),
+      };
+      return {
+        ...sanitisedProduct,
+        quantity,
+      };
+    });
 
-    // const { itemsPrice, taxPrice, shippingPrice, totalPrice } =
-    //   calcPrices(dbOrderItems);
+    const { itemsPrice, taxPrice, shippingPrice, totalAmount } =
+      Order.calcPrices(priceCorrectedProducts);
 
-    // const createdOrder = new orderModel({
-    //   orderItems: orderedItemsFromDb,
-    //   user: user._id,
-    //   shippingAddress,
-    //   paymentMethod,
-    //   itemsPrice,
-    //   taxPrice,
-    //   shippingPrice,
-    //   totalPrice,
-    // });
+    const createdOrder = new orderModel({
+      orderItems: priceCorrectedProducts,
+      user: user._id,
+      shippingAddress,
+      paymentMethod,
+      itemsPrice,
+      taxPrice,
+      shippingPrice,
+      totalAmount,
+    });
+
+    reply.status(201).send(createdOrder);
   }
-
-  // static toFixedDecimal(item: number) {
-  //   return (Math.round(item * 100) / 100).toFixed(2);
-  // }
-  //
-  // static calcPrices(orderItems: Array<OrderItems>) {
-  //   // Calculate the items price in whole number (pennies) to avoid issues with
-  //   // floating point number calculations
-  //   const itemsPrice = orderItems.reduce(
-  //     (acc, item) => acc + (item.price * 100 * item.qty) / 100,
-  //     0,
-  //   );
-  //
-  //   // Calculate the shipping price
-  //   const shippingPrice = itemsPrice > 100 ? 0 : 10;
-  //
-  //   // Calculate the tax price
-  //   const taxPrice = 0.15 * itemsPrice;
-  //
-  //   // Calculate the total price
-  //   const totalPrice = itemsPrice + shippingPrice + taxPrice;
-  //
-  //   // return prices as strings fixed to 2 decimal places
-  //   return {
-  //     itemsPrice: Order.toFixedDecimal(itemsPrice),
-  //     shippingPrice: Order.toFixedDecimal(shippingPrice),
-  //     taxPrice: Order.toFixedDecimal(taxPrice),
-  //     totalPrice: Order.toFixedDecimal(totalPrice),
-  //   };
-  // }
 
   async getMyOrders(req: FastifyRequest, reply: FastifyReply) {
     const user = req.user as {
