@@ -22,6 +22,11 @@ fastify.register(env, {
   schema: {},
 });
 
+fastify.register(cors, {
+  origin: "http://localhost:5173",
+  credentials: true,
+});
+
 fastify.register(cookie);
 
 fastify.register(jwt, {
@@ -33,10 +38,6 @@ fastify.register(jwt, {
     // TODO: Change this later
     expiresIn: "30d",
   },
-});
-
-fastify.register(cors, {
-  origin: "*",
 });
 
 fastify.setErrorHandler((err, req, res) => {

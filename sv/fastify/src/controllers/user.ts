@@ -1,7 +1,6 @@
 import { type FastifyReply, type FastifyRequest } from "fastify";
 import userModel from "../models/User";
 
-// biome-ignore lint/complexity/noStaticOnlyClass: <explanation>
 class User {
   // TODO: Validation for request body thingy
   async registerHandler(
@@ -58,9 +57,9 @@ class User {
         .setCookie("citrus", token, {
           httpOnly: true,
           path: "/",
-          secure: process.env.NODE_ENV === "production" ? true : false,
-          sameSite: true,
+          secure: process.env.NODE_ENV === "production",
           maxAge: 30 * 24 * 60 * 60,
+          sameSite: "strict",
         })
         .status(200)
         .send({
@@ -81,7 +80,7 @@ class User {
       .setCookie("citrus", "", {
         httpOnly: true,
         path: "/",
-        sameSite: true,
+        sameSite: "strict",
         maxAge: 0,
       })
       .status(200)
