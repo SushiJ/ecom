@@ -10,7 +10,7 @@ function App() {
   return (
     <div className="d-flex flex-column vh-100">
       <Header />
-      <main className="py-3 flex-grow-1">
+      <main className="py-3 flex-grow-1 overflow-auto">
         <Container>
           <Outlet />
         </Container>

@@ -23,6 +23,7 @@ import Profile from "./pages/Profile.tsx";
 import Shipping from "./pages/Shipping.tsx";
 import PrivateRoute from "./components/PrivateRoutes.tsx";
 import Payments from "./pages/Payments.tsx";
+import PlaceOrder from "./pages/PlaceOrder.tsx";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -36,6 +37,7 @@ const routes = createBrowserRouter(
       <Route path="" element={<PrivateRoute />}>
         <Route path="/shipping" element={<Shipping />} />
         <Route path="/payment" element={<Payments />} />
+        <Route path="/placeorder" element={<PlaceOrder />} />
       </Route>
     </Route>,
   ),

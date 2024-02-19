@@ -95,12 +95,8 @@ export default function CartPage() {
               <h2>Subtotal ({products.length} items):</h2>$
               {totalAmount.toFixed(2)}
             </ListGroup.Item>
-            <ListGroup.Item>
-              <Link
-                to="/shipping"
-                disabled={products.length === 0}
-                className="btn btn-outline-primary"
-              >
+            <ListGroup.Item disabled={products.length === 0}>
+              <Link to="/shipping" className="btn btn-outline-primary">
                 Proceed to Checkout
               </Link>
             </ListGroup.Item>

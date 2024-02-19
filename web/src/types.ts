@@ -11,4 +11,8 @@ export type Product = {
   numReviews: number;
 };
 
+export interface IProduct extends Product {
+  quantity: number;
+}
+
 export type ProductApiResponse = Product;

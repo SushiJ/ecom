@@ -12,6 +12,9 @@ export const userApiSlice = api.injectEndpoints({
         url: "users/login",
         method: "POST",
         body: data,
+        headers: {
+          "Content-Type": "application/json",
+        },
       }),
     }),
     register: builder.mutation<void, Register>({

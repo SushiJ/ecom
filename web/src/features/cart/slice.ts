@@ -86,12 +86,6 @@ const cartSlice = createSlice({
     resetCart: (state) => {
       state.products = [];
       state.totalAmount = 0;
-      state.shippingAddress = {
-        city: "",
-        address: "",
-        country: "",
-        postalCode: "",
-      };
       localStorage.setItem("cart", "");
     },
     saveShippingAddress: (state, action: PayloadAction<ShippingAddress>) => {
