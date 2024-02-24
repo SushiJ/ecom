@@ -52,8 +52,8 @@ function PlaceOrder() {
         totalPrice: cart.totalAmount,
       }).unwrap();
       console.log(res);
-      // dispatch(resetCart());
-      // navigate(`/order/${res._id}`);
+      dispatch(resetCart());
+      navigate(`/order/${res._id}`);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err);
