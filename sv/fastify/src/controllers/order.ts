@@ -15,12 +15,10 @@ type Product = {
   numReviews: number;
 };
 
-type OrderedProducts = {
-  products: Array<{
-    product: Product;
-    quantity: number;
-  }>;
-};
+type OrderedProducts = Array<{
+  product: Product;
+  quantity: number;
+}>;
 
 interface IProduct extends Product {
   quantity: number;
@@ -34,21 +32,21 @@ class Order {
   static calcPrices(products: Array<IProduct>) {
     // Calculate the items price in whole number (pennies) to avoid issues with
     // floating point number calculations
-    let itemsPrice: number = 0;
-    products.map(({ price, quantity }) => (itemsPrice += price * quantity));
+    let productPrice: number = 0;
+    products.map(({ price, quantity }) => (productPrice += price * quantity));
 
     // Calculate the shipping price
-    const shippingPrice = itemsPrice > 100 ? 0 : 10;
+    const shippingPrice = productPrice > 100 ? 0 : 10;
 
     // Calculate the tax price
-    const taxPrice = 0.15 * itemsPrice;
+    const taxPrice = 0.15 * productPrice;
 
     // Calculate the total price
-    const totalAmount = itemsPrice + shippingPrice + taxPrice;
+    const totalAmount = productPrice + shippingPrice + taxPrice;
 
     // return prices as strings fixed to 2 decimal places
     return {
-      itemsPrice: Order.toFixedDecimal(itemsPrice),
+      productsPrice: Order.toFixedDecimal(productPrice),
       shippingPrice: Order.toFixedDecimal(shippingPrice),
       taxPrice: Order.toFixedDecimal(taxPrice),
       totalAmount: Order.toFixedDecimal(totalAmount),
@@ -66,7 +64,7 @@ class Order {
 
     if (
       !orderedProducts ||
-      orderedProducts.products.length === 0 ||
+      orderedProducts.length === 0 ||
       !shippingAddress ||
       !paymentMethod
     ) {
@@ -75,57 +73,59 @@ class Order {
     }
 
     // get the ordered items from our database
-    const { products } = orderedProducts;
-
     const orderedProductsFromDB = await productModel.find({
-      _id: { $in: products.map(({ product }) => product._id) },
+      _id: { $in: orderedProducts.map(({ product }) => product._id) },
     });
+
+    // map over the order items and use the price from our items from database
+    const priceCorrectedProducts = orderedProducts.map(
+      ({ product, quantity }) => {
+        const matchingProductFromDB = orderedProductsFromDB.find(
+          (itemFromDB) => itemFromDB._id.toString() === product._id,
+        );
+        const sanitisedProduct = {
+          ...product,
+          price: Number(matchingProductFromDB?.price),
+        };
+        return {
+          ...sanitisedProduct,
+          quantity,
+        };
+      },
+    );
+
+    const { productsPrice, taxPrice, shippingPrice, totalAmount } =
+      Order.calcPrices(priceCorrectedProducts);
 
     const user = request.user as {
       _id: string;
+      email: string;
+      name: string;
     };
-
-    // map over the order items and use the price from our items from database
-    const priceCorrectedProducts = products.map(({ product, quantity }) => {
-      const matchingProductFromDB = orderedProductsFromDB.find(
-        (itemFromDB) => itemFromDB._id.toString() === product._id,
-      );
-      const sanitisedProduct = {
-        ...product,
-        price: Number(matchingProductFromDB!.price),
-      };
-      return {
-        ...sanitisedProduct,
-        quantity,
-      };
-    });
-
-    const { itemsPrice, taxPrice, shippingPrice, totalAmount } =
-      Order.calcPrices(priceCorrectedProducts);
 
     const createdOrder = new orderModel({
       orderItems: priceCorrectedProducts,
-      user: user._id,
+      user,
       shippingAddress,
       paymentMethod,
-      itemsPrice,
+      productsPrice,
       taxPrice,
       shippingPrice,
       totalAmount,
+      paymentResult: false,
     });
 
-    reply.status(201).send(createdOrder);
+    const created = await createdOrder.save();
+
+    return reply.status(201).send(created);
   }
 
   async getMyOrders(req: FastifyRequest, reply: FastifyReply) {
     const user = req.user as {
       _id: string;
-      name: string;
-      email: string;
-      isAdmin: boolean;
     };
     const orders = await orderModel.find({ user: user._id });
-    reply.send(orders);
+    reply.status(200).send(orders);
   }
 
   async getOrderById(req: FastifyRequest, reply: FastifyReply) {
@@ -142,7 +142,7 @@ class Order {
         reply.status(204).send("No order with that id");
         return;
       }
-      reply.status(200).send(order);
+      return reply.status(200).send(order);
     } catch (e) {
       console.log(e);
       reply.status(500).send("Internal server Error");
@@ -171,9 +171,9 @@ class Order {
 
   async getOrders(_req: FastifyRequest, reply: FastifyReply) {
     try {
-      const orders = await orderModel.find().populate("user", "id", "nam");
+      const orders = await orderModel.find().populate("user", "id name");
       if (!orders) reply.status(200).send([]);
-      reply.status(200).send(orders);
+      return reply.status(200).send(orders);
     } catch (e) {
       reply.status(500).send("Internal server Error");
     }

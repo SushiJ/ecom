@@ -1,6 +1,7 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { productModel } from "../models/Product";
 
+//TODO: migrate the prices to INR
 class Product {
   async getProducts(_req: FastifyRequest, reply: FastifyReply) {
     try {

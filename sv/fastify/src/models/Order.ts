@@ -10,21 +10,13 @@ import { Product } from "./Product";
 
 class OrderItems {
   @prop({ required: true })
-  public name!: string;
-
-  @prop({ required: true })
-  public qty!: number;
-
-  @prop({ required: true })
-  public image!: string;
-
-  @prop({ required: true })
-  public price!: number;
+  public quantity!: number;
 
   @prop({ required: true, ref: () => Product })
   public product!: Ref<Product>;
 }
 
+@modelOptions({ schemaOptions: { _id: false } })
 class ShippingAddress {
   @prop({ required: true })
   public address!: string;
@@ -62,7 +54,7 @@ class Order {
   };
 
   @prop({ required: true, default: 0 })
-  public itemsPrice!: number;
+  public productsPrice!: number;
 
   @prop({ required: true, default: 0 })
   public taxPrice!: number;
