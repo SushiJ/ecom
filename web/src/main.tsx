@@ -7,6 +7,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { Provider } from "react-redux";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 import "./assets/bootstrap.css";
 import "./assets/index.css";
@@ -48,7 +49,9 @@ const routes = createBrowserRouter(
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>
-      <RouterProvider router={routes} />
+      <PayPalScriptProvider options={{ clientId: "test" }}>
+        <RouterProvider router={routes} />
+      </PayPalScriptProvider>
     </Provider>
   </React.StrictMode>,
 );

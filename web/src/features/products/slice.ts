@@ -1,4 +1,4 @@
-import { ProductApiResponse } from "../../types.ts";
+import { ProductApiResponse } from "../../types/product.ts";
 import { api } from "../api.ts";
 
 export const productApiSlice = api.injectEndpoints({

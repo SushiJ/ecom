@@ -140,14 +140,6 @@ const Profile = () => {
           </fieldset>
           {isLoading && <Loader />}
         </Form>
-        <Row className="py-3">
-          <Col>
-            Already have an account?
-            <Link to="/login" className="ms-1">
-              Sign in
-            </Link>
-          </Col>
-        </Row>
       </Fragment>
     </FormContainer>
   );

@@ -8,50 +8,162 @@ import {
   Button,
   Alert,
 } from "react-bootstrap";
+import {
+  PayPalButtons,
+  SCRIPT_LOADING_STATE,
+  usePayPalScriptReducer,
+} from "@paypal/react-paypal-js";
 
 import Loader from "../components/Loader";
-import { useGetOrderDetailsQuery } from "../features/orders/slice";
+import {
+  useGetOrderDetailsQuery,
+  useGetPaypalClientIdQuery,
+  usePayOrderMutation,
+} from "../features/orders/slice";
 
 import { useAppSelector } from "../hooks/redux";
+import { useCallback, useEffect } from "react";
+import { toast } from "react-toastify";
+import {
+  CreateOrderActions,
+  OnApproveActions,
+  OnApproveData,
+} from "../types/paypal";
 
 const OrderScreen = () => {
   const { id: orderId } = useParams() as { id: string };
-
-  const { data, isLoading, error } = useGetOrderDetailsQuery(orderId);
-
   const { userInfo } = useAppSelector((state) => state.auth);
 
-  if (!data) {
-    return <Alert variant="danger">{JSON.stringify(error)}</Alert>;
+  const {
+    data: order,
+    isLoading: isOrderLoading,
+    refetch,
+    error: errorOrder,
+  } = useGetOrderDetailsQuery(orderId);
+  const [payOrder, { isLoading: loadingPay }] = usePayOrderMutation();
+
+  const {
+    data: paypal_id,
+    isLoading: loadingPaypalId,
+    error: errorPaypalId,
+  } = useGetPaypalClientIdQuery();
+
+  const [{ isPending, options }, paypalDispatch] = usePayPalScriptReducer();
+
+  const loadPayPalScript = useCallback(() => {
+    return async function () {
+      paypalDispatch({
+        type: "resetOptions",
+        value: {
+          ...options,
+          clientId: paypal_id!.clientId,
+          //TODO: Change this to INR later
+          currency: "USD",
+        },
+      });
+      paypalDispatch({
+        type: "setLoadingStatus",
+        value: {
+          state: SCRIPT_LOADING_STATE.PENDING,
+          message: "pending",
+        },
+      });
+    };
+  }, [options, paypalDispatch, paypal_id]);
+
+  //INFO: IDK what I'm doing Smile
+  useEffect(() => {
+    if (
+      !errorPaypalId &&
+      !loadingPaypalId &&
+      paypal_id &&
+      order &&
+      !order.isPaid &&
+      !window.paypal
+    ) {
+      loadPayPalScript();
+    }
+  }, [order, errorPaypalId, loadPayPalScript, loadingPaypalId, paypal_id]);
+
+  async function onApprove(_: OnApproveData, actions: OnApproveActions) {
+    return actions.order?.capture().then(async function (details) {
+      try {
+        console.log({ orderId, details });
+        await payOrder({ orderId, details });
+        refetch();
+        toast.success("Order is paid");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (err: any) {
+        toast.error(err?.data?.message || err.error);
+      }
+    });
   }
-  return isLoading ? (
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function onError(err: any) {
+    toast.error(err.message);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async function createOrder(_: any, actions: CreateOrderActions) {
+    return actions.order
+      .create({
+        purchase_units: [
+          {
+            amount: { value: order!.totalAmount.toString() },
+          },
+        ],
+      })
+      .then((orderID) => {
+        return orderID;
+      });
+  }
+
+  // TESTING ONLY! REMOVE BEFORE PRODUCTION
+  // async function onApproveTest() {
+  //   await payOrder({ orderId, details: { payer: {} } });
+  //   refetch();
+  //
+  //   toast.success("Order is paid");
+  // }
+
+  // const deliverHandler = async () => {
+  //   await deliverOrder(orderId);
+  //   refetch();
+  // };
+
+  if (!order) {
+    return <Alert variant="danger">"No order found for that Id"</Alert>;
+  }
+
+  return isOrderLoading ? (
     <Loader />
-  ) : error ? (
-    <Alert variant="danger">{JSON.stringify(error)}</Alert>
+  ) : errorOrder ? (
+    <Alert variant="danger">{JSON.stringify(errorOrder)}</Alert>
   ) : (
     <>
-      <h1>Order {data._id}</h1>
+      <h1>Order {order._id}</h1>
       <Row>
         <Col md={8}>
           <ListGroup variant="flush">
             <ListGroup.Item>
               <h2>Shipping</h2>
               <p>
-                <strong>Name: </strong> {data.user.name}
+                <strong>Name: </strong> {order.user.name}
               </p>
               <p>
                 <strong>Email: </strong>{" "}
-                <a href={`mailto:${data.user.email}`}>{data.user.email}</a>
+                <a href={`mailto:${order.user.email}`}>{order.user.email}</a>
               </p>
               <p>
                 <strong>Address:</strong>
-                {data.shippingAddress.address}, {data.shippingAddress.city}{" "}
-                {data.shippingAddress.postalCode},{" "}
-                {data.shippingAddress.country}
+                {order.shippingAddress.address}, {order.shippingAddress.city}
+                {order.shippingAddress.postalCode},
+                {order.shippingAddress.country}
               </p>
-              {data.isDelivered && data.deliveredAt ? (
+              {order.isDelivered && order.deliveredAt ? (
                 <Alert variant="success">
-                  Delivered on {new Date(data.deliveredAt).toString()}
+                  Delivered on {new Date(order.deliveredAt).toString()}
                 </Alert>
               ) : (
                 <Alert variant="danger">Not Delivered</Alert>
@@ -62,12 +174,20 @@ const OrderScreen = () => {
               <h2>Payment Method</h2>
               <p>
                 <strong>Method: </strong>
-                {data.paymentMethod}
+                {order.paymentMethod}
               </p>
-              {data.isPaid ? (
+              {order.isPaid ? (
                 <Alert variant="success">
                   Paid on{" "}
-                  {data.paidAt ? new Date(data.paidAt).toString() : "Not paid"}
+                  {order.paidAt
+                    ? new Date(order.paidAt).toLocaleString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : "Not paid"}
                 </Alert>
               ) : (
                 <Alert variant="danger">Not Paid</Alert>
@@ -75,12 +195,13 @@ const OrderScreen = () => {
             </ListGroup.Item>
 
             <ListGroup.Item>
-              <h2>data Items</h2>
-              {data.orderItems.length === 0 ? (
+              <h2>Order Items</h2>
+
+              {order.orderItems.length <= 0 ? (
                 <Alert>data is empty</Alert>
               ) : (
                 <ListGroup variant="flush">
-                  {data.orderItems.map((item, index) => (
+                  {order.orderItems.map((item, index) => (
                     <ListGroup.Item key={index}>
                       <Row>
                         <Col md={1}>
@@ -110,64 +231,62 @@ const OrderScreen = () => {
           <Card>
             <ListGroup variant="flush">
               <ListGroup.Item>
-                <h2>data Summary</h2>
+                <h2>Data Summary</h2>
               </ListGroup.Item>
               <ListGroup.Item>
                 <Row>
                   <Col>Items</Col>
-                  <Col>${data.productsPrice}</Col>
+                  <Col>${order.productsPrice}</Col>
                 </Row>
               </ListGroup.Item>
               <ListGroup.Item>
                 <Row>
                   <Col>Shipping</Col>
-                  <Col>${data.shippingPrice}</Col>
+                  <Col>${order.shippingPrice}</Col>
                 </Row>
               </ListGroup.Item>
               <ListGroup.Item>
                 <Row>
                   <Col>Tax</Col>
-                  <Col>${data.taxPrice}</Col>
+                  <Col>${order.taxPrice}</Col>
                 </Row>
               </ListGroup.Item>
               <ListGroup.Item>
                 <Row>
                   <Col>Total</Col>
-                  <Col>${data.totalAmount}</Col>
+                  <Col>${order.totalAmount}</Col>
                 </Row>
               </ListGroup.Item>
-              {/* {!data.isPaid && ( */}
-              {/* <ListGroup.Item> */}
-              {/*   {loadingPay && <Loader />} */}
-              {/**/}
-              {/*   {isPending ? ( */}
-              {/*     <Loader /> */}
-              {/*   ) : ( */}
-              {/*     <div> */}
-              {/* THIS BUTTON IS FOR TESTING! REMOVE BEFORE PRODUCTION! */}
-              {/* <Button
-                        style={{ marginBottom: '10px' }}
-                        onClick={onApproveTest}
-                      >
-                        Test Pay data
-                      </Button> */}
-
-              {/* <div> */}
-              {/*   <PayPalButtons */}
-              {/*     createdata={createOrder} */}
-              {/*     onApprove={onApprove} */}
-              {/*     onError={onError} */}
-              {/*   ></PayPalButtons> */}
-              {/* </div> */}
-              {/*       </div> */}
-              {/*     )} */}
-              {/*   </ListGroup.Item> */}
-              {/* )} */}
+              {!order.isPaid && (
+                <ListGroup.Item>
+                  {loadingPay && <Loader />}
+                  {isPending ? (
+                    <Loader />
+                  ) : (
+                    <div>
+                      {/* THIS BUTTON IS FOR TESTING! REMOVE BEFORE PRODUCTION! */}
+                      {/* <Button */}
+                      {/*   style={{ marginBottom: "10px" }} */}
+                      {/*   onClick={onApproveTest} */}
+                      {/* > */}
+                      {/*   Test Pay data */}
+                      {/* </Button> */}
+                      <div>
+                        <PayPalButtons
+                          createOrder={createOrder}
+                          onApprove={onApprove}
+                          onError={onError}
+                        ></PayPalButtons>
+                      </div>
+                    </div>
+                  )}
+                </ListGroup.Item>
+              )}
 
               {userInfo &&
                 userInfo.isAdmin &&
-                data.isPaid &&
-                !data.isDelivered && (
+                order.isPaid &&
+                !order.isDelivered && (
                   <ListGroup.Item>
                     <Button
                       type="button"
