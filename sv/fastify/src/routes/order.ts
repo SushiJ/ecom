@@ -13,8 +13,7 @@ async function orderRoutes(fastify: FastifyInstance) {
 
   fastify.get("/:id", { onRequest: protect }, order.getOrderById);
 
-  // TODO: pay
-  // fastify.put("/:id/pay", { onRequest: protect }, () => {});
+  fastify.put("/:id/pay", { onRequest: protect }, order.updateOrderToPaid);
 
   fastify.delete(
     "/:id/deliver",

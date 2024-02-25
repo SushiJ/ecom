@@ -47,10 +47,10 @@ class Order {
 
   @prop({ required: true })
   public paymentResult!: {
-    id: { type: string };
-    status: { type: string };
-    update_time: { type: string };
-    email_address: { type: string };
+    id: string;
+    status: string;
+    update_time: Date;
+    email_address: string;
   };
 
   @prop({ required: true, default: 0 })

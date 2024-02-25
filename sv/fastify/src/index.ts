@@ -2,7 +2,7 @@ import cookie from "@fastify/cookie";
 import cors from "@fastify/cors";
 import env from "@fastify/env";
 import jwt from "@fastify/jwt";
-import Fastify from "fastify";
+import Fastify, { type FastifyReply, type FastifyRequest } from "fastify";
 
 import productRoutes from "./routes/product";
 import userRoutes from "./routes/user";
@@ -56,6 +56,15 @@ fastify.get("/check", (_req, reply) => {
 fastify.register(userRoutes, { prefix: "/users" });
 fastify.register(productRoutes, { prefix: "/products" });
 fastify.register(orderRoutes, { prefix: "/orders" });
+
+// PAYPAL
+fastify.get(
+  "/api/config/paypal",
+  (_request: FastifyRequest, reply: FastifyReply) =>
+    reply.status(200).send({
+      clientId: process.env.PAYPAL_CLIENT_ID,
+    }),
+);
 
 fastify.listen({ port: 3000, host: "0.0.0.0" }, (err, address) => {
   if (err) {
