@@ -42,3 +42,7 @@ export type OrderCreateResponse = {
   updatedAt: string;
   __v: 0;
 };
+
+export type GetOrdersResponse = Omit<OrderCreateResponse, "user"> & {
+  user: string;
+};

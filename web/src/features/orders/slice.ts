@@ -1,4 +1,4 @@
-import { OrderCreateResponse } from "../../types/order";
+import { GetOrdersResponse, OrderCreateResponse } from "../../types/order";
 import { api } from "../api";
 
 export const orderApiSlice = api.injectEndpoints({
@@ -34,7 +34,7 @@ export const orderApiSlice = api.injectEndpoints({
       }),
       keepUnusedDataFor: 5,
     }),
-    getMyOrders: builder.query({
+    getMyOrders: builder.query<Array<GetOrdersResponse>, void>({
       query: () => ({
         url: `orders/me`,
       }),
