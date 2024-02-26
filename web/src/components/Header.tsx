@@ -63,7 +63,7 @@ export function Header() {
               </Link>
               {/* Admin Links */}
               {userInfo && userInfo.isAdmin && (
-                <NavDropdown title="Admin" id="adminmenu">
+                <NavDropdown title="Admin" id="adminmenu" className="me-0">
                   <NavDropdown.Item
                     onClick={() => navigate("/admin/productlist")}
                   >
@@ -81,7 +81,11 @@ export function Header() {
               )}
               {/* INFO: There's a bug where the menu is still after the user logs out, checking for name property fixes it */}
               {userInfo && userInfo.name ? (
-                <NavDropdown title={userInfo.name} id="username">
+                <NavDropdown
+                  title={userInfo.name}
+                  id="username"
+                  className="me-0"
+                >
                   <NavDropdown.Item onClick={() => navigate("/profile")}>
                     Profile
                   </NavDropdown.Item>
