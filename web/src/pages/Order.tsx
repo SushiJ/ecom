@@ -16,7 +16,6 @@ import {
 
 import Loader from "../components/Loader";
 import {
-  useDeliverOrderMutation,
   useGetOrderDetailsQuery,
   useGetPaypalClientIdQuery,
   usePayOrderMutation,
@@ -50,8 +49,6 @@ const OrderScreen = () => {
   } = useGetPaypalClientIdQuery();
 
   const [{ isPending, options }, paypalDispatch] = usePayPalScriptReducer();
-
-  const [updateOrderToDelivered] = useDeliverOrderMutation();
 
   const loadPayPalScript = useCallback(() => {
     return async function () {
@@ -130,10 +127,10 @@ const OrderScreen = () => {
   //   toast.success("Order is paid");
   // }
 
-  const deliverHandler = async () => {
-    await updateOrderToDelivered(orderId);
-    refetch();
-  };
+  // const deliverHandler = async () => {
+  //   await deliverOrder(orderId);
+  //   refetch();
+  // };
 
   if (!order) {
     return <Alert variant="danger">"No order found for that Id"</Alert>;
@@ -294,7 +291,7 @@ const OrderScreen = () => {
                     <Button
                       type="button"
                       className="btn btn-block"
-                      onClick={deliverHandler}
+                      onClick={() => {}}
                     >
                       Mark As Delivered
                     </Button>
