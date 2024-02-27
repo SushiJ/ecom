@@ -40,15 +40,6 @@ fastify.register(jwt, {
   },
 });
 
-fastify.setErrorHandler((err, req, res) => {
-  req.log.error({ err }, err.message);
-  if (!err.message) {
-    res.status(500).send({ status: 500, error: "Internal Server Error" });
-  }
-  res.send({ status: res.statusCode, error: err.message });
-  return res;
-});
-
 fastify.get("/check", (_req, reply) => {
   return reply.status(200).send("OK");
 });
@@ -56,6 +47,14 @@ fastify.get("/check", (_req, reply) => {
 fastify.register(userRoutes, { prefix: "/users" });
 fastify.register(productRoutes, { prefix: "/products" });
 fastify.register(orderRoutes, { prefix: "/orders" });
+
+fastify.setErrorHandler((err, req: FastifyRequest, res: FastifyReply) => {
+  req.log.error({ err }, err.message);
+  err.message
+    ? res.send({ status: res.statusCode, error: err.message })
+    : res.status(500).send({ status: 500, error: "Internal Server Error" });
+  return res;
+});
 
 // PAYPAL
 fastify.get(

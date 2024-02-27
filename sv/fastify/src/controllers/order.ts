@@ -125,6 +125,7 @@ class Order {
       _id: string;
     };
     const orders = await orderModel.find({ user: user._id });
+
     return reply.status(200).send(orders);
   }
 
@@ -140,11 +141,10 @@ class Order {
         return reply.status(204).send("No order with that id");
       }
       order = await order.populate("user", "name email");
-      reply.status(200).send(order);
-      return reply;
+      return reply.status(200).send(order);
     } catch (e) {
       console.log(e);
-      return reply.status(500).send("Internal server Error");
+      reply.status(500).send("Internal server Error");
     }
   }
 
@@ -165,7 +165,7 @@ class Order {
 
     const updatedOrder = await order.save();
 
-    reply.status(200).send(updatedOrder);
+    return reply.status(200).send(updatedOrder);
   }
 
   async getOrders(_req: FastifyRequest, reply: FastifyReply) {

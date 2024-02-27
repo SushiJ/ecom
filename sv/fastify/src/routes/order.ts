@@ -15,7 +15,7 @@ async function orderRoutes(fastify: FastifyInstance) {
 
   fastify.put("/:id/pay", { onRequest: protect }, order.updateOrderToPaid);
 
-  fastify.delete(
+  fastify.put(
     "/:id/deliver",
     { onRequest: [protect, isAdmin] },
     order.updateOrderToDelivered,
