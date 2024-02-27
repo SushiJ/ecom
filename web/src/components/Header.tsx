@@ -64,17 +64,13 @@ export function Header() {
               {/* Admin Links */}
               {userInfo && userInfo.isAdmin && (
                 <NavDropdown title="Admin" id="adminmenu" className="me-0">
-                  <NavDropdown.Item
-                    onClick={() => navigate("/admin/productlist")}
-                  >
+                  <NavDropdown.Item onClick={() => navigate("/admin/products")}>
                     Products
                   </NavDropdown.Item>
-                  <NavDropdown.Item
-                    onClick={() => navigate("/admin/orderlist")}
-                  >
+                  <NavDropdown.Item onClick={() => navigate("/admin/orders")}>
                     Orders
                   </NavDropdown.Item>
-                  <NavDropdown.Item onClick={() => navigate("/admin/userlist")}>
+                  <NavDropdown.Item onClick={() => navigate("/admin/users")}>
                     Users
                   </NavDropdown.Item>
                 </NavDropdown>
