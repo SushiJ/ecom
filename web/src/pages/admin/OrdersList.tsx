@@ -5,7 +5,7 @@ import { useGetOrdersQuery } from "../../features/orders/slice";
 
 import Loader from "../../components/Loader";
 
-const OrderListScreen = () => {
+const OrderList = () => {
   const { data: orders, isLoading, error } = useGetOrdersQuery();
 
   if (!orders) {
@@ -86,4 +86,4 @@ const OrderListScreen = () => {
   );
 };
 
-export default OrderListScreen;
+export default OrderList;
