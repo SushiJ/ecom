@@ -1,11 +1,17 @@
 import { type FastifyInstance } from "fastify";
 import Product from "../controllers/products";
+import { isAdmin, protect } from "../utils/auth";
 
 async function productRoutes(fastify: FastifyInstance) {
   const product = new Product();
-  fastify.get("/", product.getProducts);
-  // 6543e69b2cf3befc0f2c51a7
-  fastify.get("/:id", product.getProductsById);
+  fastify
+    .get("/", product.getProducts)
+    .post("/", { onRequest: [protect, isAdmin] }, product.createProducts);
+
+  fastify
+    .get("/:id", product.getProductsById)
+    .put("/:id", { onRequest: [protect, isAdmin] }, product.updateProduct)
+    .delete("/:id", { onRequest: [protect, isAdmin] }, product.deleteProduct);
 
   fastify.log.info("Products routes registered");
 }

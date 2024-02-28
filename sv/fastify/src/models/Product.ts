@@ -17,7 +17,7 @@ export class Product {
   public category!: string;
 
   @prop({ required: true })
-  public price!: string;
+  public price!: number;
 
   @prop({ required: true })
   public countInStock!: number;
