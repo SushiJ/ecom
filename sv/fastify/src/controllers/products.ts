@@ -108,8 +108,8 @@ class Product {
     reply.status(200).send("Resource deleted successfully");
   }
 
-  async getTopProducts(_req: FastifyRequest, reply: FastifyReply) {
-    const products = await productModel.find({}).sort({ rating: -1 }).limit(3);
+  async getTopProducts(_: FastifyRequest, reply: FastifyReply) {
+    const products = await productModel.find().sort({ rating: -1 }).limit(3);
     reply.status(200).send(products);
   }
 }

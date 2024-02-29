@@ -13,6 +13,8 @@ async function productRoutes(fastify: FastifyInstance) {
     .put("/:id", { onRequest: [protect, isAdmin] }, product.updateProduct)
     .delete("/:id", { onRequest: [protect, isAdmin] }, product.deleteProduct);
 
+  fastify.get("/top", product.getTopProducts);
+
   fastify.log.info("Products routes registered");
 }
 
