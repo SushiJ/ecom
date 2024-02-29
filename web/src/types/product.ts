@@ -12,3 +12,14 @@ export type Product = {
 };
 
 export type ProductApiResponse = Product;
+
+export type UpdateProductMutation = {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  brand: string;
+  category: string;
+  countInStock: number;
+  description: string;
+};
