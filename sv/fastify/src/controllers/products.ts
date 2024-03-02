@@ -25,12 +25,14 @@ class Product {
     try {
       // NOTE: May be {status, message} would be a better API? IDK
       const product = await productModel.findById(id);
+
       if (!product) {
         // May be a 204 ? But 400 suits better ( bad request )
-        reply.status(400).send("No product with that id");
-        return;
+        reply.status(400);
+        throw new Error("No product with that id");
       }
-      reply.status(200).send(product);
+
+      return reply.status(200).send(product);
     } catch (e) {
       console.log(e);
       reply.status(500).send("Internal server Error");
@@ -50,11 +52,12 @@ class Product {
       countInStock: 0,
       numReviews: 0,
       description: "Sample description",
+      rating: 0,
     });
 
     try {
       const createdProduct = await product.save();
-      reply.status(201).send(createdProduct);
+      return reply.status(201).send(createdProduct);
     } catch (e) {
       console.log(e);
       reply.status(500).send("Internal server Error");
@@ -105,7 +108,7 @@ class Product {
 
     await productModel.deleteOne({ _id: product._id });
 
-    reply.status(200).send("Resource deleted successfully");
+    return reply.status(200).send("Resource deleted successfully");
   }
 
   async getTopProducts(_: FastifyRequest, reply: FastifyReply) {

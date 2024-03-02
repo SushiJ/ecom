@@ -1,10 +1,53 @@
 import { Table, Button, Row, Col, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+
+import {
+  useCreateProductMutation,
+  useDeleteProductMutation,
+  useGetProductsQuery,
+} from "../../features/products/slice";
+
 import Loader from "../../components/Loader";
-import { useGetProductsQuery } from "../../features/products/slice";
 
 const ProductList = () => {
-  const { data, isLoading, error } = useGetProductsQuery();
+  const { data, isLoading, error, refetch } = useGetProductsQuery();
+
+  const [createProductMutation, { isLoading: loadingCreateProductMutation }] =
+    useCreateProductMutation();
+
+  const [deleteMutation, { isLoading: loadingDeleteMutation }] =
+    useDeleteProductMutation();
+
+  async function createProductHandler() {
+    if (window.confirm("Are you sure you want to create a new product?")) {
+      try {
+        await createProductMutation();
+        refetch();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
+        toast.error(e, {
+          type: "error",
+        });
+      }
+    }
+  }
+
+  async function deleteProductHandler(productId: string) {
+    if (
+      window.confirm(`Are you sure you want to delete ${productId} product?`)
+    ) {
+      try {
+        await deleteMutation(productId);
+        refetch();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
+        toast.error(e, {
+          type: "error",
+        });
+      }
+    }
+  }
 
   if (!data) {
     return <p>What?</p>;
@@ -17,9 +60,13 @@ const ProductList = () => {
           <h1>Products</h1>
         </Col>
         <Col className="text-end">
-          {/* <Button className='my-3' onClick={createProductHandler}> */}
-          {/*   <FaPlus /> Create Product */}
-          {/* </Button> */}
+          <Button
+            className="my-3"
+            onClick={createProductHandler}
+            disabled={loadingCreateProductMutation}
+          >
+            Create Product
+          </Button>
         </Col>
       </Row>
 
@@ -58,7 +105,8 @@ const ProductList = () => {
                     <Button
                       variant="danger"
                       className="btn-sm"
-                      onClick={() => {}}
+                      onClick={() => deleteProductHandler(product._id)}
+                      disabled={loadingDeleteMutation}
                     >
                       delete
                     </Button>
