@@ -4,6 +4,6 @@ const BASE_URL = "http://localhost:3000";
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: BASE_URL, credentials: "include" }),
-  tagTypes: ["Product", "Order", "User"],
+  tagTypes: ["Product", "Order", "User", "Products"],
   endpoints: () => ({}),
 });

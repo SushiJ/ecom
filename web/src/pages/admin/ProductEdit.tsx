@@ -66,7 +66,7 @@ const ProductEdit = () => {
       }).unwrap();
       toast.success("Updated successfully");
       refetch();
-      navigate("/admin/productlist");
+      navigate("/admin/products");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log("ERROR:::", error);

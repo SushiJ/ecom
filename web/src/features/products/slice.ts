@@ -9,12 +9,11 @@ export const productApiSlice = api.injectEndpoints({
   endpoints: (builder) => ({
     getProducts: builder.query<ProductApiResponse[], void>({
       query: () => `products`,
-      providesTags: ["Product"],
+      providesTags: ["Products"],
       keepUnusedDataFor: 5,
     }),
     getProductsById: builder.query<ProductApiResponse, string>({
       query: (id: string) => `products/${id}`,
-      providesTags: ["Product"],
       keepUnusedDataFor: 5,
     }),
     createProduct: builder.mutation<void, void>({
@@ -30,7 +29,7 @@ export const productApiSlice = api.injectEndpoints({
         method: "PUT",
         body: data,
       }),
-      invalidatesTags: ["Product"],
+      invalidatesTags: ["Products"],
     }),
     uploadProductImage: builder.mutation<unknown, string>({
       query: (data) => ({
