@@ -41,7 +41,7 @@ const ProductEdit = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<typeof initialState>({
-    defaultValues: initialState,
+    values: initialState,
     mode: "onSubmit",
     reValidateMode: "onChange",
   });
@@ -124,6 +124,7 @@ const ProductEdit = () => {
                   <Form.Label>Price</Form.Label>
                   <Form.Control
                     type="number"
+                    step="0.01"
                     placeholder="Enter price"
                     {...register("price", { required: "Price is required" })}
                   ></Form.Control>
@@ -147,6 +148,7 @@ const ProductEdit = () => {
                     </Form.Text>
                   )}
                   {/*  TODO: Image uploads*/}
+
                   {/* <Form.Control */}
                   {/*   onChange={uploadFileHandler} */}
                   {/*   aria-label="upload Image" */}
