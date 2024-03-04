@@ -21,13 +21,9 @@ class User {
       throw new Error("User already exists");
     }
 
-    try {
-      await userModel.create({ name, email, password });
-      reply.status(201);
-    } catch (e) {
-      console.log(e);
-      throw new Error();
-    }
+    await userModel.create({ name, email, password });
+
+    return reply.status(201);
   }
 
   async loginHandler(
@@ -39,40 +35,34 @@ class User {
     }>,
     reply: FastifyReply,
   ) {
-    try {
-      const { email, password } = req.body;
+    const { email, password } = req.body;
 
-      const user = await User.getUserByEmail(email);
+    const user = await User.getUserByEmail(email);
 
-      if (!user || !user.passwordMatch(password)) {
-        reply.status(401);
-        throw new Error("Invalid credentials");
-      }
-
-      const token = await reply.jwtSign({
-        userId: user._id,
-      });
-
-      reply
-        .setCookie("citrus", token, {
-          httpOnly: true,
-          path: "/",
-          secure: process.env.NODE_ENV === "production",
-          maxAge: 30 * 24 * 60 * 60,
-          sameSite: "strict",
-        })
-        .status(200)
-        .send({
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          isAdmin: user.isAdmin,
-        });
-      return reply;
-    } catch (e) {
-      console.log(e);
-      throw new Error(e as string);
+    if (!user || !user.passwordMatch(password)) {
+      reply.status(401);
+      throw new Error("Invalid credentials");
     }
+
+    const token = await reply.jwtSign({
+      userId: user._id,
+    });
+
+    return reply
+      .setCookie("citrus", token, {
+        httpOnly: true,
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 30 * 24 * 60 * 60,
+        sameSite: "strict",
+      })
+      .status(200)
+      .send({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      });
   }
 
   async logoutHandler(_req: FastifyRequest, reply: FastifyReply) {
@@ -93,8 +83,24 @@ class User {
     return reply.status(200).send(user);
   }
 
-  async updateInfoHandler(_req: FastifyRequest, reply: FastifyReply) {
-    reply.status(200);
+  async updateInfoHandler(req: FastifyRequest, reply: FastifyReply) {
+    const decodedUser = req.user as { _id: string };
+
+    const { name, email } = req.body as { name?: string; email?: string };
+
+    const user = await userModel.findById(decodedUser._id);
+
+    if (!user) {
+      reply.status(400);
+      throw new Error("HUH");
+    }
+
+    user.name = name ? name : user.name;
+    user.email = email ? email : user.email;
+
+    const updatedUser = await user.save();
+
+    return reply.status(200).send(updatedUser);
   }
 
   static async getUserByEmail(email: string) {
@@ -112,33 +118,58 @@ class User {
   // FIXME: This "as" business IDK But it works for now
   async a_getUserById(req: FastifyRequest, reply: FastifyReply) {
     const { id } = req.params as { id: string };
-    try {
-      const user = await userModel
-        .findById({
-          id,
-        })
-        .select("-password");
+    const user = await userModel
+      .findById({
+        id,
+      })
+      .select("-password");
 
-      if (!user) {
-        reply.status(400).send("Not Found");
-        return reply;
-      }
-
-      return reply.status(200).send({ status: 200, data: user });
-    } catch (e) {
-      console.log(e);
-      throw new Error("IDK YET");
+    if (!user) {
+      reply.status(400);
+      throw new Error("Not user with that Id");
     }
+
+    return reply.status(200).send({ status: 200, data: user });
   }
 
-  async a_deleteUser(_req: FastifyRequest, reply: FastifyReply) {
-    reply.status(200);
-    return reply;
+  async a_deleteUser(req: FastifyRequest, reply: FastifyReply) {
+    const { id } = req.params as { id: string };
+
+    const user = await userModel.findById(id);
+
+    if (user?.isAdmin) {
+      reply.status(400);
+      throw new Error("Hey, You can't do that");
+    }
+
+    const deletedUser = await userModel.deleteOne({ _id: user?._id });
+
+    return reply.status(200).send(deletedUser);
   }
 
-  async a_updateUserInfoHandler(_req: FastifyRequest, reply: FastifyReply) {
-    reply.status(200);
-    return;
+  async a_updateUserInfoHandler(req: FastifyRequest, reply: FastifyReply) {
+    const { id } = req.params as { id: string };
+
+    const { name, email, isAdmin } = req.body as {
+      name?: string;
+      email?: string;
+      isAdmin?: boolean;
+    };
+
+    const user = await userModel.findById(id);
+
+    if (!user) {
+      reply.status(400);
+      throw new Error("Done goofed, it ain't there");
+    }
+
+    user.name = name ? name : user.name;
+    user.email = email ? email : user.email;
+    user.isAdmin = isAdmin ? isAdmin : user.isAdmin;
+
+    const updatedUser = await user.save();
+
+    return reply.status(200).send(updatedUser);
   }
 }
 
