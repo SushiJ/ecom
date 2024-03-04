@@ -118,18 +118,14 @@ class User {
   // FIXME: This "as" business IDK But it works for now
   async a_getUserById(req: FastifyRequest, reply: FastifyReply) {
     const { id } = req.params as { id: string };
-    const user = await userModel
-      .findById({
-        id,
-      })
-      .select("-password");
+    const user = await userModel.findById(id).select("-password");
 
     if (!user) {
       reply.status(400);
       throw new Error("Not user with that Id");
     }
 
-    return reply.status(200).send({ status: 200, data: user });
+    return reply.status(200).send(user);
   }
 
   async a_deleteUser(req: FastifyRequest, reply: FastifyReply) {
@@ -151,9 +147,9 @@ class User {
     const { id } = req.params as { id: string };
 
     const { name, email, isAdmin } = req.body as {
-      name?: string;
-      email?: string;
-      isAdmin?: boolean;
+      name: string;
+      email: string;
+      isAdmin: boolean;
     };
 
     const user = await userModel.findById(id);
@@ -163,9 +159,9 @@ class User {
       throw new Error("Done goofed, it ain't there");
     }
 
-    user.name = name ? name : user.name;
-    user.email = email ? email : user.email;
-    user.isAdmin = isAdmin ? isAdmin : user.isAdmin;
+    user.name = name;
+    user.email = email;
+    user.isAdmin = isAdmin;
 
     const updatedUser = await user.save();
 

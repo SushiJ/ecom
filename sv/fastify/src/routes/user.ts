@@ -12,9 +12,8 @@ async function userRoutes(fastify: FastifyInstance) {
     .get("/profile", { onRequest: protect }, user.getInfoHandler)
     .put("/profile", { preHandler: protect }, user.updateInfoHandler);
 
-  fastify
-    .post("/", user.registerHandler)
-    .get("/", { onRequest: [protect, isAdmin] }, user.a_getAllUsers);
+  fastify.post("/", user.registerHandler);
+  fastify.get("/", { onRequest: [protect, isAdmin] }, user.a_getAllUsers);
 
   fastify
     .get("/:id", { onRequest: [protect, isAdmin] }, user.a_getUserById)

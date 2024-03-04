@@ -18,28 +18,23 @@ export async function protect(
     throw new Error("Not Authorized, No token");
   }
 
-  try {
-    const decoded = await req.jwtDecode<{
-      userId: string;
-      iat: number;
-      exp: number;
-    }>();
+  const decoded = await req.jwtDecode<{
+    userId: string;
+    iat: number;
+    exp: number;
+  }>();
 
-    const { userId } = decoded;
+  const { userId } = decoded;
 
-    const user = await userModel.findById(userId).select("-password");
+  const user = await userModel.findById(userId).select("-password");
 
-    // WARN: this should never happen?
-    if (!user) {
-      rep.status(401);
-      throw new Error("User? Where");
-    }
-    req.user = user;
-    done();
-  } catch (e) {
-    rep.status(400);
-    throw new Error("What?");
+  if (!user) {
+    rep.status(401);
+    throw new Error("User not found");
   }
+
+  req.user = user;
+  done();
 }
 
 export function isAdmin(
