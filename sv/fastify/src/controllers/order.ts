@@ -133,19 +133,14 @@ class Order {
     const { id } = req.params as {
       id: string;
     };
-    try {
-      let order = await orderModel.findById(id);
+    let order = await orderModel.findById(id);
 
-      if (!order) {
-        // INFO: could be a 400? Not sure
-        return reply.status(204).send("No order with that id");
-      }
-      order = await order.populate("user", "name email");
-      return reply.status(200).send(order);
-    } catch (e) {
-      console.log(e);
-      reply.status(500).send("Internal server Error");
+    if (!order) {
+      // INFO: could be a 400? Not sure
+      return reply.status(204).send("No order with that id");
     }
+    order = await order.populate("user", "name email");
+    return reply.status(200).send(order);
   }
 
   // INFO: ADMIN ROUTES
@@ -169,13 +164,11 @@ class Order {
   }
 
   async getOrders(_req: FastifyRequest, reply: FastifyReply) {
-    try {
-      const orders = await orderModel.find().populate("user", "id name");
-      if (!orders) reply.status(200).send([]);
-      return reply.status(200).send(orders);
-    } catch (e) {
-      reply.status(500).send("Internal server Error");
-    }
+    const orders = await orderModel.find().populate("user", "id name");
+
+    if (!orders) reply.status(200).send([]);
+
+    return reply.status(200).send(orders);
   }
 
   async updateOrderToPaid(req: FastifyRequest, res: FastifyReply) {
