@@ -4,13 +4,9 @@ import { productModel } from "../models/Product";
 //TODO: migrate the prices to INR
 class Product {
   async getProducts(_req: FastifyRequest, reply: FastifyReply) {
-    try {
-      const products = await productModel.find();
-      if (!products) reply.status(200).send([]);
-      reply.status(200).send(products);
-    } catch (e) {
-      reply.status(500).send("Internal server Error");
-    }
+    const products = await productModel.find();
+    if (!products) reply.status(200).send([]);
+    reply.status(200).send(products);
   }
 
   async getProductsById(
@@ -22,21 +18,16 @@ class Product {
     reply: FastifyReply,
   ) {
     const { id } = req.params;
-    try {
-      // NOTE: May be {status, message} would be a better API? IDK
-      const product = await productModel.findById(id);
+    // NOTE: May be {status, message} would be a better API? IDK
+    const product = await productModel.findById(id);
 
-      if (!product) {
-        // May be a 204 ? But 400 suits better ( bad request )
-        reply.status(400);
-        throw new Error("No product with that id");
-      }
-
-      return reply.status(200).send(product);
-    } catch (e) {
-      console.log(e);
-      reply.status(500).send("Internal server Error");
+    if (!product) {
+      // May be a 204 ? But 400 suits better ( bad request )
+      reply.status(400);
+      throw new Error("No product with that id");
     }
+
+    return reply.status(200).send(product);
   }
 
   async createProducts(req: FastifyRequest, reply: FastifyReply) {
@@ -55,13 +46,8 @@ class Product {
       rating: 0,
     });
 
-    try {
-      const createdProduct = await product.save();
-      return reply.status(201).send(createdProduct);
-    } catch (e) {
-      console.log(e);
-      reply.status(500).send("Internal server Error");
-    }
+    const createdProduct = await product.save();
+    return reply.status(201).send(createdProduct);
   }
 
   async updateProduct(req: FastifyRequest, reply: FastifyReply) {
