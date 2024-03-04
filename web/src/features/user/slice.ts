@@ -2,6 +2,9 @@ import {
   LoginData,
   Register,
   LoginMutationResponse,
+  GetUsersResponse,
+  GetUsersByIdResponse,
+  UpdateUserInfoMutation,
 } from "../../types/user.ts";
 import { api } from "../api.ts";
 
@@ -41,7 +44,7 @@ export const userApiSlice = api.injectEndpoints({
         body: data,
       }),
     }),
-    getUsers: builder.query({
+    getUsers: builder.query<Array<GetUsersResponse>, void>({
       query: () => "users",
       providesTags: ["User"],
       keepUnusedDataFor: 5,
@@ -52,15 +55,15 @@ export const userApiSlice = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
-    getUserDetails: builder.query({
+    getUserDetails: builder.query<GetUsersByIdResponse, string>({
       query: (id) => ({
         url: `users/${id}`,
       }),
       keepUnusedDataFor: 5,
     }),
-    updateUser: builder.mutation({
+    updateUser: builder.mutation<unknown, UpdateUserInfoMutation>({
       query: (data) => ({
-        url: `users/${data.userId}`,
+        url: `users/${data.id}`,
         method: "PUT",
         body: data,
       }),

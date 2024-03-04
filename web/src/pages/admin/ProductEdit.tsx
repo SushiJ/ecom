@@ -24,7 +24,6 @@ const ProductEdit = () => {
     error,
   } = useGetProductsByIdQuery(productId);
 
-  // TODO: make this raective when the id changes
   const initialState = {
     name: product ? product.name : "",
     price: product ? product.price : 0,

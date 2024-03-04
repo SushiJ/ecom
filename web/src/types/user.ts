@@ -5,6 +5,14 @@ export type LoginMutationResponse = {
   isAdmin: boolean;
 };
 
+export interface GetUsersResponse extends LoginMutationResponse {}
+
+export interface GetUsersByIdResponse extends LoginMutationResponse {}
+
+export type UpdateUserInfoMutation = Omit<LoginMutationResponse, "_id"> & {
+  id: string;
+};
+
 export type LoginData = {
   password: string;
   email: string;
