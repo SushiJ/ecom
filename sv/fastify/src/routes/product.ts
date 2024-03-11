@@ -15,6 +15,12 @@ async function productRoutes(fastify: FastifyInstance) {
 
   fastify.get("/top", product.getTopProducts);
 
+  fastify.post(
+    "/reviews/:id",
+    { onRequest: [protect] },
+    product.createProductReview,
+  );
+
   fastify.log.info("Products routes registered");
 }
 

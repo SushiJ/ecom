@@ -1,4 +1,20 @@
-import { getModelForClass, prop } from "@typegoose/typegoose";
+import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
+
+@modelOptions({ schemaOptions: { timestamps: true } })
+class Reviews {
+  @prop({ required: true })
+  public rating!: number;
+
+  @prop({ required: true })
+  public comment!: string;
+
+  @prop({ required: true })
+  public user!: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+}
 
 export class Product {
   @prop({ required: true })
@@ -27,6 +43,9 @@ export class Product {
 
   @prop({ required: true })
   public numReviews!: number;
+
+  @prop()
+  public reviews!: Array<Reviews>;
 }
 
 export const productModel = getModelForClass(Product);

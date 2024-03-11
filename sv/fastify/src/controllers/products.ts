@@ -97,6 +97,50 @@ class Product {
     return reply.status(200).send("Resource deleted successfully");
   }
 
+  async createProductReview(req: FastifyRequest, reply: FastifyReply) {
+    const { id } = req.params as { id: string };
+
+    const { rating, comment } = req.body as { rating: number; comment: string };
+
+    const product = await productModel.findById(id);
+
+    if (!product) {
+      reply.status(404);
+      throw new Error("Product not found");
+    }
+
+    const user = req.user as { _id: string; name: string; email: string };
+
+    const alreadyReviewed = product.reviews.find((review) => {
+      return review.user._id.toString() === user._id.toString();
+    });
+
+    if (alreadyReviewed) {
+      reply.status(400);
+      throw new Error("Product already reviewed");
+    }
+
+    const review = {
+      rating: rating,
+      comment,
+      user: user,
+    };
+
+    product.reviews.push(review);
+
+    product.numReviews = product.reviews.length;
+
+    let totalRating = 0;
+    for (let i = 0; i < product.reviews.length; i++) {
+      totalRating += product.reviews[i]!.rating;
+    }
+
+    product.rating = totalRating / product.reviews.length;
+
+    await product.save();
+    return reply.status(201).send("Review added");
+  }
+
   async getTopProducts(_: FastifyRequest, reply: FastifyReply) {
     const products = await productModel.find().sort({ rating: -1 }).limit(3);
     reply.status(200).send(products);
