@@ -1,3 +1,13 @@
+import { UserWithReview } from "./user";
+
+export type Review = {
+  _id: string;
+  user: UserWithReview;
+  rating: number;
+  comment: string;
+  createdAt?: string;
+};
+
 export type Product = {
   _id: string;
   name: string;
@@ -9,6 +19,7 @@ export type Product = {
   countInStock: number;
   rating: number;
   numReviews: number;
+  reviews: Array<Review>;
 };
 
 export type ProductApiResponse = Product;
@@ -22,4 +33,10 @@ export type UpdateProductMutation = {
   category: string;
   countInStock: number;
   description: string;
+};
+
+export type CreateProductReviewMutation = {
+  id: string;
+  comment: string;
+  rating: number;
 };

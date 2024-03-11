@@ -21,6 +21,7 @@ export type LoginData = {
 export type Register = LoginData & {
   name: string;
 };
+export type UserWithReview = Register;
 
 export type Error = {
   status: number;
