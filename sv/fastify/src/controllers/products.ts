@@ -122,11 +122,11 @@ class Product {
 
     const review = {
       rating: rating,
-      comment,
+      comment: comment,
       user: user,
     };
 
-    product.reviews.push(review);
+    product.reviews = [...product.reviews, review];
 
     product.numReviews = product.reviews.length;
 

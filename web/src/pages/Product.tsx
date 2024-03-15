@@ -20,7 +20,7 @@ export default function Product() {
   const dispatch = useAppDispatch();
   const { id } = useParams() as { id: string };
   const [quantity, setQuantity] = useState(1);
-  const { data, isError, isLoading } = useGetProductsByIdQuery(id);
+  const { data, isError, isLoading, refetch } = useGetProductsByIdQuery(id);
 
   // TODO: Spinner component
   if (isLoading) <p>Loading...</p>;
@@ -123,7 +123,12 @@ export default function Product() {
           </Card>
         </Col>
       </Row>
-      <Reviews isLoading={isLoading} id={id} reviews={data.reviews} />
+      <Reviews
+        isLoading={isLoading}
+        id={id}
+        reviews={data.reviews}
+        refetch={refetch}
+      />
     </>
   );
 }

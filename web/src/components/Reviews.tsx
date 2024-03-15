@@ -15,12 +15,13 @@ type ReviewProps = {
   id: string;
   isLoading: boolean;
   reviews: Array<Review>;
+  refetch: () => void;
 };
 
 function Reviews(props: ReviewProps) {
   const user = useAppSelector((state) => state.auth.userInfo);
 
-  const [createReview, { isLoading: loadingProductReview, reset }] =
+  const [createReview, { isLoading: loadingProductReview }] =
     useCreateProductReviewsMutation();
 
   type FormValues = {
@@ -38,21 +39,22 @@ function Reviews(props: ReviewProps) {
     reValidateMode: "onSubmit",
   });
 
-  // TODO: Why is it submitting two times?
+  // TODO: Refresh the page, so that new review shows up
   const onSubmit = async (values: FormValues) => {
+    console.log("submitting");
     try {
       await createReview({
         id: props.id,
         rating: values.rating,
         comment: values.comment,
       }).unwrap();
-      reset();
+      // props.refetch(); FIX: This doesn't work Like how I'd like it to
       toast.success("Review created successfully");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err.data.error);
     } finally {
-      setValue("rating", "");
+      setValue("rating", 0);
       setValue("comment", "");
     }
   };
@@ -67,8 +69,8 @@ function Reviews(props: ReviewProps) {
         <h2>Reviews</h2>
         {props.reviews.length === 0 && <Alert variant="info">No Reviews</Alert>}
         <ListGroup variant="flush">
-          {props.reviews.map((review) => (
-            <ListGroup.Item key={review._id}>
+          {props.reviews.map((review, idx) => (
+            <ListGroup.Item key={idx}>
               <strong>{review.user.name}</strong>
               <Rating value={review.rating} />
               {/* <p>{review.createdAt?.substring(0, 10)}</p> */}

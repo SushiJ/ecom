@@ -1,5 +1,6 @@
 import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
 
+// TODO: may be i have to seed the db again for this change?
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Reviews {
   @prop({ required: true })
