@@ -1,12 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Card, Col, Row } from "react-bootstrap";
 import { Icon } from "@iconify/react";
 
-import { Product } from "../types";
+import { Product } from "../types/product";
 import { useGetProductsQuery } from "../features/products/slice";
 
 export default function Home() {
-  const { data, isError, isLoading } = useGetProductsQuery();
+  const { pageNum } = useParams();
+  const { data, isError, isLoading } = useGetProductsQuery({ pageNum });
 
   if (isLoading) {
     return (
@@ -26,7 +27,7 @@ export default function Home() {
     );
   }
 
-  if (data.length < 1) {
+  if (data.products.length < 1) {
     return (
       <>
         <h1>Latest Products</h1>
@@ -39,7 +40,7 @@ export default function Home() {
     <>
       <h1>Latest Products</h1>
       <Row>
-        {data.map((p) => (
+        {data.products.map((p) => (
           <Col key={p._id} sm={12} md={6} lg={4} xl={3}>
             <Product product={p} />
           </Col>

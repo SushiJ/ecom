@@ -22,6 +22,12 @@ export type Product = {
   reviews: Array<Review>;
 };
 
+export type ProductsPaginated = {
+  products: Array<Product>;
+  page: number;
+  pages: number;
+};
+
 export type ProductApiResponse = Product;
 
 export type UpdateProductMutation = {

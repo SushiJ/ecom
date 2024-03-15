@@ -2,14 +2,23 @@ import {
   CreateProductReviewMutation,
   Product,
   ProductApiResponse,
+  ProductsPaginated,
   UpdateProductMutation,
 } from "../../types/product.ts";
 import { api } from "../api.ts";
 
 export const productApiSlice = api.injectEndpoints({
   endpoints: (builder) => ({
-    getProducts: builder.query<ProductApiResponse[], void>({
-      query: () => `products`,
+    getProducts: builder.query<
+      ProductsPaginated,
+      { pageNum: string | undefined }
+    >({
+      query: ({ pageNum }) => ({
+        url: `products`,
+        params: {
+          pageNum,
+        },
+      }),
       providesTags: ["Products"],
       keepUnusedDataFor: 5,
     }),

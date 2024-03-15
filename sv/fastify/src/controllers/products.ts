@@ -3,10 +3,26 @@ import { productModel } from "../models/Product";
 
 //TODO: migrate the prices to INR
 class Product {
-  async getProducts(_req: FastifyRequest, reply: FastifyReply) {
-    const products = await productModel.find();
+  async getProducts(
+    req: FastifyRequest<{
+      Querystring: {
+        pageNum?: string;
+      };
+    }>,
+    reply: FastifyReply,
+  ) {
+    const page = Number(req.query.pageNum) || 1;
+    const pageSize = 2;
+    const count = await productModel.countDocuments();
+
+    const products = await productModel
+      .find()
+      .limit(pageSize)
+      .skip(pageSize * (page - 1));
     if (!products) reply.status(200).send([]);
-    reply.status(200).send(products);
+    reply
+      .status(200)
+      .send({ products, page, pages: Math.ceil(count / pageSize) });
   }
 
   async getProductsById(
