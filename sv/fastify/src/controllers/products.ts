@@ -12,7 +12,7 @@ class Product {
     reply: FastifyReply,
   ) {
     const page = Number(req.query.pageNum) || 1;
-    const pageSize = 2;
+    const pageSize = 4;
     const count = await productModel.countDocuments();
 
     const products = await productModel

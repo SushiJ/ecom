@@ -5,6 +5,8 @@ import { Icon } from "@iconify/react";
 import { Product } from "../types/product";
 import { useGetProductsQuery } from "../features/products/slice";
 
+import Paginate from "../components/Paginate";
+
 export default function Home() {
   const { pageNum } = useParams();
   const { data, isError, isLoading } = useGetProductsQuery({ pageNum });
@@ -21,7 +23,6 @@ export default function Home() {
   if ((!data || isError) && !isLoading) {
     return (
       <>
-        <h1>Latest Products</h1>
         <p>Something went wrong</p>
       </>
     );
@@ -30,14 +31,13 @@ export default function Home() {
   if (data.products.length < 1) {
     return (
       <>
-        <h1>Latest Products</h1>
         <p>No Products found</p>
       </>
     );
   }
 
   return (
-    <>
+    <main className="d-flex flex-column">
       <h1>Latest Products</h1>
       <Row>
         {data.products.map((p) => (
@@ -46,7 +46,8 @@ export default function Home() {
           </Col>
         ))}
       </Row>
-    </>
+      <Paginate pages={data.pages} page={data.page} />
+    </main>
   );
 }
 
