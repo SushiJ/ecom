@@ -7,16 +7,24 @@ class Product {
     req: FastifyRequest<{
       Querystring: {
         pageNum?: string;
+        keyword?: string;
       };
     }>,
     reply: FastifyReply,
   ) {
     const page = Number(req.query.pageNum) || 1;
+    const keyword = req.query.keyword;
+    let query = {};
+
+    if (keyword) {
+      query = { name: { $regex: keyword, $options: "i" } };
+    }
+
     const pageSize = 4;
-    const count = await productModel.countDocuments();
+    const count = await productModel.countDocuments(query);
 
     const products = await productModel
-      .find()
+      .find(query)
       .limit(pageSize)
       .skip(pageSize * (page - 1));
     if (!products) reply.status(200).send([]);

@@ -5,12 +5,14 @@ type PaginateProps = {
   isAdmin?: boolean;
   page: number;
   pages: number;
+  keyword?: string;
 };
 
 function Paginate({
   page,
   pages,
   isAdmin = false,
+  keyword,
 }: PaginateProps): JSX.Element {
   if (pages > 1) {
     return (
@@ -18,7 +20,13 @@ function Paginate({
         {/* TODO: Rethink this? */}
         {[...Array(pages).keys()].map((x) => (
           <Link
-            to={isAdmin ? `/admin/products/${x + 1}` : `/page/${x + 1}`}
+            to={
+              keyword
+                ? isAdmin
+                  ? `/admin/products/${x + 1}`
+                  : `/search/${keyword}/page/${x + 1}`
+                : `/page/${x + 1}`
+            }
             key={x + 1}
             className="me-2 link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
           >

@@ -8,8 +8,11 @@ import { useGetProductsQuery } from "../features/products/slice";
 import Paginate from "../components/Paginate";
 
 export default function Home() {
-  const { pageNum } = useParams();
-  const { data, isError, isLoading } = useGetProductsQuery({ pageNum });
+  const { pageNum, keyword } = useParams();
+  const { data, isError, isLoading } = useGetProductsQuery({
+    pageNum,
+    keyword,
+  });
 
   if (isLoading) {
     return (
@@ -46,7 +49,7 @@ export default function Home() {
           </Col>
         ))}
       </Row>
-      <Paginate pages={data.pages} page={data.page} />
+      <Paginate pages={data.pages} page={data.page} keyword={keyword} />
     </main>
   );
 }
