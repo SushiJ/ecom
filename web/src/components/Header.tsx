@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { useLogoutMutation } from "../features/user/slice";
 import { resetCreds } from "../features/auth/slice";
 import { resetCart } from "../features/cart/slice";
+import SearchBox from "./SearchBox";
 
 export function Header() {
   const dispatch = useAppDispatch();
@@ -45,6 +46,7 @@ export function Header() {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
+              <SearchBox />
               <Link
                 to="/cart"
                 className="d-flex align-items-center text-white text-decoration-none"
