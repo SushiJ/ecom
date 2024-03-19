@@ -6,6 +6,7 @@ import { Product } from "../types/product";
 import { useGetProductsQuery } from "../features/products/slice";
 
 import Paginate from "../components/Paginate";
+import ProductCarousel from "../components/ProductCarousel";
 
 export default function Home() {
   const { pageNum, keyword } = useParams();
@@ -42,6 +43,7 @@ export default function Home() {
   return (
     <main className="d-flex flex-column">
       <h1>Latest Products</h1>
+      <ProductCarousel />
       <Row>
         {data.products.map((p) => (
           <Col key={p._id} sm={12} md={6} lg={4} xl={3}>
