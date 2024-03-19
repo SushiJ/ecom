@@ -21,11 +21,11 @@ function Paginate({
         {[...Array(pages).keys()].map((x) => (
           <Link
             to={
-              keyword
-                ? isAdmin
-                  ? `/admin/products/${x + 1}`
-                  : `/search/${keyword}/page/${x + 1}`
-                : `/page/${x + 1}`
+              isAdmin
+                ? `/admin/products/${x + 1}`
+                : keyword
+                  ? `/search/${keyword}/page/${x + 1}`
+                  : `/page/${x + 1}`
             }
             key={x + 1}
             className="me-2 link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
