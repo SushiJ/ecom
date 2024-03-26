@@ -32,10 +32,12 @@ import ProductList from "./pages/admin/ProductsList.tsx";
 import ProductEdit from "./pages/admin/ProductEdit.tsx";
 import UsersList from "./pages/admin/UsersList.tsx";
 import UserEdit from "./pages/admin/UserEdit.tsx";
+import NotFound from "./components/NotFound.tsx";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
+      <Route path="*" element={<NotFound />} />
       <Route index={true} path="/" element={<Home />} />
       <Route path="/search/:keyword" element={<Home />} />
       <Route path="/page/:pageNum" element={<Home />} />
