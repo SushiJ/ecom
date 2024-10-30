@@ -1,5 +1,4 @@
-import { Container } from "react-bootstrap";
-import { Outlet } from "react-router-dom";
+// import { Outlet } from "react-router-dom";
 
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
@@ -11,11 +10,11 @@ function App() {
   return (
     <div className="d-flex flex-column vh-100">
       <Header />
-      <main className="py-3 flex-grow-1 overflow-auto">
-        <Container>
-          <Outlet />
-        </Container>
-      </main>
+      {/* <main className="py-3 flex-grow-1 overflow-auto"> */}
+      {/* <Container> */}
+      {/*   <Outlet /> */}
+      {/* </Container> */}
+      {/* </main> */}
       <ToastContainer theme="dark" position="bottom-right" autoClose={2000} />
       <Footer />
     </div>
