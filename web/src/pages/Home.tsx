@@ -7,6 +7,7 @@ import { useGetProductsQuery } from "../features/products/slice";
 
 import Paginate from "../components/Paginate";
 import ProductCarousel from "../components/ProductCarousel";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const { pageNum, keyword } = useParams();
@@ -51,6 +52,7 @@ export default function Home() {
           </Col>
         ))}
       </Row>
+      <Button variant="ghost">THIS IS SHADCN BUTTON</Button>
       <Paginate pages={data.pages} page={data.page} keyword={keyword} />
     </main>
   );
