@@ -14,12 +14,8 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
@@ -50,7 +46,7 @@ export function Header() {
   }
 
   return (
-    <header className="bg-red-300">
+    <header className="">
       <nav className="sticky top-0 min-h-16 flex items-center justify-between p-2 max-w-screen-2xl mx-auto w-full">
         <Link
           to="/"
@@ -62,242 +58,87 @@ export function Header() {
           <SearchBox />
           <Separator orientation="vertical" />
           <Button variant="outline" size="sm">
-            Cart
+            Cart {totalItems.toFixed()}
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                {userInfo?.name ?? "No name"}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  Profile
-                  <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Billing
-                  <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Settings
-                  <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Keyboard shortcuts
-                  <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>Team</DropdownMenuItem>
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent>
-                      <DropdownMenuItem>Email</DropdownMenuItem>
-                      <DropdownMenuItem>Message</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>More...</DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-                <DropdownMenuItem>
-                  New Team
-                  <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>GitHub</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuItem disabled>API</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
-                Log out
-                <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* userInfo && userInfo.name so that it renders the button correctly when logged */}
+          {userInfo && userInfo.name ? (
+            userInfo.isAdmin ? (
+              <AdminMenu userInfo={userInfo} handleLogout={handleLogout} />
+            ) : (
+              <Menu userInfo={userInfo} handleLogout={handleLogout} />
+            )
+          ) : (
+            <Button onClick={() => navigate("/login")}>Login</Button>
+          )}
         </div>
       </nav>
     </header>
   );
 }
-{
-  {
-    /*       <Nav className="ms-auto"> */
-  }
-  {
-    /*         <SearchBox /> */
-  }
-  {
-    /*         <Link */
-  }
-  {
-    /*           to="/cart" */
-  }
-  {
-    /*           className="d-flex align-items-center text-white text-decoration-none" */
-  }
-  {
-    /*         > */
-  }
-  {
-    /*           <Icon */
-  }
-  {
-    /*             icon="fluent:shopping-bag-16-regular" */
-  }
-  {
-    /*             width="24" */
-  }
-  {
-    /*             height="24" */
-  }
-  {
-    /*           /> */
-  }
-  {
-    /*           Cart */
-  }
-  {
-    /*           {totalItems > 0 && ( */
-  }
-  {
-    /*             <Badge pill bg="success" style={{ marginLeft: "5px" }}> */
-  }
-  {
-    /*               {totalItems} */
-  }
-  {
-    /*             </Badge> */
-  }
-  {
-    /*           )} */
-  }
-  {
-    /*         </Link> */
-  }
-  {
-    /* Admin Links */
-  }
-  {
-    /*         {userInfo && userInfo.isAdmin && ( */
-  }
-  {
-    /*           <NavDropdown title="Admin" id="adminmenu" className="me-0"> */
-  }
-  {
-    /*             <NavDropdown.Item onClick={() => navigate("/admin/products")}> */
-  }
-  {
-    /*               Products */
-  }
-  {
-    /*             </NavDropdown.Item> */
-  }
-  {
-    /*             <NavDropdown.Item onClick={() => navigate("/admin/orders")}> */
-  }
-  {
-    /*               Orders */
-  }
-  {
-    /*             </NavDropdown.Item> */
-  }
-  {
-    /*             <NavDropdown.Item onClick={() => navigate("/admin/users")}> */
-  }
-  {
-    /*               Users */
-  }
-  {
-    /*             </NavDropdown.Item> */
-  }
-  {
-    /*           </NavDropdown> */
-  }
-  {
-    /*         )} */
-  }
-  {
-    /* INFO: There's a bug where the menu is still after the user logs out, checking for name property fixes it */
-  }
 
-  {
-    /*         {userInfo && userInfo.name ? */
-  }
-  {
-    /*           <NavDropdown */
-  }
-  {
-    /*             title={userInfo.name} */
-  }
-  {
-    /*             id="username" */
-  }
-  {
-    /*             className="me-0" */
-  }
-  {
-    /*           > */
-  }
-  {
-    /*             <NavDropdown.Item onClick={() => navigate("/profile")}> */
-  }
-  {
-    /*               Profile */
-  }
-  {
-    /*             </NavDropdown.Item> */
-  }
-  {
-    /*             <NavDropdown.Item as="button" onClick={handleLogout}> */
-  }
-  {
-    /*               Logout */
-  }
-  {
-    /*             </NavDropdown.Item> */
-  }
-  {
-    /*           </NavDropdown> */
-  }
-  {
-    /*         ) : ( */
-  }
-  {
-    /*           <Link */
-  }
-  {
-    /*             to="/login" */
-  }
-  {
-    /*             className="d-flex align-items-center text-white text-decoration-none" */
-  }
-  {
-    /*           > */
-  }
-  {
-    /*             <Icon icon="uil:signin" width="22" height="22" /> */
-  }
-  {
-    /*             sign in / sign up */
-  }
-  {
-    /*           </Link> */
-  }
-  {
-    /*         )} */
-  }
-  {
-    /*       </Nav> */
-  }
-  {
-    /*     </Navbar.Collapse> */
-  }
-  /*   </Container> */
+function AdminMenu(props: {
+  userInfo: any;
+  handleLogout: () => Promise<void>;
+}) {
+  const navigate = useNavigate();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm">
+          {props.userInfo.name}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuGroup>
+          <DropdownMenuItem onClick={() => navigate("/profile")}>
+            Profile
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem onClick={() => navigate("/admin/products")}>
+            Products
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/admin/orders")}>
+            Orders
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/admin/users")}>
+            Users
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={props.handleLogout}>
+          Log out
+          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function Menu(props: { userInfo: any; handleLogout: () => Promise<void> }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm">
+          {props.userInfo.name}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            Profile
+            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={props.handleLogout}>
+          Log out
+          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
