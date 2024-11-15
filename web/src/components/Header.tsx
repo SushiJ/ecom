@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Icon } from "@iconify/react";
+// import { Icon } from "@iconify/react";
 import { toast } from "react-toastify";
 
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
