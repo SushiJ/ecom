@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
+import { Icon } from "@iconify/react";
 
 import {
   Form,
@@ -46,14 +47,18 @@ export function SearchBox() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Search products..." {...field} />
+                <Input
+                  placeholder="Search products..."
+                  {...field}
+                  className="h-8"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <Button type="submit" variant="outline" size="sm">
-          Submit
+          <Icon icon="mynaui:search" />
         </Button>
       </form>
       <Button

@@ -68,7 +68,9 @@ export function Header() {
               <Menu userInfo={userInfo} handleLogout={handleLogout} />
             )
           ) : (
-            <Button onClick={() => navigate("/login")}>Login</Button>
+            <Button size="sm" onClick={() => navigate("/login")}>
+              Login
+            </Button>
           )}
         </div>
       </nav>
