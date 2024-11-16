@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from "react";
+import { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
@@ -20,24 +20,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { cn } from "@/lib/utils";
+import FormContainer from "@/components/FormContainer";
 
-const formSchema = z
-  .object({
-    email: z.string().email({
-      message: "Please enter a valid email address",
+const formSchema = z.object({
+  email: z.string().email({
+    message: "Please enter a valid email address",
+  }),
+  password: z
+    .string({
+      message: "Password is required",
+    })
+    .min(6, {
+      message: "Password must be at least 6 characters",
     }),
-    password: z
-      .string({
-        message: "Password is required",
-      })
-      .min(6, {
-        message: "Password must be at least 6 characters",
-      }),
-  })
-  .required({
-    email: true,
-    password: true,
-  });
+});
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -83,21 +80,25 @@ const Login = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log("ERROR:::", error);
-      toast(error.data.error, {
+      toast(error.data.message, {
         type: "error",
       });
     }
   };
 
   return (
-    <Fragment>
+    <FormContainer>
       <Form {...form}>
-        <h1>Login</h1>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="max-w-56 flex items-center justify-center mx-auto"
+          className="items-center justify-center mx-auto"
         >
-          <fieldset className={isLoading ? "opacity-50" : "opacity-100"}>
+          <fieldset
+            className={cn(
+              "space-y-10",
+              isLoading ? "opacity-50" : "opacity-100",
+            )}
+          >
             <FormField
               control={form.control}
               name="email"
@@ -129,23 +130,23 @@ const Login = () => {
               )}
             />
 
-            <Button disabled={isLoading} type="submit" variant="outline">
+            <Button disabled={isLoading} type="submit" className="w-full">
               Sign In
             </Button>
           </fieldset>
         </form>
         {isLoading && <Loader />}
+        <div className="text-center mt-4">
+          New Customer?
+          <Link
+            to={redirect ? `/register?redirect=${redirect}` : "/register"}
+            className="ms-1 underline"
+          >
+            Sign up
+          </Link>
+        </div>
       </Form>
-      <div className="flex justify-center">
-        New Customer?
-        <Link
-          to={redirect ? `/register?redirect=${redirect}` : "/register"}
-          className="ms-1 underline"
-        >
-          Sign up
-        </Link>
-      </div>
-    </Fragment>
+    </FormContainer>
   );
 };
 
