@@ -1,20 +1,19 @@
 import { Link, useParams } from "react-router-dom";
-import { Col, Row } from "react-bootstrap";
 import { Icon } from "@iconify/react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 import { Product } from "../types/product";
 import { useGetProductsQuery } from "../features/products/slice";
 
 import Paginate from "../components/Paginate";
 import ProductCarousel from "../components/ProductCarousel";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 export default function Home() {
   const { pageNum, keyword } = useParams();
@@ -52,7 +51,8 @@ export default function Home() {
     <section className="flex flex-col">
       <h1>Latest Products</h1>
       <ProductCarousel />
-      <div className="grid gap-2 grid-cols-2">
+      <Separator className="my-2" />
+      <div className="grid grid-cols-2 gap-2">
         {data.products.map((p) => (
           <div key={p._id}>
             <Product product={p} />
@@ -66,7 +66,7 @@ export default function Home() {
 
 function Product(props: { product: Product }) {
   return (
-    <Card className="">
+    <Card className="shadow-none h-[450px]">
       <Link to={`/products/${props.product._id}`}>
         <CardHeader className="flex flex-col items-center">
           <img
@@ -76,12 +76,12 @@ function Product(props: { product: Product }) {
           <CardTitle>{props.product.name}</CardTitle>
           <CardDescription>{props.product.description}</CardDescription>
         </CardHeader>
-        <CardContent className="block">
+        <CardContent>
+          <p>$ {props.product.price}</p>
           <Rating
             value={props.product.rating}
             text={`${props.product.numReviews} reviews`}
           />
-          <p>$ {props.product.price}</p>
         </CardContent>
       </Link>
     </Card>
