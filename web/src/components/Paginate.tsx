@@ -1,6 +1,3 @@
-import { Link } from "react-router-dom";
-import { Pagination } from "react-bootstrap";
-
 type PaginateProps = {
   isAdmin?: boolean;
   page: number;
@@ -8,43 +5,42 @@ type PaginateProps = {
   keyword?: string;
 };
 
-function Paginate({
-  page,
-  pages,
-  isAdmin = false,
-  keyword,
-}: PaginateProps): JSX.Element {
-  if (pages > 1) {
-    return (
-      <Pagination className="align-self-center mt-4">
-        {/* TODO: Rethink this? */}
-        {[...Array(pages).keys()].map((x) => (
-          <Link
-            to={
-              isAdmin
-                ? `/admin/products/${x + 1}`
-                : keyword
-                  ? `/search/${keyword}/page/${x + 1}`
-                  : `/page/${x + 1}`
-            }
-            key={x + 1}
-            className="me-2 link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
-          >
-            {isActive(page, x + 1) ? (
-              <span className="fw-bold p-2">{x + 1}</span>
-            ) : (
-              <span className="p-2">{x + 1}</span>
-            )}
-          </Link>
-        ))}
-      </Pagination>
-    );
-  }
-  return <></>;
-}
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+} from "@/components/ui/pagination";
+import { cn } from "@/lib/utils";
+import { Link, useLocation } from "react-router-dom";
 
-function isActive(page: number, compare: number) {
-  return compare === page ? true : false;
+function Paginate(props: PaginateProps) {
+  const { pathname } = useLocation();
+
+  return (
+    <Pagination className="mt-4">
+      <PaginationContent className="space-x-2">
+        {[...Array(props.pages).keys()].map((x) => (
+          <PaginationItem key={x}>
+            <Link
+              className={cn(
+                "py-2 px-3 hover:bg-neutral-100",
+                x + 1 === Number(pathname.split("/")[2]) ? "font-bold" : "",
+              )}
+              to={
+                props.isAdmin
+                  ? `/admin/products/${x + 1}`
+                  : props.keyword
+                    ? `/search/${props.keyword}/page/${x + 1}`
+                    : `/page/${x + 1}`
+              }
+            >
+              {x + 1}
+            </Link>
+          </PaginationItem>
+        ))}
+      </PaginationContent>
+    </Pagination>
+  );
 }
 
 export default Paginate;
