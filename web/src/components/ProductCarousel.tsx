@@ -9,6 +9,7 @@ import {
 import { useGetTopProductsQuery } from "../features/products/slice";
 import { Link } from "react-router-dom";
 import Loader from "./Loader";
+import { Card } from "./ui/card";
 
 function ProductCarousel() {
   const { data: products, isLoading, error } = useGetTopProductsQuery();
@@ -35,13 +36,13 @@ function ProductCarousel() {
       <CarouselContent>
         {products.map((product) => (
           <CarouselItem key={product._id}>
-            <div>
+            <Card className="shadow-none">
               <Link to={`/products/${product._id}`} className="text-center">
                 <img src={product.image} alt={product.name} />
                 <h1>{product.name}</h1>
                 <p>${product.price}</p>
               </Link>
-            </div>
+            </Card>
           </CarouselItem>
         ))}
       </CarouselContent>
