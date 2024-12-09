@@ -48,16 +48,15 @@ fastify.register(userRoutes, { prefix: "/users" });
 fastify.register(productRoutes, { prefix: "/products" });
 fastify.register(orderRoutes, { prefix: "/orders" });
 
-fastify.setErrorHandler((err, req: FastifyRequest, res: FastifyReply) => {
-  if (err) {
-    req.log.error({ err }, err.message);
-    err.message
-      ? res.send({ status: res.status, error: err.message })
-      : res.status(500).send({ status: 500, error: "Internal Server Error" });
-    return res;
-  }
-  return;
-});
+// fastify.setErrorHandler((err, req: FastifyRequest, res: FastifyReply) => {
+//   if (err) {
+//     req.log.error({ err }, err.message);
+//     err.message
+//       ? res.send({ status: res.status, error: err.message })
+//       : res.status(500).send({ status: 500, error: "Internal Server Error" });
+//     return res;
+//   }
+// });
 
 // PAYPAL
 fastify.get(
