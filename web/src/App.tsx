@@ -8,9 +8,9 @@ import "./index.css";
 
 function App() {
   return (
-    <div className="d-flex flex-column vh-100 container">
+    <div className="container mx-auto px-6">
       <Header />
-      <main className="py-3 flex-grow-1 overflow-auto">
+      <main className="py-3 flex-grow overflow-auto">
         <Outlet />
       </main>
       <ToastContainer theme="dark" position="bottom-right" autoClose={2000} />

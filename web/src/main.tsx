@@ -9,7 +9,6 @@ import {
 import { Provider } from "react-redux";
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
-import "./assets/bootstrap.css";
 import "./assets/index.css";
 import App from "./App.tsx";
 

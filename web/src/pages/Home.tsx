@@ -1,5 +1,4 @@
 import { Link, useParams } from "react-router-dom";
-import { Icon } from "@iconify/react";
 import {
   Card,
   CardContent,
@@ -14,6 +13,7 @@ import { useGetProductsQuery } from "../features/products/slice";
 
 import Paginate from "../components/Paginate";
 import ProductCarousel from "../components/ProductCarousel";
+import { Rating } from "@/components/Rating";
 
 export default function Home() {
   const { pageNum, keyword } = useParams();
@@ -25,7 +25,7 @@ export default function Home() {
   if (isLoading) {
     return (
       <>
-        <h1>Latest Products</h1>
+        {/* <h1>Latest Products</h1> */}
         <p>Loading...</p>
       </>
     );
@@ -48,8 +48,8 @@ export default function Home() {
   }
 
   return (
-    <section className="flex flex-col">
-      <h1>Latest Products</h1>
+    <section>
+      <h1 className="text-center italic text-neutral-500">Latest Products</h1>
       <ProductCarousel />
       <Separator className="my-2" />
       <div className="grid grid-cols-2 gap-2">
@@ -85,47 +85,5 @@ function Product(props: { product: Product }) {
         </CardContent>
       </Link>
     </Card>
-  );
-}
-
-function Rating(props: { value: number; text: string }) {
-  return (
-    <div className="text-xs mb-2">
-      <RenderRatingIcon value={props.value} />
-      <span className="ms-1">{props.text ?? props.text}</span>
-    </div>
-  );
-}
-
-function RenderRatingIcon(props: { value: number }) {
-  return (
-    <>
-      <span className="flex">
-        {[1, 2, 3, 4, 5].map((num, idx) =>
-          props.value >= num ? (
-            <Icon
-              key={idx}
-              icon="fluent:star-12-filled"
-              width="20"
-              height="20"
-            />
-          ) : props.value >= num - 0.5 ? (
-            <Icon
-              key={idx}
-              icon="fluent:star-half-12-regular"
-              width="20"
-              height="20"
-            />
-          ) : (
-            <Icon
-              key={idx}
-              icon="fluent:star-12-regular"
-              width="20"
-              height="20"
-            />
-          ),
-        )}
-      </span>
-    </>
   );
 }
