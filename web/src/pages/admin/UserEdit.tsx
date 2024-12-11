@@ -1,16 +1,39 @@
-import { Fragment } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Fragment, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import * as z from "zod";
 
+import { cn, useDelay } from "@/lib/utils";
 import {
   useGetUserDetailsQuery,
   useUpdateUserMutation,
 } from "../../features/user/slice";
 
-import Loader from "../../components/Loader";
-import FormContainer from "../../components/FormContainer";
+import Loader from "@/components/Loader";
+import FormContainer from "@/components/FormContainer";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { GoBack } from "@/components/ui/goback";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+const formSchema = z.object({
+  name: z.string(),
+  email: z.string(),
+  isAdmin: z.enum(["true", "false"], {
+    required_error: "You need to select true or false",
+  }),
+});
 
 const UserEdit = () => {
   const { id: userId } = useParams() as { id: string };
@@ -19,31 +42,26 @@ const UserEdit = () => {
 
   const { data, isLoading, refetch, error } = useGetUserDetailsQuery(userId);
 
-  const initialState = {
-    name: data ? data.name : "",
-    email: data ? data.email : "",
-    isAdmin: data ? data.isAdmin : false,
-    userId,
-  };
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<typeof initialState>({
-    values: initialState,
-    mode: "onSubmit",
-    reValidateMode: "onChange",
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
   });
+
+  useEffect(() => {
+    if (!data) return;
+    form.reset({ ...data, isAdmin });
+  }, [isLoading]);
+
+  const delay = useDelay(400);
 
   const [updateUser, { isLoading: loadingUpdate }] = useUpdateUserMutation();
 
-  const onSubmit = async (values: typeof initialState) => {
+  let isAdmin: "true" | "false" = data?.isAdmin ? "true" : "false";
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await updateUser({
         name: values.name,
         email: values.email,
-        isAdmin: values.isAdmin,
+        isAdmin: values.isAdmin === "true" ? true : false,
         id: userId,
       }).unwrap();
       toast.success("Updated successfully");
@@ -60,85 +78,101 @@ const UserEdit = () => {
 
   return (
     <>
-      <Link to="/admin/users" className="btn btn-light my-3">
-        Go Back
-      </Link>
+      <div className="mb-8">
+        <GoBack to="/admin/users" />
+        <h1 className="text-center text-sm italic">Edit</h1>
+      </div>
       <FormContainer>
         <Fragment>
-          <h1>Edit User</h1>
           {loadingUpdate && <Loader />}
-          {isLoading ? (
+          {isLoading || delay ? (
             <Loader />
           ) : error ? (
-            <Alert variant="danger">{JSON.stringify(error, null, 2)}</Alert>
+            <pre>{JSON.stringify(error, null, 2)}</pre>
           ) : (
-            <Form onSubmit={handleSubmit(onSubmit)}>
-              <fieldset className={isLoading ? "opacity-50" : "opacity-100"}>
-                <Form.Group className="my-2" controlId="name">
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter name..."
-                    {...register("name", { required: "Name is required" })}
-                  ></Form.Control>
-                  {errors.name && (
-                    <Form.Text className="text-danger">
-                      {errors.name.message}
-                    </Form.Text>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <fieldset
+                  className={cn(
+                    isLoading ? "opacity-50" : "opacity-100",
+                    "space-y-2",
                   )}
-                </Form.Group>
-
-                <Form.Group className="my-2" controlId="email">
-                  <Form.Label>Email</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Enter email..."
-                    {...register("email", { required: "Email is required" })}
-                  ></Form.Control>
-                  {errors.email && (
-                    <Form.Text className="text-danger">
-                      {errors.email.message}
-                    </Form.Text>
-                  )}
-                </Form.Group>
-
-                <Form.Group className="my-2" controlId="isAdmin">
-                  <Form.Label>Is admin</Form.Label>
-                  <Form.Check
-                    className="my-2"
-                    type="radio"
-                    label="False"
-                    id="false"
-                    value="false"
-                    {...register("isAdmin", {
-                      required: "isAdmin is required",
-                    })}
+                >
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="John Doe..." {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          This is your public display name.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  <Form.Check
-                    className="my-2"
-                    type="radio"
-                    label="True"
-                    id="true"
-                    value="true"
-                    {...register("isAdmin", {
-                      required: "isAdmin is required",
-                    })}
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="johndoe@email.com" {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          This is your public email.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  {errors.isAdmin && (
-                    <Form.Text className="text-danger">
-                      {errors.isAdmin.message}
-                    </Form.Text>
-                  )}
-                </Form.Group>
-
+                  <FormField
+                    control={form.control}
+                    name="isAdmin"
+                    render={({ field }) => (
+                      <FormItem className="space-y-3">
+                        <FormLabel>Admin status</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={isAdmin}
+                            className="flex flex-col space-y-1"
+                          >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="true" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                True
+                              </FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="false" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                False
+                              </FormLabel>
+                            </FormItem>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </fieldset>
                 <Button
                   type="submit"
-                  variant="primary"
-                  style={{ marginTop: "1rem" }}
+                  className="w-full mt-10"
+                  onClick={() => console.log("SUBMITTING")}
                 >
                   Update
                 </Button>
-              </fieldset>
+              </form>
             </Form>
           )}
         </Fragment>
