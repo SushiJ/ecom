@@ -1,12 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
-// import { Icon } from "@iconify/react";
 import { toast } from "react-toastify";
 
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { useLogoutMutation } from "../features/user/slice";
 import { resetCreds } from "../features/auth/slice";
 import { resetCart } from "../features/cart/slice";
-import SearchBox from "./SearchBox";
+
+import SearchBox from "@/components/SearchBox";
+import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,7 +19,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
+import { Icon } from "@iconify/react";
 
 export function Header() {
   const dispatch = useAppDispatch();
@@ -46,20 +47,23 @@ export function Header() {
   }
 
   return (
-    <header className="">
+    <header>
       <nav className="sticky top-0 min-h-16 flex items-center justify-between p-2 max-w-screen-2xl mx-auto w-full">
         <Link
           to="/"
-          className="me-6 text-2xl font-bold hover:text-neutral-700/80"
+          className="lg:text-2xl lg:font-bold hover:text-neutral-700/80"
         >
           Shopp-e
         </Link>
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 items-center">
           <SearchBox />
           <Separator orientation="vertical" />
           <Link to="/cart">
-            <Button variant="outline" size="sm">
-              Cart {totalItems.toFixed()}
+            <Button variant="outline" size="sm" className="relative">
+              <Icon icon="solar:cart-4-line-duotone" width="32" height="32" />
+              <span className="absolute top-[-0.5rem] right-[-0.5rem] bg-neutral-800 text-white px-1.5 py-0.5 rounded text-xs">
+                {totalItems.toFixed()}
+              </span>
             </Button>
           </Link>
           {/* userInfo && userInfo.name so that it renders the button correctly when logged */}
@@ -121,6 +125,7 @@ function AdminMenu(props: {
 }
 
 function Menu(props: { userInfo: any; handleLogout: () => Promise<void> }) {
+  const navigate = useNavigate();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -132,15 +137,13 @@ function Menu(props: { userInfo: any; handleLogout: () => Promise<void> }) {
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/profile")}>
             Profile
-            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={props.handleLogout}>
           Log out
-          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -40,40 +40,41 @@ export function SearchBox() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex space-x-2">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex items-center gap-1"
+      >
         <FormField
           control={form.control}
           name="keyword"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="relative">
               <FormControl>
                 <Input
+                  size={18}
                   placeholder="Search products..."
                   {...field}
-                  className="h-8"
+                  className="text-sm h-8"
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" variant="outline" size="sm">
-          <Icon icon="mynaui:search" />
+        <Button
+          type="reset"
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            form.resetField("keyword", {
+              defaultValue: "",
+            });
+            navigate("/");
+          }}
+        >
+          reset
         </Button>
       </form>
-      <Button
-        type="reset"
-        variant="outline"
-        size="sm"
-        onClick={() => {
-          form.resetField("keyword", {
-            defaultValue: "",
-          });
-          navigate("/");
-        }}
-      >
-        reset
-      </Button>
     </Form>
   );
 }
