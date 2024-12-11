@@ -1,19 +1,25 @@
-import { Fragment, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Fragment, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import clsx from "clsx";
 
+import { useDelay } from "@/lib/utils";
 import {
   useGetProductsByIdQuery,
   useUpdateProductMutation,
   // useUploadProductImageMutation,
 } from "../../features/products/slice";
 
-import Loader from "../../components/Loader";
-import FormContainer from "../../components/FormContainer";
+import Loader from "@/components/Loader";
+import FormContainer from "@/components/FormContainer";
+import { GoBack } from "@/components/ui/goback";
+
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -22,30 +28,20 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { useDelay } from "@/lib/utils";
 
 const formSchema = z.object({
   name: z.string().min(1, {
     message: "Product is required",
   }),
-  price: z.number().min(1, {
-    message: "Price is required",
-  }),
+  price: z.string(),
   image: z.string().min(6, {
     message: "Image is required",
   }),
-  brand: z.string().min(6, {
-    message: "Brand is required",
-  }),
+  brand: z.string(),
   category: z.string().min(6, {
     message: "Category is required",
   }),
-  countInStock: z.number().min(1, {
-    message: "Count is required",
-  }),
+  countInStock: z.string(),
   description: z.string().min(6, {
     message: "Description is required",
   }),
@@ -70,7 +66,12 @@ const ProductEdit = () => {
 
   //TODO: Implement skeleton
   useEffect(() => {
-    form.reset({ ...product, productId });
+    form.reset({
+      ...product,
+      price: product?.price.toString(),
+      productId,
+      countInStock: product?.countInStock.toString(),
+    });
   }, [isLoading]);
 
   const [updateProduct, { isLoading: loadingUpdate }] =
@@ -86,10 +87,10 @@ const ProductEdit = () => {
         name: values.name,
         brand: values.brand,
         description: values.description,
-        countInStock: values.countInStock,
+        countInStock: +values.countInStock,
         category: values.category,
         image: values.image,
-        price: values.price,
+        price: +values.price,
       }).unwrap();
       toast.success("Updated successfully");
       refetch();
@@ -118,12 +119,7 @@ const ProductEdit = () => {
   if (error) return <pre>{JSON.stringify(error, null, 2)}</pre>;
   return (
     <>
-      <Link
-        to="/admin/products"
-        className="my-4 text-xs bg-neutral-300 px-2 py-1 rounded"
-      >
-        Go Back
-      </Link>
+      <GoBack to="/admin/products" />
       <h1 className="text-sm italic text-center my-8">Edit</h1>
       <FormContainer>
         <Fragment>
@@ -257,10 +253,10 @@ const ProductEdit = () => {
                       </FormItem>
                     )}
                   />
-                  <Button className="w-full" type="submit">
-                    Update
-                  </Button>
                 </fieldset>
+                <Button className="w-full mt-8" type="submit">
+                  Update
+                </Button>
               </form>
             </Form>
           )}
