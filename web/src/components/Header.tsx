@@ -57,9 +57,11 @@ export function Header() {
         <div className="flex space-x-4">
           <SearchBox />
           <Separator orientation="vertical" />
-          <Button variant="outline" size="sm">
-            Cart {totalItems.toFixed()}
-          </Button>
+          <Link to="/cart">
+            <Button variant="outline" size="sm">
+              Cart {totalItems.toFixed()}
+            </Button>
+          </Link>
           {/* userInfo && userInfo.name so that it renders the button correctly when logged */}
           {userInfo && userInfo.name ? (
             userInfo.isAdmin ? (
