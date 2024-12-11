@@ -1,49 +1,62 @@
 import { Link } from "react-router-dom";
-import { Table, Alert, Badge } from "react-bootstrap";
 
 import { useGetOrdersQuery } from "../../features/orders/slice";
 
-import Loader from "../../components/Loader";
+import { Badge } from "@/components/ui/badge";
+import Loader from "@/components/Loader";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const OrderList = () => {
   const { data: orders, isLoading, error } = useGetOrdersQuery();
 
-  if (!orders) {
-    return <p>No orders</p>;
+  if (!orders || orders.length === 0) {
+    return (
+      <>
+        <h1 className="text-sm italic text-center my-8">Orders</h1>
+        <p className="text-xs italic text-center">No orders</p>
+      </>
+    );
   }
 
-  console.log(orders);
   return (
     <>
-      <p>Admin Route</p>
-      <h1>Orders</h1>
+      <h1 className="text-sm italic text-center my-8">Orders</h1>
       {isLoading ? (
         <Loader />
       ) : error ? (
-        <Alert variant="danger">{JSON.stringify(error, null, 2)}</Alert>
+        <pre>{JSON.stringify(error, null, 2)}</pre>
       ) : (
-        <Table striped bordered hover responsive className="table-sm">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>USER</th>
-              <th>DATE</th>
-              <th>TOTAL</th>
-              <th>PAID</th>
-              <th>DELIVERED</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>USER</TableHead>
+              <TableHead>DATE</TableHead>
+              <TableHead>TOTAL</TableHead>
+              <TableHead>PAID</TableHead>
+              <TableHead>DELIVERED</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {orders.map((order) => (
-              <tr key={order._id}>
-                <td>{order._id}</td>
-                <td>{order.user._id && order.user.name}</td>
-                <td>{new Date(order.createdAt).toLocaleString("en-IN", {})}</td>
-                <td>${order.totalAmount}</td>
-                <td>
+              <TableRow key={order._id}>
+                <TableCell>{order._id}</TableCell>
+                <TableCell>{order.user._id && order.user.name}</TableCell>
+                <TableCell>
+                  {new Date(order.createdAt).toLocaleString("en-IN", {})}
+                </TableCell>
+                <TableCell>${order.totalAmount}</TableCell>
+                <TableCell>
                   {order.isPaid ? (
-                    <Badge bg="success" style={{ padding: "0.5rem" }}>
+                    <Badge variant="secondary">
                       {new Date(order.paidAt!).toLocaleString("en-IN", {
                         day: "numeric",
                         month: "short",
@@ -53,10 +66,12 @@ const OrderList = () => {
                       })}
                     </Badge>
                   ) : (
-                    <Badge bg="danger">Not Paid</Badge>
+                    <Badge variant="outline" className="text-xs italic">
+                      Not Paid
+                    </Badge>
                   )}
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                   {order.isDelivered ? (
                     new Date(order.deliveredAt!).toLocaleString("en-IN", {
                       day: "numeric",
@@ -66,20 +81,17 @@ const OrderList = () => {
                       minute: "2-digit",
                     })
                   ) : (
-                    <Badge bg="danger">Not Delivered</Badge>
+                    <Badge variant="outline" className="text-xs italic">
+                      Not delivered
+                    </Badge>
                   )}
-                </td>
-                <td>
-                  <Link
-                    to={`/order/${order._id}`}
-                    className="btn btn-sm btn-primary"
-                  >
-                    Details
-                  </Link>
-                </td>
-              </tr>
+                </TableCell>
+                <TableCell>
+                  <Link to={`/order/${order._id}`}>Details</Link>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
+          </TableBody>
         </Table>
       )}
     </>
