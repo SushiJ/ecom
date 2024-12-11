@@ -1,16 +1,57 @@
 import { Fragment, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Alert, Button, Form, Table } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Icon } from "@iconify/react";
+import clsx from "clsx";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useAppSelector } from "../hooks/redux";
 import { useProfileMutation } from "../features/user/slice";
-
-import FormContainer from "../components/FormContainer";
-import Loader from "../components/Loader";
 import { useGetMyOrdersQuery } from "../features/orders/slice";
+
+import FormContainer from "@/components/FormContainer";
+import Loader from "@/components/Loader";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+const formSchema = z
+  .object({
+    name: z.string().min(1, {
+      message: "name is required",
+    }),
+    email: z.string().email({
+      message: "please enter a valid email address",
+    }),
+    password: z.string().min(6, {
+      message: "password must be at least 6 characters",
+    }),
+    confirm: z.string().min(6, {
+      message: "password must be at least 6 characters",
+    }),
+  })
+  .refine((data) => data.password === data.confirm, {
+    message: "passwords do not match",
+    path: ["confirm"],
+  });
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -27,37 +68,22 @@ const Profile = () => {
     }
   }, [navigate, userInfo]);
 
-  const initialState = {
-    name: userInfo.name,
-    email: userInfo.email,
-    password: "",
-    confirmPassword: "",
-  };
-
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors },
-    setFocus,
-  } = useForm<typeof initialState>({
-    defaultValues: initialState,
-    mode: "onSubmit",
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     reValidateMode: "onChange",
+    defaultValues: {
+      name: userInfo.name,
+      email: userInfo.email,
+      confirm: "",
+      password: "",
+    },
   });
 
   useEffect(() => {
-    setFocus("name");
-  }, [setFocus]);
+    form.setFocus("name");
+  }, [form.setFocus]);
 
-  const onSubmit = async (values: typeof initialState) => {
-    if (values.password !== values.confirmPassword) {
-      setError("confirmPassword", {
-        message: "Password do not match",
-        type: "onBlur",
-      });
-      return;
-    }
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await updateProfile({
         name: values.name,
@@ -78,108 +104,104 @@ const Profile = () => {
     <Fragment>
       <FormContainer>
         <Fragment>
-          <h2>User Profile</h2>
-          <Form onSubmit={handleSubmit(onSubmit)}>
-            {/* TODO: may be address form side to side? */}
-            <fieldset className={isLoading ? "opacity-50" : "opacity-100"}>
-              <Form.Group className="my-2" controlId="name">
-                <Form.Label>Name</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter name..."
-                  {...register("name", { required: "Name is required" })}
-                ></Form.Control>
-                {errors.name && (
-                  <Form.Text className="text-danger">
-                    {errors.name.message}
-                  </Form.Text>
-                )}
-              </Form.Group>
+          <h2 className="text-center italic text-sm mb-8">Profile</h2>
+          <Form {...form}>
+            {/*       {/* TODO: may be address form side to side? */}
 
-              <Form.Group className="my-2" controlId="email">
-                <Form.Label>Email Address</Form.Label>
-                <Form.Control
-                  type="email"
-                  placeholder="Enter email..."
-                  {...register("email", { required: "Email is required" })}
-                ></Form.Control>
-                {errors.email && (
-                  <Form.Text className="text-danger">
-                    {errors.email.message}
-                  </Form.Text>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <fieldset
+                className={clsx(
+                  isLoading ? "opacity-50" : "opacity-100",
+                  "space-y-4",
                 )}
-              </Form.Group>
-
-              <Form.Group className="my-2" controlId="password">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Enter password..."
-                  {...register("password", {
-                    required: "password is required",
-                  })}
-                ></Form.Control>
-                {errors.password && (
-                  <Form.Text className="text-danger">
-                    {errors.password.message}
-                  </Form.Text>
-                )}
-              </Form.Group>
-
-              <Form.Group className="my-2" controlId="confirm">
-                <Form.Label>Confirm Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Enter password..."
-                  {...register("confirmPassword", {
-                    required: "password is required",
-                  })}
-                ></Form.Control>
-                {errors.confirmPassword && (
-                  <Form.Text className="text-danger">
-                    {errors.confirmPassword.message}
-                  </Form.Text>
-                )}
-              </Form.Group>
-
-              <Button
-                disabled={isLoading}
-                type="submit"
-                variant="primary"
-                className="mt-2"
               >
-                Save
-              </Button>
-            </fieldset>
-            {isLoading && <Loader />}
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Username</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John doe..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="johndoe@email.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input placeholder="******" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="confirm"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm password</FormLabel>
+                      <FormControl>
+                        <Input placeholder="******" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button disabled={isLoading} type="submit" className="mt-2">
+                  Save
+                </Button>
+              </fieldset>
+              {isLoading && <Loader />}
+            </form>
           </Form>
         </Fragment>
       </FormContainer>
       {loadingProfile && <Loader />}
-      <h2 className="mt-5">My Orders</h2>
+      <h2 className="text-sm italic text-center">Orders</h2>
       {isLoading ? (
         <Loader />
       ) : error ? (
-        <Alert variant="danger">{JSON.stringify(error, null, 2)}</Alert>
+        <pre>{JSON.stringify(error, null, 2)}</pre>
       ) : orders && orders.length > 0 ? (
-        <Table striped hover responsive className="table-sm">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>DATE</th>
-              <th>TOTAL</th>
-              <th>PAID</th>
-              <th>DELIVERED</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableCaption>A list of your recent orders</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>DATE</TableHead>
+              <TableHead>TOTAL</TableHead>
+              <TableHead>PAID</TableHead>
+              <TableHead>DELIVERED</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {orders.map((order) => (
-              <tr key={order._id}>
-                <td>{order._id}</td>
-                <td>{order.createdAt.substring(0, 10)}</td>
-                <td>{order.totalAmount}</td>
-                <td>
+              <TableRow key={order._id}>
+                <TableCell>{order._id}</TableCell>
+                <TableCell>{order.createdAt.substring(0, 10)}</TableCell>
+                <TableCell>{order.totalAmount}</TableCell>
+                <TableCell>
                   {order.isPaid ? (
                     new Date(order.paidAt!).toLocaleString("en-IN", {
                       day: "numeric",
@@ -191,8 +213,8 @@ const Profile = () => {
                   ) : (
                     <Icon icon="solar:bill-cross-bold" width="22" height="22" />
                   )}
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                   {order.isDelivered ? (
                     new Date(order.deliveredAt!).toLocaleString("en-IN", {
                       day: "numeric",
@@ -208,18 +230,18 @@ const Profile = () => {
                       height="22"
                     />
                   )}
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                   <Link className="btn btn-primary" to={`/order/${order._id}`}>
                     Details
                   </Link>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
+          </TableBody>
         </Table>
       ) : (
-        <p>None found</p>
+        <p className="mt-4 text-sm text-center">No orders yet.</p>
       )}
     </Fragment>
   );
