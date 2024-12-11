@@ -35,7 +35,6 @@ const FormSchema = z.object({
 export default function Product() {
   const dispatch = useAppDispatch();
   const { id } = useParams() as { id: string };
-  const [quantity, setQuantity] = useState(1);
   const { data, isError, isLoading } = useGetProductsByIdQuery(id);
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -69,8 +68,9 @@ export default function Product() {
     );
   }
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    setQuantity(+data.qty);
+  function onSubmit(values: z.infer<typeof FormSchema>) {
+    const quantity = +values.qty;
+    if (!data) return;
     dispatch(addToCart({ data, quantity }));
   }
 

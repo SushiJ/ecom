@@ -77,7 +77,6 @@ export default function CartPage() {
                     <Button
                       type="button"
                       variant="destructive"
-                      // className="mt-2 absolute bottom-0 right-0"
                       onClick={() => dispatch(removeFromCart(product._id))}
                     >
                       Remove item

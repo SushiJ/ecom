@@ -14,6 +14,7 @@ import { useGetProductsQuery } from "../features/products/slice";
 import Paginate from "../components/Paginate";
 import ProductCarousel from "../components/ProductCarousel";
 import { Rating } from "@/components/Rating";
+import truncate from "../lib/truncate";
 
 export default function Home() {
   const { pageNum, keyword } = useParams();
@@ -51,7 +52,7 @@ export default function Home() {
     <section>
       <h1 className="text-center italic text-neutral-500">Latest Products</h1>
       <ProductCarousel />
-      <Separator className="my-2" />
+      <Separator className="my-8" />
       <div className="grid grid-cols-2 gap-2">
         {data.products.map((p) => (
           <div key={p._id}>
@@ -74,7 +75,9 @@ function Product(props: { product: Product }) {
             className="rounded h-48 w-48 object-cover"
           />
           <CardTitle>{props.product.name}</CardTitle>
-          <CardDescription>{props.product.description}</CardDescription>
+          <CardDescription>
+            {truncate(props.product.description)}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <p>$ {props.product.price}</p>
