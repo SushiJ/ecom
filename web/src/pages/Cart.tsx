@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import truncate from "@/lib/truncate";
+import { GoBack } from "@/components/ui/goback";
 
 export default function CartPage() {
   const { products, totalAmount } = useAppSelector((state) => state.cart);
@@ -33,12 +34,8 @@ export default function CartPage() {
     return (
       <div>
         <h1 className="text-neutral-700 mb-2">Shopping Cart</h1>
-        <p className="italic">
-          Your cart is empty{" "}
-          <Link to="/" className="underline">
-            Go back
-          </Link>
-        </p>
+        <p className="italic">Your cart is empty </p>
+        <GoBack to="/" />
       </div>
     );
   }
@@ -46,18 +43,16 @@ export default function CartPage() {
   return (
     <>
       <div>
-        <Link
-          className="text-xs italic bg-neutral-200 px-2 py-1 rounded shadow-md"
-          to="/"
-        >
-          Go Back
-        </Link>
+        <GoBack to="/" />
         <p className="text-center italic text-neutral-700 mb-8 mt-4">
           Shopping cart
         </p>
         <div className="space-y-8">
           {products.map(({ product, quantity }) => (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3">
+            <div
+              className="grid md:grid-cols-2 lg:grid-cols-3"
+              key={product._id}
+            >
               <div className="lg:col-span-1 object-contain md:mr-4 grid place-items-center mx-auto">
                 <img
                   src={product.image}
