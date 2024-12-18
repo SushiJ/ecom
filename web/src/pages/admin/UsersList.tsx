@@ -1,13 +1,14 @@
 import { toast } from "react-toastify";
 import { Icon } from "@iconify/react";
+import { Link } from "react-router-dom";
 
 import {
   useDeleteUserMutation,
   useGetUsersQuery,
 } from "../../features/user/slice";
 
-import Loader from "../../components/Loader";
-import { Link } from "react-router-dom";
+import Loader from "@/components/Loader";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -16,7 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 
 const UsersList = () => {
   const { data: users, refetch, isLoading, error } = useGetUsersQuery();
@@ -36,7 +36,7 @@ const UsersList = () => {
   };
 
   if (!users) {
-    return <>Empty</>;
+    return <h1>Empty</h1>;
   }
 
   return (
