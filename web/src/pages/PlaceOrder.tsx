@@ -1,22 +1,15 @@
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Button,
-  Card,
-  Col,
-  ListGroup,
-  Row,
-  Image,
-  Alert,
-} from "react-bootstrap";
+import { toast } from "react-toastify";
 
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { useCreateOrderMutation } from "../features/orders/slice";
-
-import CheckoutSteps from "../components/CheckoutSteps";
-import Loader from "../components/Loader";
 import { resetCart } from "../features/cart/slice";
-import { toast } from "react-toastify";
+
+import CheckoutSteps from "@/components/CheckoutSteps";
+import Loader from "@/components/Loader";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 function PlaceOrder() {
   const navigate = useNavigate();
@@ -26,22 +19,14 @@ function PlaceOrder() {
 
   const [createOrder, { isLoading, error }] = useCreateOrderMutation();
 
-  const getItemPrice = (products: typeof cart.products) => {
-    let ItemsPrice: number = 0;
-    for (let i = 0; i < products.length; i++) {
-      ItemsPrice += products[i].product.price * products[i].quantity;
-    }
-    return ItemsPrice;
-  };
-
   useEffect(() => {
-    if (!cart.shippingAddress.address) {
+    if (!cart.shippingAddress || !cart.shippingAddress.address) {
       navigate("/shipping");
     }
     if (!cart.paymentMethod) {
       navigate("/payment");
     }
-  }, [cart.paymentMethod, cart.shippingAddress.address, navigate]);
+  }, [cart.paymentMethod, cart.shippingAddress?.address, navigate]);
 
   const placeOrderHandler = async () => {
     try {
@@ -60,109 +45,82 @@ function PlaceOrder() {
     }
   };
 
+  if (error) {
+    return (
+      <>
+        <pre>{JSON.stringify(error, null, 2)}</pre>
+        toast.error(err);
+      </>
+    );
+  }
+
   return (
-    <div>
+    <Fragment>
+      <h2 className="text-sm italic text-center my-8">Order Summary</h2>
       <CheckoutSteps step1 step2 step3 step4 />
-      <Row>
-        <Col md={8}>
-          <ListGroup variant="flush">
-            <ListGroup.Item>
-              <h2>Shipping</h2>
-              <p>
-                <strong>Address:</strong>
-                <br />
-                {cart.shippingAddress.address},{cart.shippingAddress.city}
-                {cart.shippingAddress.postalCode},{cart.shippingAddress.country}
-              </p>
-            </ListGroup.Item>
-
-            <ListGroup.Item>
-              <h2>Payment Method</h2>
-              <strong>Method: </strong>
-              {cart.paymentMethod}
-            </ListGroup.Item>
-
-            <ListGroup.Item>
-              <h2>Order Items</h2>
-              {cart.products.length === 0 ? (
-                <p>Your cart is empty</p>
-              ) : (
-                <ListGroup variant="flush">
-                  {cart.products.map(({ product, quantity }, idx) => (
-                    <ListGroup.Item key={idx}>
-                      <Row>
-                        <Col md={1}>
-                          <Image
-                            src={product.image}
-                            alt={product.name}
-                            fluid
-                            rounded
-                          />
-                        </Col>
-                        <Col>
-                          <Link to={`/product/${product._id}`}>
-                            {product.name}
-                          </Link>
-                        </Col>
-                        <Col md={4}>
-                          {quantity} x ${product.price} = $
-                          {(quantity * (product.price * 100)) / 100}
-                        </Col>
-                      </Row>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              )}
-            </ListGroup.Item>
-          </ListGroup>
-        </Col>
-        <Col md={4}>
-          <Card>
-            <ListGroup variant="flush">
-              <ListGroup.Item>
-                <h2>Order Summary</h2>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Items</Col>
-                  <Col>${getItemPrice(cart.products)}</Col>
-                </Row>
-              </ListGroup.Item>
-              {/*<ListGroup.Item>
-                <Row>
-                  <Col>Shipping</Col>
-                  <pre>${JSON.stringify(cart, null, 2)}</pre>
-                </Row> 
-              </ListGroup.Item>*/}
-              <ListGroup.Item>
-                <Row>
-                  <Col>Total</Col>
-                  <Col>${cart.totalAmount}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                {error && (
-                  <Alert variant="danger">
-                    {JSON.stringify(error, null, 2)}
-                  </Alert>
-                )}
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Button
-                  type="button"
-                  className="btn-block"
-                  disabled={cart.products.length === 0}
-                  onClick={placeOrderHandler}
-                >
-                  Place Order
-                </Button>
-                {isLoading && <Loader />}
-              </ListGroup.Item>
-            </ListGroup>
-          </Card>
-        </Col>
-      </Row>
-    </div>
+      <div className="grid grid-cols-2 mt-8">
+        <div className="space-y-4">
+          <h2 className="text-sm italic text-center">Shipping</h2>
+          <div>
+            <p className="ml-2 italic text-sm">
+              {cart.shippingAddress?.address}
+            </p>
+            <p className="ml-2 italic text-sm">{cart.shippingAddress?.city}</p>
+            <p className="ml-2 italic text-sm">
+              {cart.shippingAddress?.postalCode}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm italic font-semibold">Payment Method: </p>
+            <p className="ml-2 italic text-sm">{cart.paymentMethod}</p>
+          </div>
+          <div>
+            <p className="text-sm italic font-semibold">Total</p>
+            <p className="italic text-sm">${cart.totalAmount}</p>
+          </div>
+        </div>
+        <div>
+          <h2 className="text-sm italic mb-4 text-center">Order Items</h2>
+          {cart.products.length === 0 ? (
+            <p>Your cart is empty</p>
+          ) : (
+            <div className="overflow-y-auto max-h-96 space-y-4 rounded-sm flex flex-col items-center">
+              {cart.products.map(({ product, quantity }, idx) => (
+                <div key={idx}>
+                  <div className="object-contain">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="h-52 rounded-lg"
+                    />
+                  </div>
+                  <div>
+                    <Link
+                      to={`/product/${product._id}`}
+                      className="underline my-1 italic text-sm w-full"
+                    >
+                      {product.name}
+                    </Link>
+                  </div>
+                  <Badge className="text-xs" variant="secondary">
+                    {quantity} x ${product.price} = $
+                    {(quantity * (product.price * 100)) / 100}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+      <Button
+        disabled={cart.products.length === 0}
+        onClick={placeOrderHandler}
+        className="mt-16 w-full"
+      >
+        Place Order
+      </Button>
+      {isLoading && <Loader />}
+    </Fragment>
   );
 }
 
