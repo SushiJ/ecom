@@ -16,7 +16,6 @@ type ShippingAddress = {
   address: string;
   city: string;
   postalCode: string;
-  country: string;
 };
 
 type InitialState = {
@@ -25,15 +24,12 @@ type InitialState = {
     quantity: number;
   }>;
   totalAmount: number;
-  shippingAddress: ShippingAddress;
+  shippingAddress?: ShippingAddress;
   paymentMethod: string;
 };
 
 // TODO: need different way than an enum
-enum PaymentEnum {
-  PAYPAL = "paypal",
-  RAZORPAY = "razorpay",
-}
+type Payment = "paypal" | "razorpay" | "stripe";
 
 const cartItems = getLocalStorage("cart");
 
@@ -41,11 +37,11 @@ const cartItems = getLocalStorage("cart");
 const initialState: InitialState = cartItems
   ? cartItems
   : {
-      products: [],
-      totalAmount: 0,
-      shippingAddress: {},
-      paymentMethod: "PayPal",
-    };
+    products: [],
+    totalAmount: 0,
+    shippingAddress: {},
+    paymentMethod: "PayPal",
+  };
 
 const cartSlice = createSlice({
   name: "cart",
@@ -121,7 +117,7 @@ const cartSlice = createSlice({
       state.shippingAddress = action.payload;
       localStorage.setItem("cart", JSON.stringify(state));
     },
-    savePaymentMethod: (state, action: PayloadAction<PaymentEnum>) => {
+    savePaymentMethod: (state, action: PayloadAction<Payment>) => {
       state.paymentMethod = action.payload;
       localStorage.setItem("cart", JSON.stringify(state));
     },
