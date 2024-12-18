@@ -38,21 +38,24 @@ const Shipping = () => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      address: "",
+      city: "",
+      postalCode: "",
+    },
   });
 
-  // useEffect(() => {
-  //   form.setFocus("address");
-  // }, [form.setFocus]);
+  useEffect(() => {
+    form.setFocus("address");
+  }, [form.setFocus]);
 
-  // useEffect(() => {
-  //   if (shippingAddress) {
-  //     form.reset({ ...shippingAddress });
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (shippingAddress && shippingAddress.address) {
+      form.reset({ ...shippingAddress });
+    }
+  }, []);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    return;
     dispatch(saveShippingAddress({ ...values }));
     navigate("/payment");
   };
