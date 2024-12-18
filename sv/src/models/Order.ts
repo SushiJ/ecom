@@ -1,4 +1,4 @@
-import {} from "crypto";
+import { } from "crypto";
 import {
   getModelForClass,
   prop,
@@ -26,9 +26,6 @@ class ShippingAddress {
 
   @prop({ required: true })
   public postalCode!: string;
-
-  @prop({ required: true })
-  public country!: string;
 }
 
 @modelOptions({ schemaOptions: { timestamps: true } })
