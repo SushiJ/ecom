@@ -1,35 +1,30 @@
 import { Link, useParams } from "react-router-dom";
-import {
-  Row,
-  Col,
-  ListGroup,
-  Image,
-  Card,
-  Button,
-  Alert,
-} from "react-bootstrap";
+import { Fragment, useCallback, useEffect } from "react";
+import { toast } from "react-toastify";
+
 import {
   PayPalButtons,
   SCRIPT_LOADING_STATE,
   usePayPalScriptReducer,
 } from "@paypal/react-paypal-js";
-
-import Loader from "../components/Loader";
 import {
   useDeliverOrderMutation,
   useGetOrderDetailsQuery,
   useGetPaypalClientIdQuery,
   usePayOrderMutation,
 } from "../features/orders/slice";
-
 import { useAppSelector } from "../hooks/redux";
-import { useCallback, useEffect } from "react";
-import { toast } from "react-toastify";
+
+import Loader from "@/components/Loader";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+
 import {
-  CreateOrderActions,
-  OnApproveActions,
-  OnApproveData,
+  type CreateOrderActions,
+  type OnApproveActions,
+  type OnApproveData,
 } from "../types/paypal";
+import { Button } from "@/components/ui/button";
 
 const OrderScreen = () => {
   const { id: orderId } = useParams() as { id: string };
@@ -54,7 +49,7 @@ const OrderScreen = () => {
   const [updateOrderToDelivered] = useDeliverOrderMutation();
 
   const loadPayPalScript = useCallback(() => {
-    return async function () {
+    return async function() {
       paypalDispatch({
         type: "resetOptions",
         value: {
@@ -89,7 +84,7 @@ const OrderScreen = () => {
   }, [order, errorPaypalId, loadPayPalScript, loadingPaypalId, paypal_id]);
 
   async function onApprove(_: OnApproveData, actions: OnApproveActions) {
-    return actions.order?.capture().then(async function (details) {
+    return actions.order?.capture().then(async function(details) {
       try {
         console.log({ orderId, details });
         await payOrder({ orderId, details });
@@ -102,12 +97,10 @@ const OrderScreen = () => {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function onError(err: any) {
     toast.error(err.message);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async function createOrder(_: any, actions: CreateOrderActions) {
     return actions.order
       .create({
@@ -123,12 +116,12 @@ const OrderScreen = () => {
   }
 
   // TESTING ONLY! REMOVE BEFORE PRODUCTION
-  // async function onApproveTest() {
-  //   await payOrder({ orderId, details: { payer: {} } });
-  //   refetch();
-  //
-  //   toast.success("Order is paid");
-  // }
+  async function onApproveTest() {
+    await payOrder({ orderId, details: { payer: {} } });
+    refetch();
+
+    toast.success("Order is paid");
+  }
 
   const deliverHandler = async () => {
     await updateOrderToDelivered(orderId);
@@ -136,175 +129,178 @@ const OrderScreen = () => {
   };
 
   if (!order) {
-    return <Alert variant="danger">"No order found for that Id"</Alert>;
+    return <div>"No order found for that Id"</div>;
   }
 
-  return isOrderLoading ? (
-    <Loader />
-  ) : errorOrder ? (
-    <Alert variant="danger">{JSON.stringify(errorOrder)}</Alert>
-  ) : (
-    <>
-      <h1>Order {order._id}</h1>
-      <Row>
-        <Col md={8}>
-          <ListGroup variant="flush">
-            <ListGroup.Item>
-              <h2>Shipping</h2>
-              <p>
-                <strong>Name: </strong> {order.user.name}
-              </p>
-              <p>
-                <strong>Email: </strong>{" "}
-                <a href={`mailto:${order.user.email}`}>{order.user.email}</a>
-              </p>
-              <p>
-                <strong>Address:</strong>
-                {order.shippingAddress.address}, {order.shippingAddress.city}
-                {order.shippingAddress.postalCode},
-                {order.shippingAddress.country}
-              </p>
-              {order.isDelivered && order.deliveredAt ? (
-                <Alert variant="success">
-                  Delivered on {new Date(order.deliveredAt).toString()}
-                </Alert>
-              ) : (
-                <Alert variant="danger">Not Delivered</Alert>
-              )}
-            </ListGroup.Item>
-
-            <ListGroup.Item>
-              <h2>Payment Method</h2>
-              <p>
-                <strong>Method: </strong>
-                {order.paymentMethod}
-              </p>
-              {order.isPaid ? (
-                <Alert variant="success">
-                  Paid on{" "}
-                  {order.paidAt
-                    ? new Date(order.paidAt).toLocaleString("en-IN", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                    : "Not paid"}
-                </Alert>
-              ) : (
-                <Alert variant="danger">Not Paid</Alert>
-              )}
-            </ListGroup.Item>
-
-            <ListGroup.Item>
-              <h2>Order Items</h2>
-
+  return (
+    <Fragment>
+      <h1 className="text-sm text-center my-8 italic">Order {order._id}</h1>
+      {isOrderLoading ? (
+        <Loader />
+      ) : errorOrder ? (
+        <pre>{JSON.stringify(errorOrder)}</pre>
+      ) : (
+        <div>
+          <div className="flex justify-between">
+            <div>
+              <div className="space-y-8">
+                <div className="space-y-1">
+                  <h2 className="text-sm italic underline">
+                    Contact Info &minus;
+                  </h2>
+                  <p className="text-md italic">{order.user.name}</p>
+                  <a href={`mailto:${order.user.email}`} className="underline">
+                    {order.user.email}
+                  </a>
+                </div>
+                <div>
+                  <h2 className="text-sm italic underline">
+                    Shipping Info &minus;
+                  </h2>
+                  <p>
+                    <p>{order.shippingAddress.address}</p>
+                    <p>{order.shippingAddress.city}</p>
+                    <p>{order.shippingAddress.postalCode}</p>
+                  </p>
+                </div>
+                <div className="flex space-x-2">
+                  <p className="text-sm italic font-semibold">
+                    Shipping Status
+                  </p>
+                  {order.isDelivered && order.deliveredAt ? (
+                    <Badge variant="outline">
+                      Delivered on {new Date(order.deliveredAt).toString()}
+                    </Badge>
+                  ) : (
+                    <Badge variant="destructive">Not Delivered</Badge>
+                  )}
+                </div>
+              </div>
+              <Separator className="my-8" />
+              <div>
+                <div className="flex mt-4">
+                  <h2 className="text-md italic font-semibold">
+                    Payment Method &minus;
+                  </h2>
+                  <Badge
+                    variant="outline"
+                    className="text-sm italic ml-2 font-normal"
+                  >
+                    {order.paymentMethod}
+                  </Badge>
+                </div>
+                <div className="flex space-x-2">
+                  <p className="text-sm italic">Status</p>
+                  {order.isPaid ? (
+                    <Badge variant="outline">
+                      Paid on
+                      {order.paidAt
+                        ? new Date(order.paidAt).toLocaleString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                        : ""}
+                    </Badge>
+                  ) : (
+                    <Badge variant="destructive">Not Paid</Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div>
+              <h2 className="text-sm text-center italic mb-4">Order Items</h2>
               {order.orderItems.length <= 0 ? (
-                <Alert>data is empty</Alert>
+                <p>data is empty</p>
               ) : (
-                <ListGroup variant="flush">
+                <div className="max-h-[400px] overflow-y-auto px-2 space-y-4 py-4">
                   {order.orderItems.map((item, index) => (
-                    <ListGroup.Item key={index}>
-                      <Row>
-                        <Col md={1}>
-                          <Image
+                    <div key={index}>
+                      <div>
+                        <div className="rounded">
+                          <img
                             src={item.image}
                             alt={item.name}
-                            fluid
-                            rounded
+                            className="h-56 rounded"
                           />
-                        </Col>
-                        <Col>
-                          <Link to={`/products/${item._id}`}>{item.name}</Link>
-                        </Col>
-                        <Col md={4}>
+                        </div>
+                        <div className="w-full">
+                          <Link
+                            to={`/products/${item._id}`}
+                            className="text-sm italic underline"
+                          >
+                            {item.name}
+                          </Link>
+                        </div>
+                        <Badge variant="outline" className="text-xs">
                           {item.quantity} x ${item.price} = $
-                          {item.quantity * item.price}
-                        </Col>
-                      </Row>
-                    </ListGroup.Item>
+                          {(item.quantity * (item.price * 100)) / 100}
+                        </Badge>
+                      </div>
+                    </div>
                   ))}
-                </ListGroup>
+                </div>
               )}
-            </ListGroup.Item>
-          </ListGroup>
-        </Col>
-        <Col md={4}>
-          <Card>
-            <ListGroup variant="flush">
-              <ListGroup.Item>
-                <h2>Data Summary</h2>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Items</Col>
-                  <Col>${order.productsPrice}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Shipping</Col>
-                  <Col>${order.shippingPrice}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Tax</Col>
-                  <Col>${order.taxPrice}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Total</Col>
-                  <Col>${order.totalAmount}</Col>
-                </Row>
-              </ListGroup.Item>
+            </div>
+          </div>
+          <Separator className="my-8" />
+          <div className="mb-4">
+            <h2 className="text-sm italic my-4 underline">Summary</h2>
+            <div className="space-y-2">
+              <div>
+                <p>Items</p>
+                <p>${order.productsPrice}</p>
+              </div>
+              <div>
+                <p>Shipping</p>
+                <p>${order.shippingPrice}</p>
+              </div>
+              <div>
+                <p>Tax</p>
+                <p>${order.taxPrice}</p>
+              </div>
+              <div>
+                <p>Total</p>
+                <p>${order.totalAmount}</p>
+              </div>
               {!order.isPaid && (
-                <ListGroup.Item>
+                <div className="my-8">
                   {loadingPay && <Loader />}
                   {isPending ? (
                     <Loader />
                   ) : (
                     <div>
-                      {/* THIS BUTTON IS FOR TESTING! REMOVE BEFORE PRODUCTION! */}
-                      {/* <Button */}
-                      {/*   style={{ marginBottom: "10px" }} */}
-                      {/*   onClick={onApproveTest} */}
-                      {/* > */}
-                      {/*   Test Pay data */}
-                      {/* </Button> */}
+                      THIS BUTTON IS FOR TESTING! REMOVE BEFORE PRODUCTION!
+                      <Button
+                        style={{ marginBottom: "10px" }}
+                        onClick={onApproveTest}
+                      >
+                        Test Pay data
+                      </Button>
                       <div>
                         <PayPalButtons
                           createOrder={createOrder}
                           onApprove={onApprove}
                           onError={onError}
-                        ></PayPalButtons>
+                        />
                       </div>
                     </div>
                   )}
-                </ListGroup.Item>
+                </div>
               )}
-
               {userInfo &&
                 userInfo.isAdmin &&
                 order.isPaid &&
                 !order.isDelivered && (
-                  <ListGroup.Item>
-                    <Button
-                      type="button"
-                      className="btn btn-block"
-                      onClick={deliverHandler}
-                    >
-                      Mark As Delivered
-                    </Button>
-                  </ListGroup.Item>
+                  <Button onClick={deliverHandler}>Mark As Delivered</Button>
                 )}
-            </ListGroup>
-          </Card>
-        </Col>
-      </Row>
-    </>
+            </div>
+          </div>
+        </div>
+      )}
+    </Fragment>
   );
 };
 
