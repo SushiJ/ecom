@@ -1,15 +1,34 @@
-import { Row, Col, ListGroup, Alert, Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-
-import { Rating } from "./Rating";
-
-import { useCreateProductReviewsMutation } from "../features/products/slice";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Review } from "../types/product";
+
+import { useCreateProductReviewsMutation } from "../features/products/slice";
 import { useAppSelector } from "../hooks/redux";
-import Loader from "./Loader";
+
+import { Rating } from "@/components/Rating";
+import Loader from "@/components/Loader";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+  Select,
+  SelectItem,
+} from "@/components/ui/select";
 
 type ReviewProps = {
   id: string;
@@ -18,44 +37,42 @@ type ReviewProps = {
   refetch: () => void;
 };
 
+const formSchema = z.object({
+  rating: z.string(),
+  comment: z.string(),
+});
+
 function Reviews(props: ReviewProps) {
   const user = useAppSelector((state) => state.auth.userInfo);
 
   const [createReview, { isLoading: loadingProductReview }] =
     useCreateProductReviewsMutation();
 
-  type FormValues = {
-    rating: number;
-    comment: string;
-  };
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = useForm<FormValues>({
-    mode: "onSubmit",
-    reValidateMode: "onSubmit",
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
   });
 
   // TODO: Refresh the page, so that new review shows up
-  const onSubmit = async (values: FormValues) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log("submitting");
+    console.log(values);
     try {
       await createReview({
         id: props.id,
-        rating: values.rating,
+        rating: +values.rating,
         comment: values.comment,
       }).unwrap();
-      // props.refetch(); FIX: This doesn't work Like how I'd like it to
+      // FIX: This doesn't work Like how I'd like it to
+      props.refetch();
       toast.success("Review created successfully");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err.data.error);
     } finally {
-      setValue("rating", 0);
-      setValue("comment", "");
+      form.reset({
+        rating: "",
+        comment: "",
+      });
     }
   };
 
@@ -64,78 +81,80 @@ function Reviews(props: ReviewProps) {
   }
 
   return (
-    <Row>
-      <Col md={6}>
+    <div>
+      <div>
         <h2>Reviews</h2>
-        {props.reviews.length === 0 && <Alert variant="info">No Reviews</Alert>}
-        <ListGroup variant="flush">
+        {props.reviews.length === 0 && <Badge>No Reviews</Badge>}
+        <ul>
           {props.reviews.map((review, idx) => (
-            <ListGroup.Item key={idx}>
+            <li key={idx}>
               <strong>{review.user.name}</strong>
               <Rating value={review.rating} />
-              {/* <p>{review.createdAt?.substring(0, 10)}</p> */}
+              <p>{review.createdAt?.substring(0, 10)}</p>
               <p>{review.comment}</p>
-            </ListGroup.Item>
+            </li>
           ))}
-          <ListGroup.Item>
+          <li>
             <h2>Write a Customer Review</h2>
             {user._id ? (
-              <Form onSubmit={handleSubmit(onSubmit)}>
-                <Form.Group className="my-2" controlId="rating">
-                  <Form.Label>Rating</Form.Label>
-                  <Form.Control
-                    as="select"
-                    required
-                    {...register("rating", {
-                      required: "Rating is required",
-                    })}
-                  >
-                    <option value="">Select...</option>
-                    <option value="1">1 - Poor</option>
-                    <option value="2">2 - Fair</option>
-                    <option value="3">3 - Good</option>
-                    <option value="4">4 - Very Good</option>
-                    <option value="5">5 - Excellent</option>
-                  </Form.Control>
-                  {errors.rating && (
-                    <Form.Text className="text-danger">
-                      {errors.rating.message}
-                    </Form.Text>
-                  )}
-                </Form.Group>
-
-                <Form.Group className="my-2" controlId="comment">
-                  <Form.Label>Comment</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    {...register("comment", {
-                      required: "Comment is required",
-                    })}
-                  ></Form.Control>
-                  {errors.comment && (
-                    <Form.Text className="text-danger">
-                      {errors.comment.message}
-                    </Form.Text>
-                  )}
-                </Form.Group>
-
-                <Button
-                  disabled={loadingProductReview}
-                  type="submit"
-                  variant="primary"
-                >
-                  Submit
-                </Button>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                  <fieldset>
+                    <FormField
+                      control={form.control}
+                      name="rating"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Rating</FormLabel>
+                          <Select onValueChange={field.onChange}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select rating" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="1">1 - Poor</SelectItem>
+                              <SelectItem value="2">2 - Fair</SelectItem>
+                              <SelectItem value="3">3 - Good</SelectItem>
+                              <SelectItem value="4">4 - Very Good</SelectItem>
+                              <SelectItem value="5">5 - Excellent</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="comment"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Comment</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              placeholder="Additional info about the product"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button disabled={loadingProductReview} type="submit">
+                      Submit
+                    </Button>
+                  </fieldset>
+                </form>
               </Form>
             ) : (
-              <Alert>
+              <p>
                 Please <Link to="/login">sign in</Link> to write a review
-              </Alert>
+              </p>
             )}
-          </ListGroup.Item>
-        </ListGroup>
-      </Col>
-    </Row>
+          </li>
+        </ul>
+      </div>
+    </div>
   );
 }
 

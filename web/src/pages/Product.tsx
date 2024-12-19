@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -27,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Reviews from "@/components/Reviews";
 
 const FormSchema = z.object({
   qty: z.string().default("1"),
@@ -35,7 +35,7 @@ const FormSchema = z.object({
 export default function Product() {
   const dispatch = useAppDispatch();
   const { id } = useParams() as { id: string };
-  const { data, isError, isLoading } = useGetProductsByIdQuery(id);
+  const { data, isError, isLoading, refetch } = useGetProductsByIdQuery(id);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -80,12 +80,6 @@ export default function Product() {
         <span className="mr-2 no-underline">&lt;</span>
         <span className="underline">Go Back</span>
       </Link>
-      {/* <Reviews */}
-      {/*   isLoading={isLoading} */}
-      {/*   id={id} */}
-      {/*   reviews={data.reviews} */}
-      {/*   refetch={refetch} */}
-      {/* /> */}
       <div className="sm:flex items-center justify-center h-full py-12">
         <div className="object-contain mx-auto max-w-3/4 pb-8 sm:pb-0">
           <img src={data.image} alt={data.name} />
@@ -157,8 +151,12 @@ export default function Product() {
           </div>
         </Card>
       </div>
+      <Reviews
+        isLoading={isLoading}
+        id={id}
+        reviews={data.reviews}
+        refetch={refetch}
+      />
     </div>
   );
 }
-// Array.from(data.countInStock)
-// {data.countInStock}
