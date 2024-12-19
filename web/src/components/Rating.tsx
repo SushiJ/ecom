@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
 
-export function Rating(props: { value: number; text: string }) {
+export function Rating(props: { value: number; text?: string }) {
   return (
     <div className="text-xs mb-2">
       <RenderRatingIcon value={props.value} />
