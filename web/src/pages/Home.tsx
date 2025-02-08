@@ -49,7 +49,7 @@ export default function Home() {
       <Title title="Latest Products" className="text-neutral-500 text-md" />
       <ProductCarousel />
       <Separator className="my-8" />
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid md:grid-cols-2 gap-2">
         {data.products.map((p) => (
           <div key={p._id}>
             <Product product={p} />
