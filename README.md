@@ -1,6 +1,6 @@
 # Ecom
 
-A comprehensive e-commerce platform designed to facilitate seamless online shopping experiences.
+A comprehensive e-commerce platform designed to facilitate seamless online shopping experience.
 
 ## Features
 
@@ -81,7 +81,26 @@ A comprehensive e-commerce platform designed to facilitate seamless online shopp
 
    Access the application at `http://localhost:5173`.
 
-## Docker Deployment
+## Screenshots
+
+- Login & Register: 
+![Login](/images/sign_in.png)
+![Register](/images/register.png)
+
+- Home Page: 
+![Home](/images/Home.png)
+![Home](/images/home-2.png)
+
+- Product Listing:
+  ![Product](/images/Product.png)
+  
+- Shopping Cart | shipping | Place order | payment:
+  ![Cart](/images/Cart.png)
+  ![Shipping](/images/Shipping.png)
+  ![Place_order](/images/Place_order.png)
+  ![Payment](/images/payment.png)
+
+## Docker (Server and database)
 
 For containerized deployment, ensure Docker is installed and running on your system.
 
@@ -90,8 +109,7 @@ For containerized deployment, ensure Docker is installed and running on your sys
    ```bash
    docker-compose up --build
    ```
-
-   This command will build and start both the frontend and backend services.
+   This command will build and start backend services.
 
 2. **Access the Application**:
 
