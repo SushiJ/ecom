@@ -1,30 +1,32 @@
 import { Link } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+// import { useForm } from "react-hook-form";
+// import { zodResolver } from "@hookform/resolvers/zod";
+// import * as z from "zod";
 
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { removeFromCart } from "../features/cart/slice";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import truncate from "@/lib/truncate";
+// import {
+//   Form,
+//   FormControl,
+//   FormField,
+//   FormItem,
+//   FormLabel,
+//   FormMessage,
+// } from "@/components/ui/form";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
+// import truncate from "@/lib/truncate";
+
 import { GoBack } from "@/components/ui/goback";
+import { Title } from "@/components/Title";
 
 export default function CartPage() {
   const { products, totalAmount } = useAppSelector((state) => state.cart);
@@ -33,9 +35,9 @@ export default function CartPage() {
   if (products.length === 0) {
     return (
       <div>
-        <h1 className="text-neutral-700 mb-2">Shopping Cart</h1>
-        <p className="italic">Your cart is empty </p>
         <GoBack to="/" />
+        <Title title="Your cart" />
+        <p className="italic text-center text-neutral-500">Cart is empty </p>
       </div>
     );
   }
@@ -44,9 +46,7 @@ export default function CartPage() {
     <>
       <div>
         <GoBack to="/" />
-        <p className="text-center italic text-neutral-700 mb-8 mt-4">
-          Shopping cart
-        </p>
+        <Title title="Cart" />
         <div className="space-y-8">
           {products.map(({ product, quantity }) => (
             <div

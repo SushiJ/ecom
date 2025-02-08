@@ -12,14 +12,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
 import { Product } from "../types/product";
 import { useGetProductsQuery } from "../features/products/slice";
-
-import Paginate from "../components/Paginate";
-import ProductCarousel from "../components/ProductCarousel";
-import { Rating } from "@/components/Rating";
 import truncate from "../lib/truncate";
 import { useDelay } from "@/lib/utils";
 import Loader from "@/components/Loader";
@@ -51,7 +46,7 @@ export default function Home() {
 
   return (
     <section>
-      <h1 className="text-center italic text-neutral-500">Latest Products</h1>
+      <Title title="Latest Products" className="text-neutral-500 text-md" />
       <ProductCarousel />
       <Separator className="my-8" />
       <div className="grid grid-cols-2 gap-2">
