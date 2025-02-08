@@ -49,7 +49,7 @@ const OrderScreen = () => {
   const [updateOrderToDelivered] = useDeliverOrderMutation();
 
   const loadPayPalScript = useCallback(() => {
-    return async function() {
+    return async function () {
       paypalDispatch({
         type: "resetOptions",
         value: {
@@ -84,7 +84,7 @@ const OrderScreen = () => {
   }, [order, errorPaypalId, loadPayPalScript, loadingPaypalId, paypal_id]);
 
   async function onApprove(_: OnApproveData, actions: OnApproveActions) {
-    return actions.order?.capture().then(async function(details) {
+    return actions.order?.capture().then(async function (details) {
       try {
         console.log({ orderId, details });
         await payOrder({ orderId, details });
@@ -163,13 +163,20 @@ const OrderScreen = () => {
                     <p>{order.shippingAddress.postalCode}</p>
                   </p>
                 </div>
-                <div className="flex space-x-2">
+                <div className="">
                   <p className="text-sm italic font-semibold">
                     Shipping Status
                   </p>
                   {order.isDelivered && order.deliveredAt ? (
                     <Badge variant="outline">
-                      Delivered on {new Date(order.deliveredAt).toString()}
+                      Delivered on
+                      {new Date(order.deliveredAt).toLocaleString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </Badge>
                   ) : (
                     <Badge variant="destructive">Not Delivered</Badge>
@@ -196,12 +203,12 @@ const OrderScreen = () => {
                       Paid on
                       {order.paidAt
                         ? new Date(order.paidAt).toLocaleString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
                         : ""}
                     </Badge>
                   ) : (

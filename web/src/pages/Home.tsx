@@ -1,4 +1,10 @@
 import { Link, useParams } from "react-router-dom";
+
+import { Separator } from "@/components/ui/separator";
+import { Rating } from "@/components/Rating";
+import { Title } from "@/components/Title";
+import Paginate from "@/components/Paginate";
+import ProductCarousel from "@/components/ProductCarousel";
 import {
   Card,
   CardContent,
@@ -15,6 +21,8 @@ import Paginate from "../components/Paginate";
 import ProductCarousel from "../components/ProductCarousel";
 import { Rating } from "@/components/Rating";
 import truncate from "../lib/truncate";
+import { useDelay } from "@/lib/utils";
+import Loader from "@/components/Loader";
 
 export default function Home() {
   const { pageNum, keyword } = useParams();
@@ -23,24 +31,17 @@ export default function Home() {
     keyword,
   });
 
-  if (isLoading) {
-    return (
-      <>
-        {/* <h1>Latest Products</h1> */}
-        <p>Loading...</p>
-      </>
-    );
+  const delay = useDelay(500);
+
+  if (isLoading || delay) {
+    return <Loader />;
   }
 
-  if ((!data || isError) && !isLoading) {
-    return (
-      <>
-        <p>Something went wrong</p>
-      </>
-    );
+  if ((isError && !isLoading) || !data) {
+    return <p className="text-center text-lg">Something went wrong</p>;
   }
 
-  if (data.products.length < 1) {
+  if (data.products.length === 0) {
     return (
       <>
         <p>No Products found</p>

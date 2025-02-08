@@ -6,7 +6,9 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-type ms = number;
+type time = number;
+type ms = time;
+
 export function useDelay(time: ms) {
   const [delay, setDelay] = useState(true);
 
