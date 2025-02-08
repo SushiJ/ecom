@@ -132,10 +132,8 @@ export default function CartPage() {
           <p>Subtotal ({products.length} items):</p>
           <p>$ {totalAmount?.toFixed(2)}</p>
         </div>
-        <Button className="mt-4">
-          <Link to="/shipping" className="">
-            Proceed to Checkout
-          </Link>
+        <Button className="mt-4 mx-auto w-96">
+          <Link to="/shipping">Proceed to Checkout</Link>
         </Button>
       </div>
     </>

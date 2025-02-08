@@ -26,7 +26,7 @@ export default function Home() {
     keyword,
   });
 
-  const delay = useDelay(500);
+  const delay = useDelay(200);
 
   if (isLoading || delay) {
     return <Loader />;

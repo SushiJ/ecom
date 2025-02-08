@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useAppDispatch } from "../hooks/redux";
 
-import { useGetProductsByIdQuery } from "../features/products/slice";
-import { addToCart } from "../features/cart/slice";
+import { useGetProductsByIdQuery } from "@/features/products/slice";
+import { addToCart } from "@/features/cart/slice";
 
 import { Rating } from "@/components/Rating";
 import { Card } from "@/components/ui/card";
@@ -27,6 +27,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Reviews from "@/components/Reviews";
+import Loader from "@/components/Loader";
+
+import { useDelay } from "@/lib/utils";
+import { GoBack } from "@/components/ui/goback";
 
 const FormSchema = z.object({
   qty: z.string().default("1"),
@@ -44,15 +48,16 @@ export default function Product() {
     },
   });
 
-  // TODO: Spinner component
-  if (isLoading) <p>Loading...</p>;
+  const delay = useDelay(200);
+
+  if (isLoading || delay) {
+    return <Loader />;
+  }
 
   if (isError && !isLoading) {
     return (
       <>
-        <Link className="my-3 btn btn-outline-primary" to="/">
-          Go Back
-        </Link>
+        <GoBack to="/" />
       </>
     );
   }
@@ -60,9 +65,7 @@ export default function Product() {
   if (!data) {
     return (
       <>
-        <Link className="my-3 btn btn-outline-primary" to="/">
-          Go Back
-        </Link>
+        <GoBack to="/" />
         <p>Something went wrong</p>
       </>
     );
@@ -76,11 +79,8 @@ export default function Product() {
 
   return (
     <div className="min-h-full py-4">
-      <Link className="my-3 btn btn-outline-primary" to="/">
-        <span className="mr-2 no-underline">&lt;</span>
-        <span className="underline">Go Back</span>
-      </Link>
-      <div className="sm:flex items-center justify-center h-full py-12">
+      <GoBack to="/" />
+      <div className="flex flex-col lg:flex-row items-center justify-center h-full py-12 gap-8">
         <div className="object-contain mx-auto max-w-3/4 pb-8 sm:pb-0">
           <img src={data.image} alt={data.name} />
         </div>

@@ -48,7 +48,7 @@ export function Header() {
 
   return (
     <header>
-      <nav className="sticky top-0 min-h-16 flex items-center justify-between p-1 md:p-2 max-w-screen-2xl mx-auto w-full">
+      <nav className="sticky top-0 min-h-16 flex items-center justify-between max-w-screen-2xl mx-auto w-full">
         <Link
           to="/"
           className="hidden md:block md:text-2xl lg:font-bold hover:text-neutral-700/80"

@@ -140,7 +140,11 @@ function Reviews(props: ReviewProps) {
                         </FormItem>
                       )}
                     />
-                    <Button disabled={loadingProductReview} type="submit">
+                    <Button
+                      disabled={loadingProductReview}
+                      type="submit"
+                      className="mt-4"
+                    >
                       Submit
                     </Button>
                   </fieldset>
