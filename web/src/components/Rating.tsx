@@ -2,9 +2,9 @@ import { Icon } from "@iconify/react";
 
 export function Rating(props: { value: number; text?: string }) {
   return (
-    <div className="rating">
+    <div className="text-xs mb-2">
       <RenderRatingIcon value={props.value} />
-      <span className="rating-text">{props.text ?? props.text}</span>
+      <span className="ms-1">{props.text ?? props.text}</span>
     </div>
   );
 }
@@ -12,7 +12,7 @@ export function Rating(props: { value: number; text?: string }) {
 function RenderRatingIcon(props: { value: number }) {
   return (
     <>
-      <span>
+      <span className="flex">
         {[1, 2, 3, 4, 5].map((num, idx) =>
           props.value >= num ? (
             <Icon

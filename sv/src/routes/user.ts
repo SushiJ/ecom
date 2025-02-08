@@ -8,21 +8,19 @@ async function userRoutes(fastify: FastifyInstance) {
   fastify.post("/login", user.loginHandler);
   fastify.post("/logout", user.logoutHandler);
 
-  fastify
-    .get("/profile", { onRequest: protect }, user.getInfoHandler)
-    .put("/profile", { preHandler: protect }, user.updateInfoHandler);
+  fastify.get("/profile", { onRequest: protect }, user.getInfoHandler);
+  fastify.put("/profile", { preHandler: protect }, user.updateInfoHandler);
 
   fastify.post("/", user.registerHandler);
   fastify.get("/", { onRequest: [protect, isAdmin] }, user.a_getAllUsers);
 
-  fastify
-    .get("/:id", { onRequest: [protect, isAdmin] }, user.a_getUserById)
-    .put(
-      "/:id",
-      { onRequest: [protect, isAdmin] },
-      user.a_updateUserInfoHandler,
-    )
-    .delete("/:id", { onRequest: [protect, isAdmin] }, user.a_deleteUser);
+  fastify.get("/:id", { onRequest: [protect, isAdmin] }, user.a_getUserById);
+  fastify.put(
+    "/:id",
+    { onRequest: [protect, isAdmin] },
+    user.a_updateUserInfoHandler,
+  );
+  fastify.delete("/:id", { onRequest: [protect, isAdmin] }, user.a_deleteUser);
 
   fastify.log.info("User routes registered");
 }

@@ -1,7 +1,6 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { Form, Button, Row, Col } from "react-bootstrap";
 
 // import { useAppDispatch } from "../hooks/redux";
 import { useAppSelector } from "../hooks/redux";
@@ -9,6 +8,39 @@ import { useRegisterMutation } from "../features/user/slice";
 import { toast } from "react-toastify";
 import Loader from "../components/Loader";
 import FormContainer from "../components/FormContainer";
+import { z } from "zod";
+import { cn } from "@/lib/utils";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const formSchema = z
+  .object({
+    name: z.string().min(1, {
+      message: "name is required",
+    }),
+    email: z.string().email({
+      message: "please enter a valid email address",
+    }),
+    password: z.string().min(6, {
+      message: "password must be at least 6 characters",
+    }),
+    confirm: z.string().min(6, {
+      message: "password must be at least 6 characters",
+    }),
+  })
+  .refine((data) => data.password === data.confirm, {
+    message: "passwords do not match",
+    path: ["confirm"],
+  });
 
 const Register = () => {
   const navigate = useNavigate();
@@ -23,45 +55,27 @@ const Register = () => {
   const redirect = sp.get("redirect") || "/";
 
   useEffect(() => {
-    if (userInfo) {
+    if (userInfo && userInfo.name) {
       navigate(redirect);
     }
   }, [navigate, redirect, userInfo]);
 
-  const initialState = {
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [initialValues, _] = useState(initialState);
-
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors },
-    setFocus,
-  } = useForm({
-    mode: "onSubmit",
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     reValidateMode: "onChange",
-    defaultValues: initialValues,
+    defaultValues: {
+      name: "",
+      email: "",
+      confirm: "",
+      password: "",
+    },
   });
 
   useEffect(() => {
-    setFocus("name");
-  }, [setFocus]);
+    form.setFocus("name");
+  }, [form.setFocus]);
 
-  const onSubmit = async (values: typeof initialState) => {
-    if (values.password !== values.confirmPassword) {
-      setError("confirmPassword", {
-        message: "Password do not match",
-        type: "onBlur",
-      });
-      return;
-    }
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await registerMutation({
         name: values.name,
@@ -70,10 +84,9 @@ const Register = () => {
       }).unwrap();
       navigate("/login");
       toast.success("Registered successfully");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log("ERROR:::", error);
-      toast(error.data.error, {
+      toast(error.data.message, {
         type: "error",
       });
     }
@@ -82,81 +95,90 @@ const Register = () => {
   return (
     <FormContainer>
       <Fragment>
-        <h1>Sign up</h1>
-        <Form onSubmit={handleSubmit(onSubmit)}>
-          <fieldset className={isLoading ? "opacity-50" : "opacity-100"}>
-            <Form.Group className="my-2" controlId="name">
-              <Form.Label>Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter name..."
-                {...register("name", { required: "Name is required" })}
-              ></Form.Control>
-              {errors.name && (
-                <Form.Text className="text-danger">
-                  {errors.name.message}
-                </Form.Text>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <fieldset
+              className={cn(
+                "space-y-10",
+                isLoading ? "opacity-50" : "opacity-100",
               )}
-            </Form.Group>
+            >
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="John doe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="johndoe@email.com"
+                        {...field}
+                        type="email"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="******" type="password" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Form.Group className="my-2" controlId="email">
-              <Form.Label>Email Address</Form.Label>
-              <Form.Control
-                type="email"
-                placeholder="Enter email..."
-                {...register("email", { required: "Email is required" })}
-              ></Form.Control>
-              {errors.email && (
-                <Form.Text className="text-danger">
-                  {errors.email.message}
-                </Form.Text>
-              )}
-            </Form.Group>
+              <FormField
+                control={form.control}
+                name="confirm"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm password</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="******" type="password" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Form.Group className="my-2" controlId="password">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                type="password"
-                placeholder="Enter password..."
-                {...register("password", { required: "password is required" })}
-              ></Form.Control>
-              {errors.password && (
-                <Form.Text className="text-danger">
-                  {errors.password.message}
-                </Form.Text>
-              )}
-            </Form.Group>
-
-            <Form.Group className="my-2" controlId="confirm">
-              <Form.Label>Confirm Password</Form.Label>
-              <Form.Control
-                type="password"
-                placeholder="Enter password..."
-                {...register("confirmPassword", {
-                  required: "password is required",
-                })}
-              ></Form.Control>
-              {errors.confirmPassword && (
-                <Form.Text className="text-danger">
-                  {errors.confirmPassword.message}
-                </Form.Text>
-              )}
-            </Form.Group>
-
-            <Button disabled={isLoading} type="submit" variant="primary">
-              Sign up
-            </Button>
-          </fieldset>
-          {isLoading && <Loader />}
+              <Button
+                disabled={isLoading}
+                type="submit"
+                onClick={() => console.log("clicked")}
+                className="w-full"
+              >
+                Sign up
+              </Button>
+            </fieldset>
+            {isLoading && <Loader />}
+          </form>
         </Form>
-        <Row className="py-3">
-          <Col>
-            Already have an account?
-            <Link to="/login" className="ms-1">
-              Sign in
-            </Link>
-          </Col>
-        </Row>
+        <div className="text-center mt-4">
+          Already have an account?
+          <Link to="/login" className="ms-1 underline">
+            Sign in
+          </Link>
+        </div>
       </Fragment>
     </FormContainer>
   );

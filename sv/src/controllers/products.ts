@@ -71,7 +71,10 @@ class Product {
     });
 
     const createdProduct = await product.save();
-    return reply.status(201).send(createdProduct);
+
+    reply.code(201);
+    reply.send(createdProduct);
+    return reply;
   }
 
   async updateProduct(req: FastifyRequest, reply: FastifyReply) {

@@ -1,14 +1,6 @@
-import { Col, Container, Row } from "react-bootstrap";
-
 function FormContainer({ children }: { children: JSX.Element }) {
   return (
-    <Container>
-      <Row className="justify-content-md-center">
-        <Col xs={12} md={6}>
-          {children}
-        </Col>
-      </Row>
-    </Container>
+    <div className="h-full w-full max-w-md mx-auto my-auto">{children}</div>
   );
 }
 export default FormContainer;

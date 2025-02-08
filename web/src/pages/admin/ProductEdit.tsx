@@ -1,17 +1,52 @@
-import { Fragment } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Fragment, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import clsx from "clsx";
 
+import { useDelay } from "@/lib/utils";
 import {
   useGetProductsByIdQuery,
   useUpdateProductMutation,
   // useUploadProductImageMutation,
 } from "../../features/products/slice";
 
-import Loader from "../../components/Loader";
-import FormContainer from "../../components/FormContainer";
+import Loader from "@/components/Loader";
+import FormContainer from "@/components/FormContainer";
+import { GoBack } from "@/components/ui/goback";
+
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+const formSchema = z.object({
+  name: z.string().min(1, {
+    message: "Product is required",
+  }),
+  price: z.string(),
+  image: z.string().min(6, {
+    message: "Image is required",
+  }),
+  brand: z.string(),
+  category: z.string().min(6, {
+    message: "Category is required",
+  }),
+  countInStock: z.string(),
+  description: z.string().min(6, {
+    message: "Description is required",
+  }),
+  productId: z.string(),
+});
 
 const ProductEdit = () => {
   const { id: productId } = useParams() as { id: string };
@@ -24,26 +59,20 @@ const ProductEdit = () => {
     error,
   } = useGetProductsByIdQuery(productId);
 
-  const initialState = {
-    name: product ? product.name : "",
-    price: product ? product.price : 0,
-    image: product ? product.image : "",
-    brand: product ? product.brand : "",
-    category: product ? product.category : "",
-    countInStock: product ? product.countInStock : 0,
-    description: product ? product.description : "",
-    productId,
-  };
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<typeof initialState>({
-    values: initialState,
-    mode: "onSubmit",
-    reValidateMode: "onChange",
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
   });
+  const delay = useDelay(500);
+
+  //TODO: Implement skeleton
+  useEffect(() => {
+    form.reset({
+      ...product,
+      price: product?.price.toString(),
+      productId,
+      countInStock: product?.countInStock.toString(),
+    });
+  }, [isLoading]);
 
   const [updateProduct, { isLoading: loadingUpdate }] =
     useUpdateProductMutation();
@@ -51,17 +80,17 @@ const ProductEdit = () => {
   // const [uploadProductImage, { isLoading: loadingUpload }] =
   //   useUploadProductImageMutation();
 
-  const onSubmit = async (values: typeof initialState) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await updateProduct({
         id: values.productId,
         name: values.name,
         brand: values.brand,
         description: values.description,
-        countInStock: values.countInStock,
+        countInStock: +values.countInStock,
         category: values.category,
         image: values.image,
-        price: values.price,
+        price: +values.price,
       }).unwrap();
       toast.success("Updated successfully");
       refetch();
@@ -87,145 +116,148 @@ const ProductEdit = () => {
   //     toast.error(err);
   //   }
   // };
-
+  if (error) return <pre>{JSON.stringify(error, null, 2)}</pre>;
   return (
     <>
-      <Link to="/admin/products" className="btn btn-light my-3">
-        Go Back
-      </Link>
+      <GoBack to="/admin/products" />
+      <h1 className="text-sm italic text-center my-8">Edit</h1>
       <FormContainer>
         <Fragment>
-          <h1>Edit Product</h1>
           {loadingUpdate && <Loader />}
-          {isLoading ? (
+          {isLoading || delay ? (
             <Loader />
-          ) : error ? (
-            <Alert variant="danger">{JSON.stringify(error, null, 2)}</Alert>
           ) : (
-            <Form onSubmit={handleSubmit(onSubmit)}>
-              {/* TODO: may be address form side to side? */}
-              <fieldset className={isLoading ? "opacity-50" : "opacity-100"}>
-                <Form.Group className="my-2" controlId="name">
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter name..."
-                    {...register("name", { required: "Name is required" })}
-                  ></Form.Control>
-                  {errors.name && (
-                    <Form.Text className="text-danger">
-                      {errors.name.message}
-                    </Form.Text>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                {/* TODO: may be address form side to side? */}
+
+                <fieldset
+                  className={clsx(
+                    loadingUpdate ? "opacity-50" : "opacity-100",
+                    "space-y-2",
                   )}
-                </Form.Group>
-
-                <Form.Group controlId="price">
-                  <Form.Label>Price</Form.Label>
-                  <Form.Control
-                    type="number"
-                    step="0.01"
-                    placeholder="Enter price"
-                    {...register("price", { required: "Price is required" })}
-                  ></Form.Control>
-                  {errors.price && (
-                    <Form.Text className="text-danger">
-                      {errors.price.message}
-                    </Form.Text>
-                  )}
-                </Form.Group>
-
-                <Form.Group controlId="image">
-                  <Form.Label>Image</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter image url"
-                    {...register("image", { required: "Image is required" })}
-                  ></Form.Control>
-                  {errors.image && (
-                    <Form.Text className="text-danger">
-                      {errors.image.message}
-                    </Form.Text>
-                  )}
-                  {/*  TODO: Image uploads*/}
-
-                  {/* <Form.Control */}
-                  {/*   onChange={uploadFileHandler} */}
-                  {/*   aria-label="upload Image" */}
-                  {/*   type="file" */}
-                  {/* ></Form.Control> */}
-                  {/* {loadingUpload && <Loader />} */}
-                </Form.Group>
-
-                <Form.Group controlId="brand">
-                  <Form.Label>Brand</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter brand"
-                    {...register("brand", { required: "Brand is required" })}
-                  ></Form.Control>
-                  {errors.brand && (
-                    <Form.Text className="text-danger">
-                      {errors.brand.message}
-                    </Form.Text>
-                  )}
-                </Form.Group>
-
-                <Form.Group controlId="countInStock">
-                  <Form.Label>Count In Stock</Form.Label>
-                  <Form.Control
-                    type="number"
-                    placeholder="Enter countInStock"
-                    {...register("countInStock", {
-                      required: "Count is required",
-                    })}
-                  ></Form.Control>
-                  {errors.countInStock && (
-                    <Form.Text className="text-danger">
-                      {errors.countInStock.message}
-                    </Form.Text>
-                  )}
-                </Form.Group>
-
-                <Form.Group controlId="category">
-                  <Form.Label>Category</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter category"
-                    {...register("category", {
-                      required: "Category is required",
-                    })}
-                  ></Form.Control>
-                  {errors.category && (
-                    <Form.Text className="text-danger">
-                      {errors.category.message}
-                    </Form.Text>
-                  )}
-                </Form.Group>
-
-                <Form.Group controlId="description">
-                  <Form.Label>Description</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter description"
-                    {...register("description", {
-                      required: "Description is required",
-                    })}
-                  ></Form.Control>
-                  {errors.description && (
-                    <Form.Text className="text-danger">
-                      {errors.description.message}
-                    </Form.Text>
-                  )}
-                </Form.Group>
-
-                <Button
-                  type="submit"
-                  variant="primary"
-                  style={{ marginTop: "1rem" }}
                 >
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Product Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Name..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Price</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="5.0" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="image"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Image</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="brand"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Brand</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {/*           {/*  TODO: Image uploads*/}
+
+                  {/*           {/* <Form.Control */}
+                  {/*           {/*   onChange={uploadFileHandler} */}
+                  {/*           {/*   aria-label="upload Image" */}
+                  {/*           {/*   type="file" */}
+                  {/*           {/* ></Form.Control> */}
+                  {/*           {/* {loadingUpload && <Loader />} */}
+                  {/*         </Form.Group> */}
+                  <FormField
+                    control={form.control}
+                    name="countInStock"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Count in stock</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="1" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Category</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea rows={4} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="productId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            className="hidden"
+                            value={productId}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </fieldset>
+                <Button className="w-full mt-8" type="submit">
                   Update
                 </Button>
-              </fieldset>
+              </form>
             </Form>
           )}
         </Fragment>

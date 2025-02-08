@@ -1,4 +1,4 @@
-import { Nav } from "react-bootstrap";
+// import { Nav } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,47 +14,36 @@ const CheckoutSteps = ({
   step4?: boolean;
 }) => {
   return (
-    <Nav className="justify-content-center mb-4">
-      <Nav.Item>
+    <ul className="flex justify-center space-x-4">
+      <li>
         {step1 ? (
-          <Link to="/login" className="text-decoration-none">
-            Sign In
-          </Link>
+          <Link to="/login">Sign In</Link>
         ) : (
           <p className="opacity-50">Sign In</p>
         )}
-      </Nav.Item>
-
-      <Nav.Item>
+      </li>
+      <li>
         {step2 ? (
-          <Link to="/shipping" className="text-decoration-none">
-            Shipping
-          </Link>
+          <Link to="/shipping">Shipping</Link>
         ) : (
           <p className="opacity-50">Shipping</p>
         )}
-      </Nav.Item>
-
-      <Nav.Item>
+      </li>
+      <li>
         {step3 ? (
-          <Link to="/payment" className="text-decoration-none">
-            Payment
-          </Link>
+          <Link to="/payment">Payment</Link>
         ) : (
           <p className="opacity-50">Payment</p>
         )}
-      </Nav.Item>
-
-      <Nav.Item>
+      </li>
+      <li>
         {step4 ? (
-          <Link to="/placeorder" className="text-decoration-none">
-            Place order
-          </Link>
+          <Link to="/placeorder">Place order</Link>
         ) : (
           <p className="opacity-50">Place order</p>
         )}
-      </Nav.Item>
-    </Nav>
+      </li>
+    </ul>
   );
 };
 

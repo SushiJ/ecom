@@ -1,14 +1,22 @@
-import { Table, Button, Alert } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { Icon } from "@iconify/react";
+import { Link } from "react-router-dom";
 
 import {
   useDeleteUserMutation,
   useGetUsersQuery,
 } from "../../features/user/slice";
 
-import Loader from "../../components/Loader";
-import { Link } from "react-router-dom";
+import Loader from "@/components/Loader";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const UsersList = () => {
   const { data: users, refetch, isLoading, error } = useGetUsersQuery();
@@ -28,36 +36,36 @@ const UsersList = () => {
   };
 
   if (!users) {
-    return <>Empty</>;
+    return <h1>Empty</h1>;
   }
 
   return (
     <>
-      <h1>Users</h1>
+      <h1 className="text-sm italic text-center my-8">Users</h1>
       {isLoading ? (
         <Loader />
       ) : error ? (
-        <Alert variant="danger">{JSON.stringify(error, null, 2)}</Alert>
+        <pre>{JSON.stringify(error, null, 2)}</pre>
       ) : (
-        <Table striped bordered hover responsive className="table-sm">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>NAME</th>
-              <th>EMAIL</th>
-              <th>ADMIN</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-center">ID</TableHead>
+              <TableHead className="text-center">NAME</TableHead>
+              <TableHead className="text-center">EMAIL</TableHead>
+              <TableHead className="">ADMIN</TableHead>
+              <TableHead className="text-center">ACTION</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {users.map((user) => (
-              <tr key={user._id}>
-                <td>{user._id}</td>
-                <td>{user.name}</td>
-                <td>
+              <TableRow key={user._id}>
+                <TableCell>{user._id}</TableCell>
+                <TableCell>{user.name}</TableCell>
+                <TableCell>
                   <a href={`mailto:${user.email}`}>{user.email}</a>
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                   {user.isAdmin ? (
                     <Icon
                       icon="eos-icons:admin"
@@ -73,15 +81,12 @@ const UsersList = () => {
                       height="24"
                     />
                   )}
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                   {!user.isAdmin && (
-                    <>
-                      <Link
-                        to={`/admin/user/${user._id}/edit`}
-                        style={{ marginRight: "10px" }}
-                      >
-                        <Button variant="outline-light" className="btn-sm">
+                    <div className="space-y-2 lg:space-y-0 lg:space-x-2">
+                      <Link to={`/admin/user/${user._id}/edit`}>
+                        <Button size="sm" variant="outline">
                           <Icon
                             icon="material-symbols:person-edit"
                             style={{ color: "darkgreen" }}
@@ -91,8 +96,8 @@ const UsersList = () => {
                         </Button>
                       </Link>
                       <Button
-                        variant="outline-light"
-                        className="btn-sm"
+                        size="sm"
+                        variant="outline"
                         onClick={() => deleteHandler(user._id)}
                       >
                         <Icon
@@ -102,12 +107,12 @@ const UsersList = () => {
                           height="24"
                         />
                       </Button>
-                    </>
+                    </div>
                   )}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
+          </TableBody>
         </Table>
       )}
     </>

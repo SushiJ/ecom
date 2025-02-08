@@ -2,11 +2,13 @@
   "name": "fastify",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon",
     "seed": "ts-node ./seed.ts",
-    "lint": "eslint ."
+    "start": "ts-node ./src/index.ts",
+    "lint": "eslint .",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -19,7 +21,8 @@
     "@typegoose/typegoose": "^11.6.0",
     "fastify": "^4.24.3",
     "mongodb": "^6.3.0",
-    "mongoose": "7.6.1"
+    "mongoose": "7.6.1",
+    "pino-pretty": "^10.2.3"
   },
   "devDependencies": {
     "@types/node": "^20.8.10",
@@ -27,7 +30,6 @@
     "@typescript-eslint/parser": "^6.11.0",
     "eslint": "^8.53.0",
     "nodemon": "^3.0.1",
-    "pino-pretty": "^10.2.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }

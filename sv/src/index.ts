@@ -48,16 +48,15 @@ fastify.register(userRoutes, { prefix: "/users" });
 fastify.register(productRoutes, { prefix: "/products" });
 fastify.register(orderRoutes, { prefix: "/orders" });
 
-fastify.setErrorHandler((err, req: FastifyRequest, res: FastifyReply) => {
-  if (err) {
-    req.log.error({ err }, err.message);
-    err.message
-      ? res.send({ status: res.status, error: err.message })
-      : res.status(500).send({ status: 500, error: "Internal Server Error" });
-    return res;
-  }
-  return;
-});
+// fastify.setErrorHandler((err, req: FastifyRequest, res: FastifyReply) => {
+//   if (err) {
+//     req.log.error({ err }, err.message);
+//     err.message
+//       ? res.send({ status: res.status, error: err.message })
+//       : res.status(500).send({ status: 500, error: "Internal Server Error" });
+//     return res;
+//   }
+// });
 
 // PAYPAL
 fastify.get(
@@ -68,19 +67,18 @@ fastify.get(
     }),
 );
 
-fastify.listen({ port: 3000, host: "0.0.0.0" }, (err, address) => {
+fastify.listen({ port: 3000, host: "0.0.0.0" }, async (err, address) => {
   if (err) {
     fastify.log.error(err);
     process.exit(1);
   }
-  connect()
-    .then(() => {
-      console.log("CONNECTED");
-    })
-    .then(() => fastify.log.info(`server listening on ${address}`))
-    .catch((e) => {
-      fastify.log.error(e);
-    });
+  try {
+    await connect();
+    fastify.log.info("CONNECTED TO MONGO");
+    fastify.log.info(`server listening on ${address}`);
+  } catch (e) {
+    fastify.log.error("Failed to connect to server");
+  }
 });
 
 // biome-ignore lint/complexity/noForEach: <explanation>

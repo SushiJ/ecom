@@ -1,19 +1,17 @@
-import { Container } from "react-bootstrap";
 import { Outlet } from "react-router-dom";
-
-import { Header } from "./components/Header";
-import { Footer } from "./components/Footer";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./index.css";
+
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 function App() {
   return (
-    <div className="d-flex flex-column vh-100">
+    <div className="container mx-auto px-6 h-full">
       <Header />
-      <main className="py-3 flex-grow-1 overflow-auto">
-        <Container>
-          <Outlet />
-        </Container>
+      <main className="py-3 flex-grow overflow-y-auto h-full overflow-x-hidden">
+        <Outlet />
       </main>
       <ToastContainer theme="dark" position="bottom-right" autoClose={2000} />
       <Footer />

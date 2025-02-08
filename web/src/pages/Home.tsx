@@ -1,12 +1,23 @@
 import { Link, useParams } from "react-router-dom";
-import { Card, Col, Row } from "react-bootstrap";
-import { Icon } from "@iconify/react";
+
+import { Separator } from "@/components/ui/separator";
+import { Rating } from "@/components/Rating";
+import { Title } from "@/components/Title";
+import Paginate from "@/components/Paginate";
+import ProductCarousel from "@/components/ProductCarousel";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 import { Product } from "../types/product";
 import { useGetProductsQuery } from "../features/products/slice";
-
-import Paginate from "../components/Paginate";
-import ProductCarousel from "../components/ProductCarousel";
+import truncate from "../lib/truncate";
+import { useDelay } from "@/lib/utils";
+import Loader from "@/components/Loader";
 
 export default function Home() {
   const { pageNum, keyword } = useParams();
@@ -15,24 +26,17 @@ export default function Home() {
     keyword,
   });
 
-  if (isLoading) {
-    return (
-      <>
-        <h1>Latest Products</h1>
-        <p>Loading...</p>
-      </>
-    );
+  const delay = useDelay(200);
+
+  if (isLoading || delay) {
+    return <Loader />;
   }
 
-  if ((!data || isError) && !isLoading) {
-    return (
-      <>
-        <p>Something went wrong</p>
-      </>
-    );
+  if ((isError && !isLoading) || !data) {
+    return <p className="text-center text-lg">Something went wrong</p>;
   }
 
-  if (data.products.length < 1) {
+  if (data.products.length === 0) {
     return (
       <>
         <p>No Products found</p>
@@ -41,83 +45,44 @@ export default function Home() {
   }
 
   return (
-    <main className="d-flex flex-column">
-      <h1>Latest Products</h1>
+    <section>
+      <Title title="Latest Products" className="text-neutral-500 text-md" />
       <ProductCarousel />
-      <Row>
+      <Separator className="my-8" />
+      <div className="grid md:grid-cols-2 gap-2">
         {data.products.map((p) => (
-          <Col key={p._id} sm={12} md={6} lg={4} xl={3}>
+          <div key={p._id}>
             <Product product={p} />
-          </Col>
+          </div>
         ))}
-      </Row>
+      </div>
       <Paginate pages={data.pages} page={data.page} keyword={keyword} />
-    </main>
+    </section>
   );
 }
 
 function Product(props: { product: Product }) {
   return (
-    <Card className="my-3 p-3 rounded">
+    <Card className="shadow-none h-[450px]">
       <Link to={`/products/${props.product._id}`}>
-        <Card.Img src={props.product.image} variant="top" className="rounded" />
-      </Link>
-      <Card.Body>
-        <Link to={`/products/${props.product._id}`}>
-          <Card.Title as="div" className="product-title">
-            <strong>{props.product.name}</strong>
-          </Card.Title>
-        </Link>
-        <Card.Text as="div">
+        <CardHeader className="flex flex-col items-center">
+          <img
+            src={props.product.image}
+            className="rounded h-48 w-48 object-cover"
+          />
+          <CardTitle>{props.product.name}</CardTitle>
+          <CardDescription>
+            {truncate(props.product.description)}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p>$ {props.product.price}</p>
           <Rating
             value={props.product.rating}
             text={`${props.product.numReviews} reviews`}
           />
-        </Card.Text>
-        <Card.Text as={"h3"}>${props.product.price}</Card.Text>
-      </Card.Body>
+        </CardContent>
+      </Link>
     </Card>
-  );
-}
-
-function Rating(props: { value: number; text: string }) {
-  return (
-    <div className="rating">
-      <RenderRatingIcon value={props.value} />
-      <span className="rating-text">{props.text ?? props.text}</span>
-    </div>
-  );
-}
-
-function RenderRatingIcon(props: { value: number }) {
-  return (
-    <>
-      <span>
-        {[1, 2, 3, 4, 5].map((num, idx) =>
-          props.value >= num ? (
-            <Icon
-              key={idx}
-              icon="fluent:star-12-filled"
-              width="20"
-              height="20"
-            />
-          ) : props.value >= num - 0.5 ? (
-            <Icon
-              key={idx}
-              icon="fluent:star-half-12-regular"
-              width="20"
-              height="20"
-            />
-          ) : (
-            <Icon
-              key={idx}
-              icon="fluent:star-12-regular"
-              width="20"
-              height="20"
-            />
-          ),
-        )}
-      </span>
-    </>
   );
 }

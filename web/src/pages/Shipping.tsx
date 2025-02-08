@@ -1,113 +1,119 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import * as z from "zod";
 
 import { useAppDispatch } from "../hooks/redux";
 import { useAppSelector } from "../hooks/redux";
-// import Loader from "../components/Loader";
-import FormContainer from "../components/FormContainer";
 import { saveShippingAddress } from "../features/cart/slice";
-import CheckoutSteps from "../components/CheckoutSteps";
+
+import { Input } from "@/components/ui/input";
+import FormContainer from "@/components/FormContainer";
+import CheckoutSteps from "@/components/CheckoutSteps";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const formSchema = z.object({
+  address: z.string({ message: "Address is required" }),
+  city: z.string({
+    message: "City is required",
+  }),
+  postalCode: z.string({
+    message: "Postal code is required",
+  }),
+});
 
 const Shipping = () => {
   const navigate = useNavigate();
-
   const { shippingAddress } = useAppSelector((state) => state.cart);
-
   const dispatch = useAppDispatch();
 
-  const initialState: typeof shippingAddress = shippingAddress;
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [initialValues, _] = useState(initialState);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setFocus,
-  } = useForm({
-    mode: "onSubmit",
-    reValidateMode: "onChange",
-    defaultValues: initialValues,
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      address: "",
+      city: "",
+      postalCode: "",
+    },
   });
 
   useEffect(() => {
-    setFocus("address");
-  }, [setFocus]);
+    form.setFocus("address");
+  }, [form.setFocus]);
 
-  const onSubmit = (values: typeof initialState) => {
+  useEffect(() => {
+    if (shippingAddress && shippingAddress.address) {
+      form.reset({ ...shippingAddress });
+    }
+  }, []);
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     dispatch(saveShippingAddress({ ...values }));
     navigate("/payment");
   };
 
   return (
     <>
+      <h1 className="my-8 text-sm italic text-center">Shipping</h1>
       <CheckoutSteps step1 step2 />
       <FormContainer>
         <Fragment>
-          <h1>Shipping</h1>
-          <Form onSubmit={handleSubmit(onSubmit)}>
-            <fieldset className="">
-              <Form.Group className="my-2" controlId="address">
-                <Form.Label>Address</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter address"
-                  {...register("address", { required: "address is required" })}
-                ></Form.Control>
-                {errors.address && (
-                  <Form.Text className="text-danger">
-                    {errors.address.message}
-                  </Form.Text>
-                )}
-              </Form.Group>
-              <Form.Group className="my-2" controlId="city">
-                <Form.Label>City</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter city"
-                  {...register("city", { required: "city is required" })}
-                ></Form.Control>
-                {errors.city && (
-                  <Form.Text className="text-danger">
-                    {errors.city.message}
-                  </Form.Text>
-                )}
-              </Form.Group>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <fieldset className="space-y-4 my-8">
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Street Address" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <Form.Group className="my-2" controlId="postalCode">
-                <Form.Label>Postal Code</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter postal code"
-                  {...register("postalCode", { required: "Code is required" })}
-                ></Form.Control>
-                {errors.postalCode && (
-                  <Form.Text className="text-danger">
-                    {errors.postalCode.message}
-                  </Form.Text>
-                )}
-              </Form.Group>
+                <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>City</FormLabel>
+                      <FormControl>
+                        <Input placeholder="City" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <Form.Group className="my-2" controlId="country">
-                <Form.Label>Country</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter country"
-                  {...register("country", { required: "Country is required" })}
-                ></Form.Control>
-                {errors.country && (
-                  <Form.Text className="text-danger">
-                    {errors.country.message}
-                  </Form.Text>
-                )}
-              </Form.Group>
-              <Button type="submit" variant="primary">
-                Next
-              </Button>
-            </fieldset>
+                <FormField
+                  control={form.control}
+                  name="postalCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>City</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Postal Code" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button type="submit">Next</Button>
+              </fieldset>
+            </form>
           </Form>
         </Fragment>
       </FormContainer>

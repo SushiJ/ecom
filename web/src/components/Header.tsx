@@ -1,13 +1,25 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Navbar, Nav, Container, Badge, NavDropdown } from "react-bootstrap";
-import { Icon } from "@iconify/react";
 import { toast } from "react-toastify";
 
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { useLogoutMutation } from "../features/user/slice";
 import { resetCreds } from "../features/auth/slice";
 import { resetCart } from "../features/cart/slice";
-import SearchBox from "./SearchBox";
+
+import SearchBox from "@/components/SearchBox";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Icon } from "@iconify/react";
 
 export function Header() {
   const dispatch = useAppDispatch();
@@ -36,74 +48,119 @@ export function Header() {
 
   return (
     <header>
-      <Navbar bg="primary" variant="dark" expand="md" collapseOnSelect>
-        <Container>
-          <Navbar.Brand>
-            <Link to="/" className="text-decoration-none text-white">
-              Shop
-            </Link>
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto">
-              <SearchBox />
-              <Link
-                to="/cart"
-                className="d-flex align-items-center text-white text-decoration-none"
-              >
-                <Icon
-                  icon="fluent:shopping-bag-16-regular"
-                  width="24"
-                  height="24"
-                />
-                Cart
-                {totalItems > 0 && (
-                  <Badge pill bg="success" style={{ marginLeft: "5px" }}>
-                    {totalItems}
-                  </Badge>
-                )}
-              </Link>
-              {/* Admin Links */}
-              {userInfo && userInfo.isAdmin && (
-                <NavDropdown title="Admin" id="adminmenu" className="me-0">
-                  <NavDropdown.Item onClick={() => navigate("/admin/products")}>
-                    Products
-                  </NavDropdown.Item>
-                  <NavDropdown.Item onClick={() => navigate("/admin/orders")}>
-                    Orders
-                  </NavDropdown.Item>
-                  <NavDropdown.Item onClick={() => navigate("/admin/users")}>
-                    Users
-                  </NavDropdown.Item>
-                </NavDropdown>
-              )}
-              {/* INFO: There's a bug where the menu is still after the user logs out, checking for name property fixes it */}
-              {userInfo && userInfo.name ? (
-                <NavDropdown
-                  title={userInfo.name}
-                  id="username"
-                  className="me-0"
-                >
-                  <NavDropdown.Item onClick={() => navigate("/profile")}>
-                    Profile
-                  </NavDropdown.Item>
-                  <NavDropdown.Item as="button" onClick={handleLogout}>
-                    Logout
-                  </NavDropdown.Item>
-                </NavDropdown>
-              ) : (
-                <Link
-                  to="/login"
-                  className="d-flex align-items-center text-white text-decoration-none"
-                >
-                  <Icon icon="uil:signin" width="22" height="22" />
-                  sign in / sign up
-                </Link>
-              )}
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+      <nav className="sticky top-0 min-h-16 flex items-center justify-between max-w-screen-2xl mx-auto w-full">
+        <Link
+          to="/"
+          className="hidden md:block md:text-2xl lg:font-bold hover:text-neutral-700/80"
+        >
+          Shopp-e
+        </Link>
+        <Link
+          to="/"
+          className="md:hidden lg:font-bold hover:text-neutral-700/80 bg-black text-white px-1 rounded-sm text-2xl"
+        >
+          S
+        </Link>
+        <div className="flex space-x-4 items-center">
+          <SearchBox />
+          <Separator orientation="vertical" />
+          <Link to="/cart">
+            <Button variant="outline" size="sm" className="relative">
+              <Icon icon="solar:cart-4-line-duotone" width="32" height="32" />
+              <span className="absolute top-[-0.5rem] right-[-0.5rem] bg-neutral-800 text-white px-1.5 py-0.5 rounded text-xs">
+                {totalItems.toFixed()}
+              </span>
+            </Button>
+          </Link>
+          {/* userInfo && userInfo.name so that it renders the button correctly when logged */}
+          {userInfo && userInfo.name ? (
+            userInfo.isAdmin ? (
+              <AdminMenu userInfo={userInfo} handleLogout={handleLogout} />
+            ) : (
+              <Menu userInfo={userInfo} handleLogout={handleLogout} />
+            )
+          ) : (
+            <Button size="sm" onClick={() => navigate("/login")}>
+              Login
+            </Button>
+          )}
+        </div>
+      </nav>
     </header>
+  );
+}
+
+function AdminMenu(props: {
+  userInfo: any;
+  handleLogout: () => Promise<void>;
+}) {
+  const navigate = useNavigate();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <div>
+          <Button className="hidden lg:block" variant="outline" size="sm">
+            {props.userInfo.name}
+          </Button>
+          <Button className="lg:hidden" variant="outline" size="sm">
+            <Icon
+              icon="solar:hamburger-menu-line-duotone"
+              width="32"
+              height="32"
+            />
+          </Button>
+        </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuGroup>
+          <DropdownMenuItem onClick={() => navigate("/profile")}>
+            Profile
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem onClick={() => navigate("/admin/products")}>
+            Products
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/admin/orders")}>
+            Orders
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/admin/users")}>
+            Users
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={props.handleLogout}>
+          Log out
+          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function Menu(props: { userInfo: any; handleLogout: () => Promise<void> }) {
+  const navigate = useNavigate();
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm">
+          {props.userInfo.name}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem onClick={() => navigate("/profile")}>
+            Profile
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={props.handleLogout}>
+          Log out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
