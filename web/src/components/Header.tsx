@@ -48,12 +48,18 @@ export function Header() {
 
   return (
     <header>
-      <nav className="sticky top-0 min-h-16 flex items-center justify-between p-2 max-w-screen-2xl mx-auto w-full">
+      <nav className="sticky top-0 min-h-16 flex items-center justify-between p-1 md:p-2 max-w-screen-2xl mx-auto w-full">
         <Link
           to="/"
-          className="lg:text-2xl lg:font-bold hover:text-neutral-700/80"
+          className="hidden md:block md:text-2xl lg:font-bold hover:text-neutral-700/80"
         >
           Shopp-e
+        </Link>
+        <Link
+          to="/"
+          className="md:hidden lg:font-bold hover:text-neutral-700/80 bg-black text-white px-1 rounded-sm text-2xl"
+        >
+          S
         </Link>
         <div className="flex space-x-4 items-center">
           <SearchBox />
@@ -93,9 +99,18 @@ function AdminMenu(props: {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm">
-          {props.userInfo.name}
-        </Button>
+        <div>
+          <Button className="hidden lg:block" variant="outline" size="sm">
+            {props.userInfo.name}
+          </Button>
+          <Button className="lg:hidden" variant="outline" size="sm">
+            <Icon
+              icon="solar:hamburger-menu-line-duotone"
+              width="32"
+              height="32"
+            />
+          </Button>
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuGroup>

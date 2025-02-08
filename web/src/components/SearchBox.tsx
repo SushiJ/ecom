@@ -54,7 +54,7 @@ export function SearchBox() {
                   size={18}
                   placeholder="Search products..."
                   {...field}
-                  className="text-sm h-8"
+                  className="text-xs md:text-sm h-8"
                 />
               </FormControl>
               <FormMessage />
