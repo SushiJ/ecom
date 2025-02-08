@@ -10,7 +10,7 @@ function App() {
   return (
     <div className="container mx-auto px-6 h-full">
       <Header />
-      <main className="py-3 flex-grow overflow-auto h-full">
+      <main className="py-3 flex-grow overflow-y-auto h-full overflow-x-hidden">
         <Outlet />
       </main>
       <ToastContainer theme="dark" position="bottom-right" autoClose={2000} />
