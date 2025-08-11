@@ -1,172 +1,226 @@
 import { type FastifyReply, type FastifyRequest } from "fastify";
+
+import {
+	type RegisterInput,
+	type LoginInput,
+	type UpdateInfoInput,
+	AdminUpdateUserInput,
+} from "../schemas/userSchema";
 import userModel from "../models/User";
 
 class User {
-  // TODO: Validation for request body thingy
-  async registerHandler(
-    req: FastifyRequest<{
-      Body: {
-        name: string;
-        email: string;
-        password: string;
-      };
-    }>,
-    reply: FastifyReply,
-  ) {
-    const { name, email, password } = req.body;
-    const userExists = await userModel.findOne({ email }).select("-password");
+	async registerHandler(
+		req: FastifyRequest<{
+			Body: RegisterInput;
+		}>,
+		reply: FastifyReply,
+	) {
+		const { name, email, password } = req.body;
+		const userExists = await userModel.findOne({ email }).select("-password");
 
-    if (userExists) {
-      reply.status(409);
-      throw new Error("User already exists");
-    }
+		if (userExists) {
+			reply.status(409);
+			throw new Error("User already exists");
+		}
 
-    await userModel.create({ name, email, password });
+		const newUser = await userModel.create({ name, email, password });
 
-    return reply.status(201);
-  }
+		return reply.status(201).send({
+			message: "User created successfully",
+			user: {
+				_id: newUser._id,
+				name: newUser.name,
+				email: newUser.email,
+			},
+		});
+	}
 
-  async loginHandler(
-    req: FastifyRequest<{
-      Body: {
-        email: string;
-        password: string;
-      };
-    }>,
-    reply: FastifyReply,
-  ) {
-    const { email, password } = req.body;
+	async loginHandler(
+		req: FastifyRequest<{
+			Body: LoginInput;
+		}>,
+		reply: FastifyReply,
+	) {
+		const { email, password } = req.body;
 
-    const user = await User.getUserByEmail(email);
+		const user = await User.getUserByEmail(email);
 
-    if (!user || !user.passwordMatch(password)) {
-      reply.status(401);
-      throw new Error("Invalid credentials");
-    }
+		if (!user || !user.passwordMatch(password)) {
+			reply.status(401);
+			throw new Error("Invalid credentials");
+		}
 
-    const token = await reply.jwtSign({
-      userId: user._id,
-    });
+		const token = await reply.jwtSign({
+			userId: user._id,
+		});
 
-    return reply
-      .setCookie("citrus", token, {
-        httpOnly: true,
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 30 * 24 * 60 * 60,
-        sameSite: "strict",
-      })
-      .status(200)
-      .send({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        isAdmin: user.isAdmin,
-      });
-  }
+		return reply
+			.setCookie("citrus", token, {
+				httpOnly: true,
+				path: "/",
+				secure: process.env.NODE_ENV === "production",
+				maxAge: 30 * 24 * 60 * 60,
+				sameSite: "strict",
+			})
+			.status(200)
+			.send({
+				_id: user._id,
+				name: user.name,
+				email: user.email,
+				isAdmin: user.isAdmin,
+			});
+	}
 
-  async logoutHandler(_req: FastifyRequest, reply: FastifyReply) {
-    reply
-      .setCookie("citrus", "", {
-        httpOnly: true,
-        path: "/",
-        sameSite: "strict",
-        maxAge: 0,
-      })
-      .status(200)
-      .send();
-    return reply;
-  }
+	async logoutHandler(_req: FastifyRequest, reply: FastifyReply) {
+		reply
+			.setCookie("citrus", "", {
+				httpOnly: true,
+				path: "/",
+				sameSite: "strict",
+				maxAge: 0,
+			})
+			.status(200)
+			.send({ message: "Logged out successfully" });
+		return reply;
+	}
 
-  async getInfoHandler(req: FastifyRequest, reply: FastifyReply) {
-    const user = req.user;
-    return reply.status(200).send(user);
-  }
+	async getInfoHandler(req: FastifyRequest, reply: FastifyReply) {
+		const user = req.user;
+		return reply.status(200).send(user);
+	}
 
-  async updateInfoHandler(req: FastifyRequest, reply: FastifyReply) {
-    const decodedUser = req.user as { _id: string };
+	async updateInfoHandler(
+		req: FastifyRequest<{
+			Body: UpdateInfoInput;
+		}>,
+		reply: FastifyReply,
+	) {
+		const decodedUser = req.user as { _id: string };
 
-    const { name, email } = req.body as { name?: string; email?: string };
+		const { name, email } = req.body;
 
-    const user = await userModel.findById(decodedUser._id);
+		const user = await userModel.findById(decodedUser._id);
 
-    if (!user) {
-      reply.status(400);
-      throw new Error("HUH");
-    }
+		if (!user) {
+			reply.status(404);
+			throw new Error("HUH");
+		}
 
-    user.name = name ? name : user.name;
-    user.email = email ? email : user.email;
+		if (name !== undefined) user.name = name;
+		if (email !== undefined) user.email = email;
 
-    const updatedUser = await user.save();
+		const updatedUser = await user.save();
 
-    return reply.status(200).send(updatedUser);
-  }
+		return reply.status(200).send({
+			message: "User updated successfully",
+			user: {
+				_id: updatedUser._id,
+				name: updatedUser.name,
+				email: updatedUser.email,
+			},
+		});
+	}
 
-  static async getUserByEmail(email: string) {
-    const user = await userModel.findOne({ email });
-    return user;
-  }
+	static async getUserByEmail(email: string) {
+		const user = await userModel.findOne({ email });
+		return user;
+	}
 
-  // Admin actions
-  async a_getAllUsers(_req: FastifyRequest, reply: FastifyReply) {
-    const users = await userModel.find().select("-password");
-    reply.status(200).send(users);
-    return reply;
-  }
+	// Admin actions
+	async a_getAllUsers(
+		_req: FastifyRequest<{
+			Params: { id: string };
+		}>,
+		reply: FastifyReply,
+	) {
+		const users = await userModel.find().select("-password");
+		return reply.status(200).send({
+			message: "Users retrieved successfully",
+			users,
+		});
+	}
 
-  // FIXME: This "as" business IDK But it works for now
-  async a_getUserById(req: FastifyRequest, reply: FastifyReply) {
-    const { id } = req.params as { id: string };
-    const user = await userModel.findById(id).select("-password");
+	async a_getUserById(
+		req: FastifyRequest<{
+			Params: { id: string };
+		}>,
+		reply: FastifyReply,
+	) {
+		const { id } = req.params;
+		const user = await userModel.findById(id).select("-password");
 
-    if (!user) {
-      reply.status(400);
-      throw new Error("Not user with that Id");
-    }
+		if (!user) {
+			reply.status(404);
+			throw new Error("User not found");
+		}
 
-    return reply.status(200).send(user);
-  }
+		return reply.status(200).send({
+			message: "User retrieved successfully",
+			user,
+		});
+	}
 
-  async a_deleteUser(req: FastifyRequest, reply: FastifyReply) {
-    const { id } = req.params as { id: string };
+	async a_deleteUser(
+		req: FastifyRequest<{
+			Params: { id: string };
+		}>,
+		reply: FastifyReply,
+	) {
+		const { id } = req.params;
 
-    const user = await userModel.findById(id);
+		const user = await userModel.findById(id);
 
-    if (user?.isAdmin) {
-      reply.status(400);
-      throw new Error("Hey, You can't do that");
-    }
+		if (!user) {
+			reply.status(404);
+			throw new Error("User not found");
+		}
 
-    const deletedUser = await userModel.deleteOne({ _id: user?._id });
+		if (user.isAdmin) {
+			reply.status(400);
+			throw new Error("Hey, You can't do that");
+		}
 
-    return reply.status(200).send(deletedUser);
-  }
+		await userModel.deleteOne({ _id: user._id });
 
-  async a_updateUserInfoHandler(req: FastifyRequest, reply: FastifyReply) {
-    const { id } = req.params as { id: string };
+		return reply.status(200).send({
+			message: "User deleted successfully",
+		});
+	}
 
-    const { name, email, isAdmin } = req.body as {
-      name: string;
-      email: string;
-      isAdmin: boolean;
-    };
+	async a_updateUserInfoHandler(
+		req: FastifyRequest<{
+			Params: { id: string };
+			Body: AdminUpdateUserInput;
+		}>,
+		reply: FastifyReply,
+	) {
+		const { id } = req.params;
 
-    const user = await userModel.findById(id);
+		const { name, email, isAdmin } = req.body;
 
-    if (!user) {
-      reply.status(400);
-      throw new Error("Done goofed, it ain't there");
-    }
+		const user = await userModel.findById(id);
 
-    user.name = name;
-    user.email = email;
-    user.isAdmin = isAdmin;
+		if (!user) {
+			reply.status(403);
+			throw new Error("Done goofed, it ain't there");
+		}
 
-    const updatedUser = await user.save();
+		user.name = name;
+		user.email = email;
+		user.isAdmin = isAdmin;
 
-    return reply.status(200).send(updatedUser);
-  }
+		const updatedUser = await user.save();
+
+		return reply.status(200).send({
+			message: "User updated successfully",
+			user: {
+				_id: updatedUser._id,
+				name: updatedUser.name,
+				email: updatedUser.email,
+				isAdmin: updatedUser.isAdmin,
+			},
+		});
+	}
 }
 
 export default User;
