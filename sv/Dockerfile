@@ -1,21 +1,23 @@
-FROM node:lts-alpine as builder
+# Development Dockerfile
+FROM node:lts-alpine
+
 WORKDIR /usr/src/app
 
+# Enable pnpm
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-COPY package.json ./
-COPY pnpm-lock.yaml ./
+# Copy package files first for better caching
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
 COPY . .
 
-RUN pnpm install --frozen-lockfile
-RUN pnpm build
-
-FROM node:slim
-ENV NODE_ENV production
-WORKDIR /app
-COPY --from=builder /usr/src/app/dist /dist
-
 EXPOSE 3000
-CMD ["node", "dist/index.js"]
+
+# Use development command (adjust if you use nodemon or similar)
+CMD ["pnpm", "dev"]
