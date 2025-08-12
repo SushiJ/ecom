@@ -13,6 +13,7 @@ import productRoutes from "./routes/product";
 import userRoutes from "./routes/user";
 import connect from "./utils/connection";
 import orderRoutes from "./routes/order";
+import { HttpError } from "./utils/HttpErrors";
 
 const fastify = Fastify({
 	logger: {
@@ -78,13 +79,19 @@ fastify.setErrorHandler((error, _request, reply) => {
 		});
 	}
 
-	// Default error response
-	const statusCode = error.statusCode || 500;
-	const message = statusCode === 500 ? "Internal Server Error" : error.message;
+	if (HttpError.isHttpError(error)) {
+		return reply.status(error.statusCode).send({
+			error: error.name,
+			message: error.message,
+			...(process.env.NODE_ENV === "development" && { stack: error.stack }),
+		});
+	}
 
+	// Default error response for other errors
+	const statusCode = error.statusCode || 500;
 	return reply.status(statusCode).send({
-		error: error.name || "Server Error",
-		message,
+		error: error.name || "Internal Server Error",
+		message: error.message || "Something went wrong",
 		...(process.env.NODE_ENV === "development" && { stack: error.stack }),
 	});
 });
@@ -108,7 +115,7 @@ fastify.listen({ port: 3000, host: "0.0.0.0" }, async (err, address) => {
 		fastify.log.info("CONNECTED TO MONGO");
 		fastify.log.info(`server listening on ${address}`);
 	} catch (e) {
-		fastify.log.error("Failed to connect to server", e);
+		fastify.log.error("Failed to connect to server");
 	}
 });
 

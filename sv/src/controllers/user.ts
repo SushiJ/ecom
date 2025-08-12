@@ -7,6 +7,7 @@ import {
 	AdminUpdateUserInput,
 } from "../schemas/userSchema";
 import userModel from "../models/User";
+import { HttpError } from "../utils/HttpErrors";
 
 class User {
 	async registerHandler(
@@ -19,8 +20,7 @@ class User {
 		const userExists = await userModel.findOne({ email }).select("-password");
 
 		if (userExists) {
-			reply.status(409);
-			throw new Error("User already exists");
+			throw new HttpError(409, "User already exists");
 		}
 
 		const newUser = await userModel.create({ name, email, password });
@@ -46,8 +46,7 @@ class User {
 		const user = await User.getUserByEmail(email);
 
 		if (!user || !user.passwordMatch(password)) {
-			reply.status(401);
-			throw new Error("Invalid credentials");
+			throw new HttpError(401, "Invalid credentials");
 		}
 
 		const token = await reply.jwtSign({
@@ -101,9 +100,9 @@ class User {
 
 		const user = await userModel.findById(decodedUser._id);
 
+		// INFO: this should not happen from the app
 		if (!user) {
-			reply.status(404);
-			throw new Error("HUH");
+			throw new HttpError(404, "User not found");
 		}
 
 		if (name !== undefined) user.name = name;
@@ -150,8 +149,7 @@ class User {
 		const user = await userModel.findById(id).select("-password");
 
 		if (!user) {
-			reply.status(404);
-			throw new Error("User not found");
+			throw new HttpError(404, "User not found");
 		}
 
 		return reply.status(200).send({
@@ -171,13 +169,11 @@ class User {
 		const user = await userModel.findById(id);
 
 		if (!user) {
-			reply.status(404);
-			throw new Error("User not found");
+			throw new HttpError(404, "User not found");
 		}
 
 		if (user.isAdmin) {
-			reply.status(400);
-			throw new Error("Hey, You can't do that");
+			throw new HttpError(400, "Bad request");
 		}
 
 		await userModel.deleteOne({ _id: user._id });
@@ -200,9 +196,9 @@ class User {
 
 		const user = await userModel.findById(id);
 
+		// INFO: shouldn't happen for the web-app's interface
 		if (!user) {
-			reply.status(403);
-			throw new Error("Done goofed, it ain't there");
+			throw new HttpError(404, "User not found")
 		}
 
 		user.name = name;
