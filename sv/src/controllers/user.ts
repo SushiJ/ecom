@@ -20,7 +20,7 @@ class User {
 		const userExists = await userModel.findOne({ email }).select("-password");
 
 		if (userExists) {
-			throw new HttpError(409, "User already exists");
+			throw HttpError.conflict("User already exists");
 		}
 
 		const newUser = await userModel.create({ name, email, password });
@@ -46,7 +46,7 @@ class User {
 		const user = await User.getUserByEmail(email);
 
 		if (!user || !user.passwordMatch(password)) {
-			throw new HttpError(401, "Invalid credentials");
+			throw HttpError.unauthorized("Invalid credentials");
 		}
 
 		const token = await reply.jwtSign({
@@ -102,7 +102,7 @@ class User {
 
 		// INFO: this should not happen from the app
 		if (!user) {
-			throw new HttpError(404, "User not found");
+			throw HttpError.notFound("User not found");
 		}
 
 		if (name !== undefined) user.name = name;
@@ -126,12 +126,7 @@ class User {
 	}
 
 	// Admin actions
-	async a_getAllUsers(
-		_req: FastifyRequest<{
-			Params: { id: string };
-		}>,
-		reply: FastifyReply,
-	) {
+	async a_getAllUsers(_req: FastifyRequest, reply: FastifyReply) {
 		const users = await userModel.find().select("-password");
 		return reply.status(200).send({
 			message: "Users retrieved successfully",
@@ -149,7 +144,7 @@ class User {
 		const user = await userModel.findById(id).select("-password");
 
 		if (!user) {
-			throw new HttpError(404, "User not found");
+			throw HttpError.notFound("User not found");
 		}
 
 		return reply.status(200).send({
@@ -169,11 +164,11 @@ class User {
 		const user = await userModel.findById(id);
 
 		if (!user) {
-			throw new HttpError(404, "User not found");
+			throw HttpError.notFound("User not found");
 		}
 
 		if (user.isAdmin) {
-			throw new HttpError(400, "Bad request");
+			throw HttpError.badRequest("Bad request");
 		}
 
 		await userModel.deleteOne({ _id: user._id });
@@ -198,7 +193,7 @@ class User {
 
 		// INFO: shouldn't happen for the web-app's interface
 		if (!user) {
-			throw new HttpError(404, "User not found")
+			throw HttpError.notFound("User not found");
 		}
 
 		user.name = name;

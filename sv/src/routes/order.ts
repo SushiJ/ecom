@@ -1,26 +1,48 @@
 import { type FastifyInstance } from "fastify";
-import { isAdmin, protect } from "../utils/auth";
+import { isAdmin, protect, protectedNoBody } from "../utils/auth";
 import Order from "../controllers/order";
+import {
+	AddOrderItemsRequestBody,
+	AddOrderItemsSchema,
+	PaymentUpdateRequest,
+	PaymentUpdateSchema,
+} from "../schemas/orderSchema";
 
 async function orderRoutes(fastify: FastifyInstance) {
-    const order = new Order();
-    //TODO: Add schema validation
-    fastify.post("/", { onRequest: protect }, order.addOrderItems);
-    fastify.get("/", { onRequest: [protect, isAdmin] }, order.getOrders);
+	const order = new Order();
+	fastify.post<{
+		Body: AddOrderItemsRequestBody;
+	}>(
+		"/",
+		{ onRequest: protectedNoBody, schema: AddOrderItemsSchema },
+		order.addOrderItems,
+	);
+	fastify.get("/", { onRequest: [protect, isAdmin] }, order.getOrders);
 
-    fastify.get("/me", { onRequest: protect }, order.getMyOrders);
+	fastify.get("/me", { onRequest: protect }, order.getMyOrders);
 
-    fastify.get("/:id", { onRequest: protect }, order.getOrderById);
+	fastify.get<{
+		Params: {
+			id: string;
+		};
+	}>("/:id", { onRequest: protectedNoBody }, order.getOrderById);
 
-    fastify.put("/:id/pay", { onRequest: protect }, order.updateOrderToPaid);
+	fastify.put<PaymentUpdateRequest>(
+		"/:id/pay",
+		{
+			onRequest: protectedNoBody,
+			schema: PaymentUpdateSchema,
+		},
+		order.updateOrderToPaid,
+	);
 
-    fastify.put(
-        "/:id/deliver",
-        { onRequest: [protect, isAdmin] },
-        order.updateOrderToDelivered,
-    );
+	fastify.put(
+		"/:id/deliver",
+		{ onRequest: [protect, isAdmin] },
+		order.updateOrderToDelivered,
+	);
 
-    fastify.log.info("Order routes registered");
+	fastify.log.info("Order routes registered");
 }
 
 export default orderRoutes;
