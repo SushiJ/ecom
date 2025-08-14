@@ -1,177 +1,188 @@
-import type { FastifyReply, FastifyRequest } from "fastify";
+import { type FastifyReply, type FastifyRequest } from "fastify";
 import { productModel } from "../models/Product";
+import { HttpError } from "../utils/HttpErrors";
 
 //TODO: migrate the prices to INR
 class Product {
-  async getProducts(
-    req: FastifyRequest<{
-      Querystring: {
-        pageNum?: string;
-        keyword?: string;
-      };
-    }>,
-    reply: FastifyReply,
-  ) {
-    const page = Number(req.query.pageNum) || 1;
-    const keyword = req.query.keyword;
-    let query = {};
+	async getProducts(
+		req: FastifyRequest<{
+			Querystring: {
+				pageNum?: string;
+				keyword?: string;
+			};
+		}>,
+		reply: FastifyReply,
+	) {
+		const page = Number(req.query.pageNum) || 1;
+		const keyword = req.query.keyword;
+		let query = {};
 
-    if (keyword) {
-      query = { name: { $regex: keyword, $options: "i" } };
-    }
+		if (keyword) {
+			query = { name: { $regex: keyword, $options: "i" } };
+		}
 
-    const pageSize = 4;
-    const count = await productModel.countDocuments(query);
+		const pageSize = 4;
+		const count = await productModel.countDocuments(query);
 
-    const products = await productModel
-      .find(query)
-      .limit(pageSize)
-      .skip(pageSize * (page - 1));
-    if (!products) reply.status(200).send([]);
-    reply
-      .status(200)
-      .send({ products, page, pages: Math.ceil(count / pageSize) });
-  }
+		const products = await productModel
+			.find(query)
+			.limit(pageSize)
+			.skip(pageSize * (page - 1));
+		if (!products) reply.status(200).send([]);
 
-  async getProductsById(
-    req: FastifyRequest<{
-      Params: {
-        id: string;
-      };
-    }>,
-    reply: FastifyReply,
-  ) {
-    const { id } = req.params;
-    // NOTE: May be {status, message} would be a better API? IDK
-    const product = await productModel.findById(id);
+		reply
+			.status(200)
+			.send({ products, page, pages: Math.ceil(count / pageSize) });
+	}
 
-    if (!product) {
-      // May be a 204 ? But 400 suits better ( bad request )
-      reply.status(400);
-      throw new Error("No product with that id");
-    }
+	async getProductsById(
+		req: FastifyRequest<{
+			Params: {
+				id: string;
+			};
+		}>,
+		reply: FastifyReply,
+	) {
+		const { id } = req.params;
+		// NOTE: May be {status, message} would be a better API? IDK
+		const product = await productModel.findById(id);
 
-    return reply.status(200).send(product);
-  }
+		if (!product) {
+			throw HttpError.notFound("Product not found");
+		}
 
-  async createProducts(req: FastifyRequest, reply: FastifyReply) {
-    const { id } = req.user as { id: string };
+		return reply.status(200).send(product);
+	}
 
-    const product = new productModel({
-      name: "Sample name",
-      price: 0,
-      user: id,
-      image: "/images/sample.jpg",
-      brand: "Sample brand",
-      category: "Sample category",
-      countInStock: 0,
-      numReviews: 0,
-      description: "Sample description",
-      rating: 0,
-    });
+	async createProducts(req: FastifyRequest, reply: FastifyReply) {
+		const { id } = req.user as { id: string };
 
-    const createdProduct = await product.save();
+		const product = new productModel({
+			name: "Sample name",
+			price: 0,
+			user: id,
+			image: "/images/sample.jpg",
+			brand: "Sample brand",
+			category: "Sample category",
+			countInStock: 0,
+			numReviews: 0,
+			description: "Sample description",
+			rating: 0,
+		});
 
-    reply.code(201);
-    reply.send(createdProduct);
-    return reply;
-  }
+		let productCreated;
 
-  async updateProduct(req: FastifyRequest, reply: FastifyReply) {
-    const { id } = req.params as { id: string };
+		try {
+			productCreated = await product.save();
+		} catch (e) {
+			console.error("Something went wrong while saving the product", e);
+			throw HttpError.internalServerError("something went wrong");
+		}
 
-    const product = await productModel.findById(id);
+		reply.code(201);
+		reply.send(productCreated);
+		return reply;
+	}
 
-    if (!product) {
-      reply.status(404);
-      throw new Error("Not found");
-    }
+	async updateProduct(
+		req: FastifyRequest<{
+			Params: {
+				id: string;
+			};
+		}>,
+		reply: FastifyReply,
+	) {
+		const { id } = req.params;
 
-    const data = req.body as {
-      name: string;
-      price: number;
-      description: string;
-      image: string;
-      brand: string;
-      category: string;
-      countInStock: number;
-    };
+		const product = await productModel.findById(id);
 
-    product.price = data.price;
-    product.name = data.name;
-    product.description = data.description;
-    product.image = data.image;
-    product.brand = data.brand;
-    product.category = data.category;
-    product.countInStock = data.countInStock;
+		if (!product) {
+			throw HttpError.notFound("Not found");
+		}
 
-    const updated = await product.save();
-    return reply.status(200).send(updated);
-  }
+		const data = req.body as {
+			name: string;
+			price: number;
+			description: string;
+			image: string;
+			brand: string;
+			category: string;
+			countInStock: number;
+		};
 
-  async deleteProduct(req: FastifyRequest, reply: FastifyReply) {
-    const { id } = req.params as { id: string };
+		product.price = data.price;
+		product.name = data.name;
+		product.description = data.description;
+		product.image = data.image;
+		product.brand = data.brand;
+		product.category = data.category;
+		product.countInStock = data.countInStock;
 
-    const product = await productModel.findById(id);
+		const updated = await product.save();
 
-    if (!product) {
-      reply.status(404);
-      throw new Error("Product not found");
-    }
+		return reply.status(200).send(updated);
+	}
 
-    await productModel.deleteOne({ _id: product._id });
+	async deleteProduct(req: FastifyRequest, reply: FastifyReply) {
+		const { id } = req.params as { id: string };
 
-    return reply.status(200).send("Resource deleted successfully");
-  }
+		const product = await productModel.findById(id);
 
-  async createProductReview(req: FastifyRequest, reply: FastifyReply) {
-    const { id } = req.params as { id: string };
+		if (!product) {
+			throw HttpError.notFound("Product not found");
+		}
 
-    const { rating, comment } = req.body as { rating: number; comment: string };
+		await productModel.deleteOne({ _id: product._id });
 
-    const product = await productModel.findById(id);
+		return reply.status(200).send("Resource deleted successfully");
+	}
 
-    if (!product) {
-      reply.status(404);
-      throw new Error("Product not found");
-    }
+	async createProductReview(req: FastifyRequest, reply: FastifyReply) {
+		const { id } = req.params as { id: string };
 
-    const user = req.user as { _id: string; name: string; email: string };
+		const { rating, comment } = req.body as { rating: number; comment: string };
 
-    const alreadyReviewed = product.reviews.find((review) => {
-      return review.user._id.toString() === user._id.toString();
-    });
+		const product = await productModel.findById(id);
 
-    if (alreadyReviewed) {
-      reply.status(400);
-      throw new Error("Product already reviewed");
-    }
+		if (!product) {
+			throw HttpError.notFound("Product not found");
+		}
 
-    const review = {
-      rating: rating,
-      comment: comment,
-      user: user,
-    };
+		const user = req.user as { _id: string; name: string; email: string };
 
-    product.reviews = [...product.reviews, review];
+		const alreadyReviewed = product.reviews.find((review) => {
+			return review.user._id.toString() === user._id.toString();
+		});
 
-    product.numReviews = product.reviews.length;
+		if (alreadyReviewed) {
+			throw HttpError.badRequest("Already reviewed");
+		}
 
-    let totalRating = 0;
-    for (let i = 0; i < product.reviews.length; i++) {
-      totalRating += product.reviews[i]!.rating;
-    }
+		const review = {
+			rating: rating,
+			comment: comment,
+			user: user,
+		};
 
-    product.rating = totalRating / product.reviews.length;
+		product.reviews = [...product.reviews, review];
 
-    await product.save();
-    return reply.status(201).send("Review added");
-  }
+		product.numReviews = product.reviews.length;
 
-  async getTopProducts(_: FastifyRequest, reply: FastifyReply) {
-    const products = await productModel.find().sort({ rating: -1 }).limit(3);
-    reply.status(200).send(products);
-  }
+		let totalRating = 0;
+		for (let i = 0; i < product.reviews.length; i++) {
+			totalRating += product.reviews[i]!.rating;
+		}
+
+		product.rating = totalRating / product.reviews.length;
+
+		await product.save();
+		return reply.status(201).send("Review added");
+	}
+
+	async getTopProducts(_: FastifyRequest, reply: FastifyReply) {
+		const products = await productModel.find().sort({ rating: -1 }).limit(3);
+		reply.status(200).send(products);
+	}
 }
 
 export default Product;
