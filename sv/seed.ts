@@ -28,7 +28,7 @@ async function seedDB() {
       name: u.name,
       password: u.password,
       email: u.email,
-      isAdmin: u.isAdmin,
+      role: u.role,
     };
     userArr.push(user);
   }

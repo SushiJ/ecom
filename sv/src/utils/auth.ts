@@ -36,7 +36,7 @@ export async function protectedNoBody(
 		req.user = {
 			name: user.name,
 			email: user.email,
-			isAdmin: user.isAdmin,
+			role: user.role,
 		};
 	} catch (e) {
 		throw HttpError.badRequest();
@@ -74,7 +74,7 @@ export async function protect(
 		req.user = {
 			name: user.name,
 			email: user.email,
-			isAdmin: user.isAdmin,
+			role: user.role,
 		};
 	} catch (e) {
 		console.log(e);
@@ -90,7 +90,7 @@ export function isAdmin(
 	done: DoneFuncWithErrOrRes,
 ) {
 	// @ts-expect-error no user or is not admin
-	if (!req.user || !req.user.isAdmin) {
+	if (!req.user || !req.user.role == "admin") {
 		throw HttpError.forbidden("Not authorized");
 	}
 	done();

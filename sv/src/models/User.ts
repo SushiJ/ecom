@@ -29,8 +29,8 @@ export class User {
   @prop({ required: true })
   public password!: string;
 
-  @prop({ required: true, default: false })
-  public isAdmin!: boolean;
+  @prop({ required: true, default: "user" })
+  public role!: string;
 
   public passwordMatch(this: DocumentType<User>, password: string) {
     const bool = matchPassword(this.password, password);

@@ -66,7 +66,7 @@ class User {
 				_id: user._id,
 				name: user.name,
 				email: user.email,
-				isAdmin: user.isAdmin,
+				role: user.role,
 			});
 	}
 
@@ -167,7 +167,7 @@ class User {
 			throw HttpError.notFound("User not found");
 		}
 
-		if (user.isAdmin) {
+		if (user.role === "admin") {
 			throw HttpError.badRequest("Bad request");
 		}
 
@@ -187,7 +187,7 @@ class User {
 	) {
 		const { id } = req.params;
 
-		const { name, email, isAdmin } = req.body;
+		const { name, email, role } = req.body;
 
 		const user = await userModel.findById(id);
 
@@ -198,7 +198,7 @@ class User {
 
 		user.name = name;
 		user.email = email;
-		user.isAdmin = isAdmin;
+		user.role = role;
 
 		const updatedUser = await user.save();
 
@@ -208,7 +208,7 @@ class User {
 				_id: updatedUser._id,
 				name: updatedUser.name,
 				email: updatedUser.email,
-				isAdmin: updatedUser.isAdmin,
+				role: updatedUser.role,
 			},
 		});
 	}

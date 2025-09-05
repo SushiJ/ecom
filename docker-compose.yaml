@@ -8,7 +8,7 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=mongo
       - MONGO_INITDB_ROOT_PASSWORD=mongo
     volumes:
-      - mongo_data:/data/db
+      - ./data:/data/db
     networks:
       - back
     restart: unless-stopped
@@ -39,5 +39,5 @@ networks:
   back:
     driver: bridge
 
-volumes:
-  mongo_data:
+# volumes:
+#   mongo_data: ./data/db

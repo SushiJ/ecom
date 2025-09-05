@@ -80,19 +80,19 @@ export const users = [
     name: "Admin User",
     email: "admin@email.com",
     password: setPassword("123456"),
-    isAdmin: true,
+    role: "admin",
   },
   {
     name: "John Doe",
     email: "john@email.com",
     password: setPassword("123456"),
-    isAdmin: false,
+    role: "user",
   },
   {
     name: "Jane Doe",
     email: "jane@email.com",
     password: setPassword("123456"),
-    isAdmin: false,
+    role: "user",
   },
 ];
 
