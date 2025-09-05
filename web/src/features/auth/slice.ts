@@ -6,7 +6,7 @@ type initialState = {
     _id: string;
     name: string;
     email: string;
-    isAdmin: boolean;
+    role: string;
   };
 };
 
@@ -18,7 +18,7 @@ type ActionType = {
   _id: string;
   name: string;
   email: string;
-  isAdmin: boolean;
+  role: string;
 };
 
 const authSlice = createSlice({
@@ -31,12 +31,12 @@ const authSlice = createSlice({
     },
     resetCreds: (state) => {
       state.userInfo = {
-        isAdmin: false,
+        role: "",
         _id: "",
         name: "",
         email: "",
       };
-      localStorage.setItem("user", "");
+      localStorage.removeItem("user")
     },
   },
 });

@@ -44,7 +44,7 @@ export const userApiSlice = api.injectEndpoints({
         body: data,
       }),
     }),
-    getUsers: builder.query<Array<GetUsersResponse>, void>({
+    getUsers: builder.query<GetUsersResponse, void>({
       query: () => "users",
       providesTags: ["User"],
       keepUnusedDataFor: 5,

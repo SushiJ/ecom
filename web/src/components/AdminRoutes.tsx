@@ -3,7 +3,7 @@ import { useAppSelector } from "../hooks/redux";
 
 const AdminRoute = () => {
   const { userInfo } = useAppSelector((state) => state.auth);
-  return userInfo && userInfo.isAdmin ? (
+  return userInfo && userInfo.role === "admin" ? (
     <Outlet />
   ) : (
     <Navigate to="/" replace />
