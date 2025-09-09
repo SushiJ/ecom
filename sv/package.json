@@ -1,38 +1,38 @@
 {
-  "name": "fastify",
-  "version": "1.0.0",
-  "description": "",
-  "main": "dist/index.js",
-  "scripts": {
-    "dev": "nodemon",
-    "seed": "ts-node ./seed.ts",
-    "start": "ts-node ./src/index.ts",
-    "lint": "eslint .",
-    "build": "tsc"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@fastify/cookie": "^9.3.1",
-    "@fastify/cors": "^8.4.1",
-    "@fastify/env": "^4.3.0",
-    "@fastify/jwt": "^8.0.0",
-    "@typegoose/typegoose": "^11.6.0",
-    "fastify": "^4.29.1",
-    "fastify-type-provider-zod": "^5.0.3",
-    "mongodb": "^6.3.0",
-    "mongoose": "7.6.1",
-    "pino-pretty": "^10.2.3",
-    "zod": "^4.0.17"
-  },
-  "devDependencies": {
-    "@types/node": "^20.8.10",
-    "@typescript-eslint/eslint-plugin": "^6.11.0",
-    "@typescript-eslint/parser": "^6.11.0",
-    "eslint": "^8.53.0",
-    "nodemon": "^3.0.1",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
-  }
+	"name": "fastify",
+	"version": "1.0.0",
+	"description": "",
+	"main": "dist/index.js",
+	"scripts": {
+		"dev": "nodemon",
+		"seed": "ts-node ./seed.ts",
+		"start": "ts-node ./src/index.ts",
+		"lint": "eslint .",
+		"build": "tsc"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@fastify/cookie": "^9.3.1",
+		"@fastify/cors": "^8.4.1",
+		"@fastify/env": "^4.3.0",
+		"@fastify/jwt": "^8.0.0",
+		"@typegoose/typegoose": "^11.6.0",
+		"fastify": "^4.29.1",
+		"fastify-type-provider-zod": "^5.0.3",
+		"mongodb": "^6.3.0",
+		"mongoose": "7.6.1",
+		"pino-pretty": "^10.2.3",
+		"zod": "^4.0.17"
+	},
+	"devDependencies": {
+		"@types/node": "^20.8.10",
+		"@typescript-eslint/eslint-plugin": "^6.11.0",
+		"@typescript-eslint/parser": "^6.11.0",
+		"eslint": "^8.53.0",
+		"nodemon": "^3.0.1",
+		"ts-node": "^10.9.1",
+		"typescript": "^5.2.2"
+	}
 }
