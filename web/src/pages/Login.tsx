@@ -74,7 +74,7 @@ const Login = () => {
         password: values.password,
       }).unwrap();
 
-      dispatch(setCredentials(res));
+      dispatch(setCredentials(res.user));
       navigate(redirect);
       toast.success("Logged in successfully");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

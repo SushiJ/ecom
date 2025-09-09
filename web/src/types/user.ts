@@ -3,20 +3,19 @@ type User = {
 	name: string;
 	email: string;
 	role: string;
-}
+};
 
-export type LoginMutationResponse = User
+export interface LoginMutationResponse extends GetUsersByIdResponse {}
 
 export type GetUsersResponse = {
 	message: string;
 	users: Array<LoginMutationResponse>;
 };
 
-
 export type GetUsersByIdResponse = {
 	message: string;
-	user: User
-}
+	user: User;
+};
 
 export type UpdateUserInfoMutation = Omit<LoginMutationResponse, "_id"> & {
 	id: string;
