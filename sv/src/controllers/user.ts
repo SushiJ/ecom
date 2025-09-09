@@ -63,10 +63,13 @@ class User {
 			})
 			.status(200)
 			.send({
-				_id: user._id,
-				name: user.name,
-				email: user.email,
-				role: user.role,
+				message: "Login successfull",
+				user: {
+					_id: user._id,
+					name: user.name,
+					email: user.email,
+					role: user.role,
+				},
 			});
 	}
 
@@ -79,13 +82,16 @@ class User {
 				maxAge: 0,
 			})
 			.status(200)
-			.send({ message: "Logged out successfully" });
+			.send({ message: "Log out successfull" });
 		return reply;
 	}
 
 	async getInfoHandler(req: FastifyRequest, reply: FastifyReply) {
 		const user = req.user;
-		return reply.status(200).send(user);
+		return reply.status(200).send({
+			message: "Success",
+			user,
+		});
 	}
 
 	async updateInfoHandler(
@@ -167,6 +173,7 @@ class User {
 			throw HttpError.notFound("User not found");
 		}
 
+		// INFO: can't delete admins
 		if (user.role === "admin") {
 			throw HttpError.badRequest("Bad request");
 		}
