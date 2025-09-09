@@ -1,10 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import {
-  createBrowserRouter,
-  createRoutesFromElements,
-  Route,
-  RouterProvider,
+	createBrowserRouter,
+	createRoutesFromElements,
+	Route,
+	RouterProvider,
 } from "react-router-dom";
 import { Provider } from "react-redux";
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
@@ -34,42 +34,42 @@ import UserEdit from "./pages/admin/UserEdit.tsx";
 import NotFound from "./components/NotFound.tsx";
 
 const routes = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path="/" element={<App />}>
-      <Route path="*" element={<NotFound />} />
-      <Route index={true} path="/" element={<Home />} />
-      <Route path="/search/:keyword" element={<Home />} />
-      <Route path="/page/:pageNum" element={<Home />} />
-      <Route path="/search/:keyword/page/:pageNum" element={<Home />} />
-      <Route path="/products/:id" element={<Product />} />
-      <Route path="/cart" element={<CartPage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="" element={<PrivateRoute />}>
-        <Route path="/shipping" element={<Shipping />} />
-        <Route path="/payment" element={<Payments />} />
-        <Route path="/placeorder" element={<PlaceOrder />} />
-        <Route path="/order/:id" element={<OrderScreen />} />
-      </Route>
-      <Route path="" element={<AdminRoute />}>
-        <Route path="/admin/orders" element={<OrderList />} />
-        <Route path="/admin/products" element={<ProductList />} />
-        <Route path="/admin/products/:pageNum" element={<ProductList />} />
-        <Route path="/admin/product/:id/edit" element={<ProductEdit />} />
-        <Route path="/admin/users" element={<UsersList />} />
-        <Route path="/admin/user/:id/edit" element={<UserEdit />} />
-      </Route>
-    </Route>,
-  ),
+	createRoutesFromElements(
+		<Route path="/" element={<App />}>
+			<Route path="*" element={<NotFound />} />
+			<Route index={true} path="/" element={<Home />} />
+			<Route path="/search/:keyword" element={<Home />} />
+			<Route path="/page/:pageNum" element={<Home />} />
+			<Route path="/search/:keyword/page/:pageNum" element={<Home />} />
+			<Route path="/products/:id" element={<Product />} />
+			<Route path="/cart" element={<CartPage />} />
+			<Route path="/login" element={<Login />} />
+			<Route path="/register" element={<Register />} />
+			<Route path="/profile" element={<Profile />} />
+			<Route path="" element={<PrivateRoute />}>
+				<Route path="/shipping" element={<Shipping />} />
+				<Route path="/payment" element={<Payments />} />
+				<Route path="/placeorder" element={<PlaceOrder />} />
+				<Route path="/order/:id" element={<OrderScreen />} />
+			</Route>
+			<Route path="" element={<AdminRoute />}>
+				<Route path="/admin/orders" element={<OrderList />} />
+				<Route path="/admin/products" element={<ProductList />} />
+				<Route path="/admin/products/:pageNum" element={<ProductList />} />
+				<Route path="/admin/product/:id/edit" element={<ProductEdit />} />
+				<Route path="/admin/users" element={<UsersList />} />
+				<Route path="/admin/user/:id/edit" element={<UserEdit />} />
+			</Route>
+		</Route>,
+	),
 );
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <PayPalScriptProvider options={{ clientId: "test" }}>
-        <RouterProvider router={routes} />
-      </PayPalScriptProvider>
-    </Provider>
-  </React.StrictMode>,
+	<React.StrictMode>
+		<Provider store={store}>
+			<PayPalScriptProvider options={{ clientId: "test" }}>
+				<RouterProvider router={routes} />
+			</PayPalScriptProvider>
+		</Provider>
+	</React.StrictMode>,
 );
