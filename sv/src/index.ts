@@ -59,8 +59,19 @@ fastify.register(userRoutes, { prefix: "/users" });
 fastify.register(productRoutes, { prefix: "/products" });
 fastify.register(orderRoutes, { prefix: "/orders" });
 
-fastify.setErrorHandler((error, _request, reply) => {
-	fastify.log.error(error);
+fastify.setErrorHandler((error, request, reply) => {
+	 fastify.log.error(
+      {
+        error,
+        request: {
+          method: request.method,
+          url: request.url,
+          query: request.query,
+          params: request.params
+        }
+      },
+      'Unhandled error occurred'
+    )
 
 	// Zod validation errors
 	if (error.validation) {
