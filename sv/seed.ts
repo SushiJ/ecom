@@ -1,5 +1,6 @@
 import { products, users } from "./initialData.js";
 import { MongoClient } from "mongodb";
+import { hashPassword } from "./src/utils/hash.js";
 
 type User = (typeof users)[0];
 type Product = (typeof products)[0];
@@ -22,11 +23,12 @@ async function seedDB() {
 
 	const userArr: Array<User> = [];
 	const product: Array<Product> = [];
+	const password = await hashPassword("123456");
 
 	for (const u of users) {
 		const user: User = {
 			name: u.name,
-			password: u.password,
+			password,
 			email: u.email,
 			role: u.role,
 		};

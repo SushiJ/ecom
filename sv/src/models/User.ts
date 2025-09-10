@@ -5,18 +5,15 @@ import {
 	DocumentType,
 	pre,
 } from "@typegoose/typegoose";
-import { matchPassword, setPassword } from "../utils/pass";
+import { comparePassword, hashPassword } from "../utils/hash";
 
 @pre<User>("save", async function () {
 	if (!this.isModified("password")) {
 		return;
 	}
 
-	const hash = setPassword(this.password);
-
-	this.password = hash;
-
-	return;
+	const hashedPassword = await hashPassword(this.password);
+	this.password = hashedPassword;
 })
 @modelOptions({ schemaOptions: { timestamps: true } })
 export class User {
@@ -32,9 +29,8 @@ export class User {
 	@prop({ required: true, default: "user" })
 	public role!: string;
 
-	public passwordMatch(this: DocumentType<User>, password: string) {
-		const bool = matchPassword(this.password, password);
-		return bool;
+	public async passwordMatch(this: DocumentType<User>, password: string) {
+		return await comparePassword(password, this.password);
 	}
 }
 

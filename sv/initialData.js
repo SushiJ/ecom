@@ -1,5 +1,3 @@
-import { setPassword } from "./src/utils/pass";
-
 export const products = [
 	{
 		name: "Airpods Wireless Bluetooth Headphones",
@@ -79,19 +77,19 @@ export const users = [
 	{
 		name: "Admin User",
 		email: "admin@email.com",
-		password: setPassword("123456"),
+		password: "",
 		role: "admin",
 	},
 	{
 		name: "John Doe",
 		email: "john@email.com",
-		password: setPassword("123456"),
+		password: "",
 		role: "user",
 	},
 	{
 		name: "Jane Doe",
 		email: "jane@email.com",
-		password: setPassword("123456"),
+		password: "",
 		role: "user",
 	},
 ];

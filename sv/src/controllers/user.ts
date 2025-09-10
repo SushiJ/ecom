@@ -45,7 +45,11 @@ class User {
 
 		const user = await User.getUserByEmail(email);
 
-		if (!user || !user.passwordMatch(password)) {
+		if (!user) {
+			throw HttpError.unauthorized("Invalid credentials");
+		}
+
+		if (!(await user.passwordMatch(password))) {
 			throw HttpError.unauthorized("Invalid credentials");
 		}
 
