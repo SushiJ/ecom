@@ -1,3 +1,4 @@
+import type { FastifyCookieOptions } from "@fastify/cookie";
 import cookie from "@fastify/cookie";
 import cors from "@fastify/cors";
 import env from "@fastify/env";
@@ -38,7 +39,10 @@ fastify.register(cors, {
 	allowedHeaders: ["Content-Type", "Authorization"],
 });
 
-fastify.register(cookie);
+fastify.register(cookie, {
+	secret: "secret",
+	hook: "onRequest",
+} as FastifyCookieOptions);
 
 fastify.register(jwt, {
 	secret: "supersecret",
