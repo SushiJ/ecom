@@ -35,13 +35,16 @@ export function build() {
 	fastify.register(cors, {
 		// INFO: directly borrowed from cors doc
 		// Development mode only
-		origin: (origin, cb) => {
-			const { hostname } = new URL(origin!);
-			if (hostname === "localhost") {
-				cb(null, true);
-			}
-			// TODO: check hostname from the envs
-		},
+		origin:
+			process.env.NODE_ENV === "testing"
+				? ["*"]
+				: (origin, cb) => {
+						const { hostname } = new URL(origin!);
+						if (hostname === "localhost") {
+							cb(null, true);
+						}
+						// TODO: check hostname from the envs
+					},
 		credentials: true, // Needed for cors in browser
 		methods: ["GET", "POST", "DELETE"],
 		allowedHeaders: ["Content-Type", "Authorization"],
