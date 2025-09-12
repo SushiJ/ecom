@@ -1,6 +1,16 @@
 import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
 
-// TODO: may be i have to seed the db again for this change?
+class ReviewUser {
+	@prop({ required: true })
+	public _id!: string;
+
+	@prop({ required: true })
+	public name!: string;
+
+	@prop({ required: true })
+	public email!: string;
+}
+
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Reviews {
 	@prop({ required: true })
@@ -10,11 +20,7 @@ class Reviews {
 	public comment!: string;
 
 	@prop({ required: true })
-	public user!: {
-		_id: string;
-		name: string;
-		email: string;
-	};
+	public user!: ReviewUser;
 }
 
 export class Product {
@@ -45,7 +51,7 @@ export class Product {
 	@prop({ required: true })
 	public numReviews!: number;
 
-	@prop()
+	@prop({ type: () => [Reviews] })
 	public reviews!: Array<Reviews>;
 }
 

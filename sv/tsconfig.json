@@ -5,7 +5,6 @@
 		"skipLibCheck": true,
 		"strictNullChecks": true,
 		"noUncheckedIndexedAccess": true,
-		// "sourceMap": true,
 		"allowJs": false,
 		"strict": true,
 		"noImplicitAny": true,
@@ -23,5 +22,5 @@
 		"outDir": "./dist"
 	},
 	"include": ["src/**/*.ts"],
-	"exclude": ["node_modules", "**/*.test.ts"]
+	"exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts"]
 }
