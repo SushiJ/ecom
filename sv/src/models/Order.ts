@@ -8,6 +8,20 @@ import {
 import { User } from "./User";
 import { Product } from "./Product";
 
+class PaymentResult {
+	@prop({ required: true })
+	public id!: string;
+
+	@prop({ required: true })
+	public status!: string;
+
+	@prop({ required: true })
+	public update_time!: Date;
+
+	@prop({ required: true })
+	public email_address!: string;
+}
+
 class OrderItems {
 	@prop({ required: true })
 	public quantity!: number;
@@ -33,7 +47,7 @@ class Order {
 	@prop({ required: true, ref: () => User })
 	public user!: Ref<User>;
 
-	@prop({ required: true })
+	@prop({ required: true, type: () => [OrderItems] })
 	public orderItems!: Array<OrderItems>;
 
 	@prop({ required: false })
@@ -43,12 +57,7 @@ class Order {
 	public paymentMethod!: string;
 
 	@prop({ required: true })
-	public paymentResult!: {
-		id: string;
-		status: string;
-		update_time: Date;
-		email_address: string;
-	};
+	public paymentResult!: PaymentResult;
 
 	@prop({ required: true, default: 0 })
 	public productsPrice!: number;
