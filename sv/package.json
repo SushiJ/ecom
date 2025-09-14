@@ -4,13 +4,13 @@
 	"description": "",
 	"main": "dist/index.js",
 	"scripts": {
-		"dev": "nodemon",
+		"dev": "export NODE_ENV=development && nodemon",
 		"seed": "ts-node ./seed.ts",
 		"start": "ts-node ./src/index.ts",
 		"start:build": "node ./dist/index.js",
 		"lint": "eslint .",
 		"build": "tsc",
-		"test" : "export NODE_ENV=testing && jest"
+		"test": "export NODE_ENV=testing && jest"
 	},
 	"keywords": [],
 	"author": "",

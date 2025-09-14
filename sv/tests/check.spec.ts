@@ -26,3 +26,8 @@ test("GET /check returns OK", async () => {
 	const res = await request(app.server).get("/check").expect(200);
 	expect(res.text).toBe("OK");
 });
+
+test("GET /api/config/paypal returns OK", async () => {
+	const res = await request(app.server).get("/api/config/paypal").expect(200);
+	expect(res.body).toHaveProperty("clientId");
+})
