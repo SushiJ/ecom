@@ -123,8 +123,15 @@ class Product {
 		return reply.status(200).send(updated);
 	}
 
-	async deleteProduct(req: FastifyRequest, reply: FastifyReply) {
-		const { id } = req.params as { id: string };
+	async deleteProduct(
+		req: FastifyRequest<{
+			Params: {
+				id: string;
+			};
+		}>,
+		reply: FastifyReply,
+	) {
+		const { id } = req.params;
 
 		const product = await productModel.findById(id);
 
@@ -137,8 +144,15 @@ class Product {
 		return reply.status(200).send("Resource deleted successfully");
 	}
 
-	async createProductReview(req: FastifyRequest, reply: FastifyReply) {
-		const { id } = req.params as { id: string };
+	async createProductReview(
+		req: FastifyRequest<{
+			Params: {
+				id: string;
+			};
+		}>,
+		reply: FastifyReply,
+	) {
+		const { id } = req.params;
 
 		const { rating, comment } = req.body as { rating: number; comment: string };
 

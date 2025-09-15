@@ -28,6 +28,8 @@ export const userSchemas = {
 	}),
 };
 
+export const mongoDBIdSchema = userSchemas.mongoId;
+
 export type RegisterInput = z.infer<typeof userSchemas.register>;
 export type LoginInput = z.infer<typeof userSchemas.login>;
 export type UpdateInfoInput = z.infer<typeof userSchemas.updateInfo>;
