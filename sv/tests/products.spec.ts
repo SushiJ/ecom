@@ -17,6 +17,25 @@ let app: FastifyInstance<
 let request: any;
 let connection: typeof mongoose;
 
+// fastify.get("/", product.getProducts);
+// fastify.post("/", { onRequest: [protect, isAdmin] }, product.createProducts);
+//
+// fastify.get("/:id", product.getProductsById);
+// fastify.put("/:id", { onRequest: [protect, isAdmin] }, product.updateProduct);
+// fastify.delete(
+// 	"/:id",
+// 	{ onRequest: [protect, isAdmin] },
+// 	product.deleteProduct,
+// );
+//
+// fastify.get("/top", product.getTopProducts);
+//
+// fastify.post(
+// 	"/reviews/:id",
+// 	{ onRequest: [protect] },
+// 	product.createProductReview,
+// );
+
 beforeAll(async () => {
 	connection = await connectTestDb();
 
@@ -35,4 +54,17 @@ test("GET /products should return empty list", async () => {
 	const res = await request.get("/products");
 	expect(res.status).toBe(200);
 	expect(res.body.products).toEqual([]);
+});
+
+test("GET /products/:id should return 400 when id is not mongo id", async () => {
+	const res = await request.get("/products/1");
+	expect(res.status).toBe(400);
+	expect(res.body).toHaveProperty(["message"]);
+});
+
+test("GET /products/:id should return 404 when id doesn't match any product", async () => {
+	const id = "68c17ccb1d2f253878dcc405";
+	const res = await request.get(`/products/${id}`);
+	expect(res.status).toBe(404);
+	expect(res.body).toHaveProperty(["message"]);
 });
