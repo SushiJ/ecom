@@ -23,7 +23,6 @@ export const userSchemas = {
 		email: z.email(),
 		role: z.string(),
 	}),
-
 	mongoId: z.object({
 		id: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid MongoDB ObjectId"),
 	}),

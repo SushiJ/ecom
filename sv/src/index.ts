@@ -75,18 +75,15 @@ export function build() {
 	fastify.register(orderRoutes, { prefix: "/orders" });
 
 	fastify.setErrorHandler((error, request, reply) => {
-		fastify.log.error(
-			{
-				error,
-				request: {
-					method: request.method,
-					url: request.url,
-					query: request.query,
-					params: request.params,
-				},
+		fastify.log.error({
+			error,
+			request: {
+				method: request.method,
+				url: request.url,
+				query: request.query,
+				params: request.params,
 			},
-			"Unhandled error occurred",
-		);
+		});
 
 		// Zod validation errors
 		if (error.validation) {
@@ -105,6 +102,7 @@ export function build() {
 			});
 		}
 
+		// HTTP Errors
 		if (HttpError.isHttpError(error)) {
 			return reply.status(error.statusCode).send({
 				error: error.name,
