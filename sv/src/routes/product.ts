@@ -6,7 +6,14 @@ import { mongoDBIdSchema } from "../schemas/userSchema";
 async function productRoutes(fastify: FastifyInstance) {
 	const product = new Product();
 	fastify.get("/", product.getProducts);
-	fastify.post("/", { onRequest: [protect, isAdmin] }, product.createProducts);
+	fastify.post(
+		"/",
+		{
+			onRequest: protect,
+			preHandler: isAdmin,
+		},
+		product.createProducts,
+	);
 
 	fastify.get(
 		"/:id",
@@ -23,7 +30,8 @@ async function productRoutes(fastify: FastifyInstance) {
 			schema: {
 				params: mongoDBIdSchema,
 			},
-			onRequest: [protect, isAdmin],
+			onRequest: protect,
+			preHandler: isAdmin,
 		},
 		product.updateProduct,
 	);
@@ -33,7 +41,8 @@ async function productRoutes(fastify: FastifyInstance) {
 			schema: {
 				params: mongoDBIdSchema,
 			},
-			onRequest: [protect, isAdmin],
+			onRequest: protect,
+			preHandler: isAdmin,
 		},
 		product.deleteProduct,
 	);
@@ -46,7 +55,7 @@ async function productRoutes(fastify: FastifyInstance) {
 			schema: {
 				params: mongoDBIdSchema,
 			},
-			onRequest: [protect],
+			onRequest: protect,
 		},
 		product.createProductReview,
 	);
@@ -55,3 +64,12 @@ async function productRoutes(fastify: FastifyInstance) {
 }
 
 export default productRoutes;
+
+// fastify.route({
+// 	method: "GET",
+// 	url: "/",
+// 	schema: {
+// 		response: {},
+// 	},
+// 	handler: () => {},
+// });

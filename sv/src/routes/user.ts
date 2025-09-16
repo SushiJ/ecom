@@ -29,10 +29,10 @@ async function userRoutes(fastify: FastifyInstance) {
 	fastify.put(
 		"/profile",
 		{
-			preHandler: protect,
 			schema: {
 				body: userSchemas.updateInfo, // Validates optional name and email
 			},
+			onRequest: protect,
 		},
 		user.updateInfoHandler,
 	);
@@ -50,7 +50,8 @@ async function userRoutes(fastify: FastifyInstance) {
 	fastify.get(
 		"/",
 		{
-			onRequest: [protect, isAdmin],
+			onRequest: protect,
+			preHandler: isAdmin,
 		},
 		user.a_getAllUsers,
 	);
@@ -58,10 +59,11 @@ async function userRoutes(fastify: FastifyInstance) {
 	fastify.get(
 		"/:id",
 		{
-			onRequest: [protect, isAdmin],
 			schema: {
 				params: userSchemas.mongoId, // Validates MongoDB ObjectId format
 			},
+			onRequest: protect,
+			preHandler: isAdmin,
 		},
 		user.a_getUserById,
 	);
@@ -69,11 +71,12 @@ async function userRoutes(fastify: FastifyInstance) {
 	fastify.put(
 		"/:id",
 		{
-			onRequest: [protect, isAdmin],
 			schema: {
 				params: userSchemas.mongoId, // Validates ID parameter
 				body: userSchemas.adminUpdateUser, // Validates name, email, isAdmin
 			},
+			onRequest: protect,
+			preHandler: isAdmin,
 		},
 		user.a_updateUserInfoHandler,
 	);
@@ -81,10 +84,11 @@ async function userRoutes(fastify: FastifyInstance) {
 	fastify.delete(
 		"/:id",
 		{
-			onRequest: [protect, isAdmin],
 			schema: {
 				params: userSchemas.mongoId, // Validates MongoDB ObjectId format
 			},
+			onRequest: protect,
+			preHandler: isAdmin,
 		},
 		user.a_deleteUser,
 	);
