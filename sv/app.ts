@@ -1,5 +1,5 @@
 import { build } from "./src/index";
-import connect from "./src/utils/connection";
+import { connect } from "./src/utils/connection";
 
 const fastify = build();
 

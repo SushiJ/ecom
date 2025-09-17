@@ -6,15 +6,6 @@ import { mongoDBIdSchema } from "../schemas/userSchema";
 async function productRoutes(fastify: FastifyInstance) {
 	const product = new Product();
 	fastify.get("/", product.getProducts);
-	fastify.post(
-		"/",
-		{
-			onRequest: protect,
-			preHandler: isAdmin,
-		},
-		product.createProducts,
-	);
-
 	fastify.get(
 		"/:id",
 		{
@@ -23,6 +14,15 @@ async function productRoutes(fastify: FastifyInstance) {
 			},
 		},
 		product.getProductsById,
+	);
+
+	fastify.post(
+		"/",
+		{
+			onRequest: protect,
+			preHandler: isAdmin,
+		},
+		product.createProducts,
 	);
 	fastify.put(
 		"/:id",

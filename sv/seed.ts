@@ -8,6 +8,11 @@ type Product = (typeof products)[0];
 const uri = "mongodb://mongo:mongo@localhost:27017/";
 const client = new MongoClient(uri);
 
+const userArr: Array<User> = [];
+const product: Array<Product> = [];
+const password = await hashPassword("123456");
+
+
 async function seedDB() {
 	// Connection URL
 	await client.connect().catch((e) => console.error(e));
@@ -20,10 +25,6 @@ async function seedDB() {
 	// Make sure you run it against proper database and collection.
 	userCollection.drop();
 	productCollection.drop();
-
-	const userArr: Array<User> = [];
-	const product: Array<Product> = [];
-	const password = await hashPassword("123456");
 
 	for (const u of users) {
 		const user: User = {
