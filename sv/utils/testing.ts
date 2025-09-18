@@ -28,54 +28,6 @@ const products = [
 		rating: 4.0,
 		numReviews: 8,
 	},
-	{
-		name: "Cannon EOS 80D DSLR Camera",
-		image: "/images/camera.jpg",
-		description:
-			"Characterized by versatile imaging specs, the Canon EOS 80D further clarifies itself using a pair of robust focusing systems and an intuitive design",
-		brand: "Cannon",
-		category: "Electronics",
-		price: 929.99,
-		countInStock: 5,
-		rating: 3,
-		numReviews: 12,
-	},
-	{
-		name: "Sony Playstation 5",
-		image: "/images/playstation.jpg",
-		description:
-			"The ultimate home entertainment center starts with PlayStation. Whether you are into gaming, HD movies, television, music",
-		brand: "Sony",
-		category: "Electronics",
-		price: 399.99,
-		countInStock: 11,
-		rating: 5,
-		numReviews: 12,
-	},
-	{
-		name: "Logitech G-Series Gaming Mouse",
-		image: "/images/mouse.jpg",
-		description:
-			"Get a better handle on your games with this Logitech LIGHTSYNC gaming mouse. The six programmable buttons allow customization for a smooth playing experience",
-		brand: "Logitech",
-		category: "Electronics",
-		price: 49.99,
-		countInStock: 7,
-		rating: 3.5,
-		numReviews: 10,
-	},
-	{
-		name: "Amazon Echo Dot 3rd Generation",
-		image: "/images/alexa.jpg",
-		description:
-			"Meet Echo Dot - Our most popular smart speaker with a fabric design. It is our most compact smart speaker that fits perfectly into small space",
-		brand: "Amazon",
-		category: "Electronics",
-		price: 29.99,
-		countInStock: 0,
-		rating: 4,
-		numReviews: 12,
-	},
 ];
 
 const users = [
@@ -86,12 +38,6 @@ const users = [
 		role: "admin",
 	},
 	{
-		name: "John Doe",
-		email: "john@email.com",
-		password: "",
-		role: "user",
-	},
-	{
 		name: "Jane Doe",
 		email: "jane@email.com",
 		password: "",
@@ -99,7 +45,6 @@ const users = [
 	},
 ];
 
-export default users;
 type User = (typeof users)[0];
 type Product = (typeof products)[0];
 
@@ -114,7 +59,8 @@ export class Database {
 	public async disconnect() {
 		await disconnectTestDatabase();
 	}
-	public async insertProducts() {
+
+	public async setupProducts() {
 		for (const p of products) {
 			const pro: Product = {
 				name: p.name,
@@ -131,8 +77,11 @@ export class Database {
 		}
 		await productModel.insertMany(this.products);
 	}
+	public async setupProduct() {
+		return await new productModel(products[0]).save();
+	}
 
-	public async insertUsers() {
+	public async setupUsers() {
 		const password = await hashPassword("123456");
 		for (const u of users) {
 			const user: User = {
@@ -145,6 +94,18 @@ export class Database {
 		}
 		await userModel.insertMany(this.products);
 	}
+	public async setupUser(role: "admin" | "user") {
+		let user: User;
+		if (role === "admin") {
+			user = users[0]!;
+			user.password = "123456";
+		} else {
+			user = users[1]!;
+			user.password = "123456";
+		}
+		return await new userModel(user).save();
+	}
+
 	public async dropDatabase(key: "PRODUCTS" | "USERS") {
 		if (key === "PRODUCTS") {
 			await productModel.deleteMany();
