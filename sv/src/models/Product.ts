@@ -1,7 +1,7 @@
 import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
 
 class ReviewUser {
-	@prop({ required: true })
+	@prop()
 	public _id!: string;
 
 	@prop({ required: true })

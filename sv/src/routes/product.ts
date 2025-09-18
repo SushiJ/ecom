@@ -2,6 +2,7 @@ import { type FastifyInstance } from "fastify";
 import Product from "../controllers/products";
 import { isAdmin, protect } from "../utils/auth";
 import { mongoDBIdSchema } from "../schemas/userSchema";
+import { reviewSchema } from "../schemas/product";
 
 async function productRoutes(fastify: FastifyInstance) {
 	const product = new Product();
@@ -22,7 +23,7 @@ async function productRoutes(fastify: FastifyInstance) {
 			onRequest: protect,
 			preHandler: isAdmin,
 		},
-		product.createProducts,
+		product.createProduct,
 	);
 	fastify.put(
 		"/:id",
@@ -54,6 +55,7 @@ async function productRoutes(fastify: FastifyInstance) {
 		{
 			schema: {
 				params: mongoDBIdSchema,
+				body: reviewSchema,
 			},
 			onRequest: protect,
 		},

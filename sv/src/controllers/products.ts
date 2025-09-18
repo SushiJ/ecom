@@ -54,13 +54,10 @@ class Product {
 		return reply.status(200).send(product);
 	}
 
-	async createProducts(req: FastifyRequest, reply: FastifyReply) {
-		const { id } = req.user as { id: string };
-
+	async createProduct(_req: FastifyRequest, reply: FastifyReply) {
 		const product = new productModel({
 			name: "Sample name",
 			price: 0,
-			user: id,
 			image: "/images/sample.jpg",
 			brand: "Sample brand",
 			category: "Sample category",
@@ -70,18 +67,8 @@ class Product {
 			rating: 0,
 		});
 
-		let productCreated;
-
-		try {
-			productCreated = await product.save();
-		} catch (e) {
-			console.error("Something went wrong while saving the product", e);
-			throw HttpError.internalServerError("something went wrong");
-		}
-
-		reply.code(201);
-		reply.send(productCreated);
-		return reply;
+		const productCreated = await product.save();
+		reply.status(201).send(productCreated);
 	}
 
 	async updateProduct(
@@ -164,9 +151,19 @@ class Product {
 
 		const user = req.user as { _id: string; name: string; email: string };
 
-		const alreadyReviewed = product.reviews.find((review) => {
-			return review.user._id.toString() === user._id.toString();
-		});
+		let alreadyReviewed = false;
+
+		if (product.reviews.length > 0) {
+			product.reviews.find((review) => {
+				if (
+					review.user &&
+					review.user._id &&
+					review.user._id.toString() === user._id.toString()
+				) {
+					alreadyReviewed = true;
+				}
+			});
+		}
 
 		if (alreadyReviewed) {
 			throw HttpError.badRequest("Already reviewed");
@@ -189,8 +186,8 @@ class Product {
 
 		product.rating = totalRating / product.reviews.length;
 
-		await product.save();
-		return reply.status(201).send("Review added");
+		let updatedProduct = await product.save();
+		return reply.status(201).send(updatedProduct);
 	}
 
 	async getTopProducts(_: FastifyRequest, reply: FastifyReply) {
