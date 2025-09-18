@@ -86,7 +86,7 @@ export function isAdmin(
 	done: DoneFuncWithErrOrRes,
 ) {
 	// @ts-expect-error no user or is not admin
-	if (!req.user || !req.user.role == "admin") {
+	if (!req.user || req.user.role !== "admin") {
 		throw HttpError.forbidden("Not authorized");
 	}
 	done();
