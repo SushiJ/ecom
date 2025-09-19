@@ -115,3 +115,8 @@ export class Database {
 		}
 	}
 }
+
+export function extractJwtFromSetCookie(setCookieHeader: any): string {
+	const raw = setCookieHeader[0]; // grab first cookie
+	return raw.split(";")[0].split("=")[1]; // get value after citrus=
+}

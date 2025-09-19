@@ -1,9 +1,10 @@
 import supertest from "supertest";
-import { build } from "../src/index";
 import { FastifyBaseLogger, FastifyInstance } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
-import { Database } from "../utils/testing";
+
+import { Database, extractJwtFromSetCookie } from "../utils/testing";
+import { build } from "../src/index";
 
 let app: FastifyInstance<
 	Server<typeof IncomingMessage, typeof ServerResponse>,
@@ -15,11 +16,6 @@ let app: FastifyInstance<
 
 let request: ReturnType<typeof supertest>;
 let database: Database;
-
-function extractJwtFromSetCookie(setCookieHeader: any): string {
-	const raw = setCookieHeader[0]; // grab first cookie
-	return raw.split(";")[0].split("=")[1]; // get value after citrus=
-}
 
 beforeAll(async () => {
 	database = new Database();
@@ -41,6 +37,7 @@ afterAll(async () => {
 	await app.close();
 });
 
+// TODO: combine similar route tests!
 test("GET /products should return empty list", async () => {
 	const res = await request.get("/products");
 	expect(res.status).toBe(200);
