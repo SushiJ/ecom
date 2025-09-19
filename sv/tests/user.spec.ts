@@ -3,7 +3,7 @@ import { build } from "../src/index";
 import { FastifyBaseLogger, FastifyInstance } from "fastify";
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
-import { Database } from "../utils/testing";
+import { Database, extractJwtFromSetCookie } from "../utils/testing";
 
 let app: FastifyInstance<
 	Server<typeof IncomingMessage, typeof ServerResponse>,
@@ -157,8 +157,43 @@ test("POST /users/register should be 400 when input fields are not corect or mis
 	expect(res.status).toBe(400);
 	expect(res.body).toHaveProperty("message");
 });
+// INFO: this just returns the user from the request (IDK how this happened but well and I'm not testing it)
 // test("GET /users/profile", async () => {});
 
+test("PUT /users/profile should return 400 when user is not authenticated & 200 when user is authenticated and there is no update", async () => {
+	let res: Response;
+
+	res = await request.put("/users/profile").send();
+
+	expect(res.status).toBe(401);
+	expect(res.body).toHaveProperty("message");
+});
+test("PUT /users/profile should return 200 when user is no update", async () => {
+	let res: Response;
+
+	const password = "123456";
+	const user = await database.setupUser("user");
+
+	res = await request.post("/users/login").send({
+		email: user.email,
+		password,
+	});
+	expect(res.status).toBe(200);
+	expect(res.headers["set-cookie"]).toBeTruthy();
+
+	const cookie = extractJwtFromSetCookie(res.headers["set-cookie"]);
+
+	res = await request
+		.put("/users/profile")
+		.send({
+			password: "12345678",
+		})
+		.set("Cookie", [`citrus=${cookie}`]);
+
+	expect(res.status).toBe(200);
+	expect(res.body).toHaveProperty("message");
+	expect(res.body.message).toBe("User updated successfully");
+});
 // fastify.put(
 // 	"/profile",
 // 	{

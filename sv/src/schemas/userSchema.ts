@@ -17,6 +17,12 @@ export const userSchemas = {
 		email: z.email().optional(),
 	}),
 
+	updateInfoWithPass: z.object({
+		name: z.string().min(2).max(50).optional(),
+		email: z.email().optional(),
+		password: z.string().min(6).optional(),
+	}),
+
 	// Admin schemas
 	adminUpdateUser: z.object({
 		name: z.string().min(2).max(50),
@@ -33,5 +39,6 @@ export const mongoDBIdSchema = userSchemas.mongoId;
 export type RegisterInput = z.infer<typeof userSchemas.register>;
 export type LoginInput = z.infer<typeof userSchemas.login>;
 export type UpdateInfoInput = z.infer<typeof userSchemas.updateInfo>;
+export type UpdateInfoInputWithPass = z.infer<typeof userSchemas.updateInfoWithPass>;
 export type AdminUpdateUserInput = z.infer<typeof userSchemas.adminUpdateUser>;
 export type MongoIdInput = z.infer<typeof userSchemas.mongoId>;

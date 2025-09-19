@@ -30,7 +30,7 @@ async function userRoutes(fastify: FastifyInstance) {
 		"/profile",
 		{
 			schema: {
-				body: userSchemas.updateInfo, // Validates optional name and email
+				body: userSchemas.updateInfoWithPass, // Validates optional name and email
 			},
 			onRequest: protect,
 		},
