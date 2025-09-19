@@ -10,7 +10,7 @@
 		"start:build": "node ./dist/index.js",
 		"lint": "eslint .",
 		"build": "tsc",
-		"test": "export NODE_ENV=testing && jest"
+		"test": "export NODE_ENV=testing && jest --verbose"
 	},
 	"keywords": [],
 	"author": "",
