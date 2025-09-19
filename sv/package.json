@@ -10,7 +10,10 @@
 		"start:build": "node ./dist/index.js",
 		"lint": "eslint .",
 		"build": "tsc",
-		"test": "export NODE_ENV=testing && jest --verbose"
+		"tp": "pnpm test:products",
+		"tu": "pnpm test:users",
+		"test:products": "export NODE_ENV=testing && jest --verbose ./tests/products.spec.ts",
+		"test:users": "export NODE_ENV=testing && jest --verbose ./tests/user.spec.ts"
 	},
 	"keywords": [],
 	"author": "",
