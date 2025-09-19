@@ -149,21 +149,19 @@ class Product {
 			throw HttpError.notFound("Product not found");
 		}
 
-		const user = req.user as { _id: string; name: string; email: string };
+		const user = req.user as {
+			_id: string;
+			name: string;
+			email: string;
+			role: string;
+		};
 
-		let alreadyReviewed = false;
-
-		if (product.reviews.length > 0) {
-			product.reviews.find((review) => {
-				if (
-					review.user &&
-					review.user._id &&
-					review.user._id.toString() === user._id.toString()
-				) {
-					alreadyReviewed = true;
-				}
-			});
-		}
+		const alreadyReviewed = product.reviews.some(
+			(review) =>
+				review.user &&
+				review.user._id &&
+				review.user._id.toString() === user._id.toString(),
+		);
 
 		if (alreadyReviewed) {
 			throw HttpError.badRequest("Already reviewed");

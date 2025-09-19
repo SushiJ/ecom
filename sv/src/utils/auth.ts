@@ -34,6 +34,7 @@ export async function protectedNoBody(
 		}
 
 		req.user = {
+			_id: user._id,
 			name: user.name,
 			email: user.email,
 			role: user.role,
@@ -71,6 +72,7 @@ export async function protect(
 	}
 
 	req.user = {
+		_id: user._id,
 		name: user.name,
 		email: user.email,
 		role: user.role,

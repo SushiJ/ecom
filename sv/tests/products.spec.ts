@@ -329,3 +329,41 @@ test("POST /products/reviews/:id should return 201 when success", async () => {
 	expect(res.body.name).toBe(product.name);
 	expect(res.body.reviews.length).toBeGreaterThan(0);
 });
+test("POST /products/reviews/:id should return 400 when product has already been reviewed by the user", async () => {
+	const password = "123456";
+	const user = await database.setupUser("user");
+	const userLoginRes = await request.post("/users/login").send({
+		email: user.email,
+		password,
+	});
+
+	expect(userLoginRes.status).toBe(200);
+	expect(userLoginRes.headers["set-cookie"]).toBeDefined();
+
+	const cookie = extractJwtFromSetCookie(userLoginRes.headers["set-cookie"]);
+
+	const product = await database.setupProduct();
+	const res = await request
+		.post(`/products/reviews/${product._id}`)
+		.send({
+			rating: 4,
+			comment: "Testing 123",
+		})
+		.set("Cookie", [`citrus=${cookie}`]);
+
+	expect(res.status).toBe(201);
+	expect(res.body.name).toBe(product.name);
+	expect(res.body.reviews.length).toBeGreaterThan(0);
+
+	const secondRes = await request
+		.post(`/products/reviews/${product._id}`)
+		.send({
+			rating: 4,
+			comment: "Testing 123",
+		})
+		.set("Cookie", [`citrus=${cookie}`]);
+
+	expect(secondRes.status).toBe(400);
+	expect(secondRes.body).toHaveProperty("message");
+	expect(secondRes.body.message).toBe("Already reviewed");
+});
