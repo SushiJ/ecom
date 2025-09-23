@@ -208,9 +208,9 @@ class User {
 			throw HttpError.notFound("User not found");
 		}
 
-		user.name = name;
-		user.email = email;
-		user.role = role;
+		if (name !== undefined) user.name = name;
+		if (email !== undefined) user.email = email;
+		if (role !== undefined) user.role = role;
 
 		const updatedUser = await user.save();
 

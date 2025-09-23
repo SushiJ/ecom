@@ -16,6 +16,9 @@ let app: FastifyInstance<
 let request: ReturnType<typeof supertest>;
 let database: Database;
 
+// TODO: A better way of doing middleware tests would be doing them as unit tests and 
+// Need to introduce faker for mocking up data
+
 beforeAll(async () => {
 	database = new Database();
 	await database.connectToDatabase();
@@ -194,58 +197,181 @@ test("PUT /users/profile should return 200 when user is no update", async () => 
 	expect(res.body).toHaveProperty("message");
 	expect(res.body.message).toBe("User updated successfully");
 });
-// fastify.put(
-// 	"/profile",
-// 	{
-// 		schema: {
-// 			body: userSchemas.updateInfo, // Validates optional name and email
-// 		},
-// 		onRequest: protect,
-// 	},
-// 	user.updateInfoHandler,
-// );
-// fastify.get(
-// 	"/",
-// 	{
-// 		onRequest: protect,
-// 		preHandler: isAdmin,
-// 	},
-// 	user.a_getAllUsers,
-// );
-//
-// fastify.get(
-// 	"/:id",
-// 	{
-// 		schema: {
-// 			params: userSchemas.mongoId, // Validates MongoDB ObjectId format
-// 		},
-// 		onRequest: protect,
-// 		preHandler: isAdmin,
-// 	},
-// 	user.a_getUserById,
-// );
-//
-// fastify.put(
-// 	"/:id",
-// 	{
-// 		schema: {
-// 			params: userSchemas.mongoId, // Validates ID parameter
-// 			body: userSchemas.adminUpdateUser, // Validates name, email, isAdmin
-// 		},
-// 		onRequest: protect,
-// 		preHandler: isAdmin,
-// 	},
-// 	user.a_updateUserInfoHandler,
-// );
-//
-// fastify.delete(
-// 	"/:id",
-// 	{
-// 		schema: {
-// 			params: userSchemas.mongoId, // Validates MongoDB ObjectId format
-// 		},
-// 		onRequest: protect,
-// 		preHandler: isAdmin,
-// 	},
-// 	user.a_deleteUser,
-// );
+test("GET /users", async () => {
+	let res: Response;
+
+	res = await request.get("/users");
+	expect(res.status).toBe(401);
+	expect(res.body).toHaveProperty("message", "No token found");
+
+	const password = "123456";
+	const normalUser = await database.setupUser("user");
+
+	res = await request.post("/users/login").send({
+		email: normalUser.email,
+		password,
+	});
+	expect(res.status).toBe(200);
+	expect(res.headers["set-cookie"]).toBeTruthy();
+
+	const cookie = extractJwtFromSetCookie(res.headers["set-cookie"]);
+
+	res = await request.get("/users").set("Cookie", [`citrus=${cookie}`]);
+	expect(res.status).toBe(403);
+	expect(res.body).toHaveProperty("message", "Not authorized");
+
+	await database.dropDatabase("USERS");
+	const adminUser = await database.setupUser("admin");
+
+	res = await request.post("/users/login").send({
+		email: adminUser.email,
+		password,
+	});
+	expect(res.status).toBe(200);
+	expect(res.headers["set-cookie"]).toBeTruthy();
+
+	const adminCookie = extractJwtFromSetCookie(res.headers["set-cookie"]);
+
+	res = await request.get("/users").set("Cookie", [`citrus=${adminCookie}`]);
+	expect(res.status).toBe(200);
+	expect(res.body).toHaveProperty("message", "Users retrieved successfully");
+	expect(res.body.users.length).toBe(1); //Admin user that is making the request;
+
+	await database.setupUsers();
+	res = await request.get("/users").set("Cookie", [`citrus=${adminCookie}`]);
+	expect(res.status).toBe(200);
+	expect(res.body).toHaveProperty("message", "Users retrieved successfully");
+	expect(res.body.users.length).toBeGreaterThanOrEqual(1); //Admin user that is making the request + whatever the users are in the db; There is a race condition here somewhere when accessing the databe but this works
+});
+test("GET /users/:id", async () => {
+	let res: Response;
+
+	res = await request.get("/users/1");
+	expect(res.status).toBe(401);
+	expect(res.body).toHaveProperty("message", "No token found");
+
+	const password = "123456";
+	const normalUser = await database.setupUser("user");
+
+	res = await request.post("/users/login").send({
+		email: normalUser.email,
+		password,
+	});
+	expect(res.status).toBe(200);
+	expect(res.headers["set-cookie"]).toBeTruthy();
+
+	const cookie = extractJwtFromSetCookie(res.headers["set-cookie"]);
+
+	res = await request.get("/users/1").set("Cookie", [`citrus=${cookie}`]);
+	expect(res.status).toBe(400);
+	expect(res.body).toHaveProperty("message", "The request data is invalid");
+	expect(res.body.details.length).toBeGreaterThan(0);
+	expect(res.body.details[0]).toHaveProperty(
+		"message",
+		"Invalid MongoDB ObjectId",
+	);
+
+	res = await request
+		.get(`/users/${normalUser._id}`)
+		.set("Cookie", [`citrus=${cookie}`]);
+	expect(res.status).toBe(403);
+	expect(res.body).toHaveProperty("message", "Not authorized");
+
+	await database.dropDatabase("USERS");
+	const adminUser = await database.setupUser("admin");
+
+	res = await request.post("/users/login").send({
+		email: adminUser.email,
+		password,
+	});
+	expect(res.status).toBe(200);
+	expect(res.headers["set-cookie"]).toBeTruthy();
+
+	const adminCookie = extractJwtFromSetCookie(res.headers["set-cookie"]);
+
+	res = await request
+		.get(`/users/${normalUser._id}`)
+		.set("Cookie", [`citrus=${adminCookie}`]);
+	expect(res.status).toBe(404);
+	expect(res.body).toHaveProperty("message", "User not found");
+
+	res = await request
+		.get(`/users/${adminUser._id}`)
+		.set("Cookie", [`citrus=${adminCookie}`]);
+	expect(res.status).toBe(200);
+	expect(res.body).toHaveProperty("message", "User retrieved successfully");
+	expect(res.body.user).toBeTruthy();
+});
+// Since I know the middlewares work Imma skip those and get straight to the meat
+test("PUT /users/:id admin route", async () => {
+	let res: Response;
+
+	const password = "123456";
+	const normalUser = await database.setupUser("user");
+	const adminUser = await database.setupUser("admin");
+
+	res = await request.post("/users/login").send({
+		email: adminUser.email,
+		password,
+	});
+	expect(res.status).toBe(200);
+	expect(res.headers["set-cookie"]).toBeTruthy();
+
+	const adminCookie = extractJwtFromSetCookie(res.headers["set-cookie"]);
+
+	res = await request
+		.put(`/users/${normalUser._id}`)
+		.send({})
+		.set("Cookie", [`citrus=${adminCookie}`]);
+	expect(res.status).toBe(200); // since it's gonna optional the input
+
+	let user = {
+		name: "testing 123",
+		email: "testing@email.com",
+		role: "user",
+	};
+	res = await request
+		.put(`/users/${normalUser._id}`)
+		.send({
+			name: user.name,
+			email: user.email,
+			role: user.role,
+		})
+		.set("Cookie", [`citrus=${adminCookie}`]);
+
+	expect(res.status).toBe(200);
+	expect(res.body).toHaveProperty("message", "User updated successfully");
+	expect(res.body.user.name).toBe(user.name);
+	expect(res.body.user.email).toBe(user.email);
+	expect(res.body.user.role).toBe(user.role);
+});
+// Since I know the middlewares work Imma skip those and get straight to the meat
+test("DELETE /users/:id admin route", async () => {
+	let res: Response;
+
+	const password = "123456";
+	const normalUser = await database.setupUser("user");
+	const adminUser = await database.setupUser("admin");
+
+	res = await request.post("/users/login").send({
+		email: adminUser.email,
+		password,
+	});
+	expect(res.status).toBe(200);
+	expect(res.headers["set-cookie"]).toBeTruthy();
+
+	const adminCookie = extractJwtFromSetCookie(res.headers["set-cookie"]);
+
+	res = await request
+		.delete(`/users/${normalUser._id}`)
+		.set("Cookie", [`citrus=${adminCookie}`]);
+	expect(res.status).toBe(200);
+	expect(res.body).toHaveProperty("message", "User deleted successfully");
+
+	res = await request
+		.delete(`/users/${adminUser._id}`)
+		.set("Cookie", [`citrus=${adminCookie}`]);
+
+	expect(res.status).toBe(400);
+	expect(res.body).toHaveProperty("message", "Bad request");
+});

@@ -25,9 +25,9 @@ export const userSchemas = {
 
 	// Admin schemas
 	adminUpdateUser: z.object({
-		name: z.string().min(2).max(50),
-		email: z.email(),
-		role: z.string(),
+		name: z.string().min(2).max(50).optional(),
+		email: z.email().optional(),
+		role: z.string().optional(),
 	}),
 	mongoId: z.object({
 		id: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid MongoDB ObjectId"),
