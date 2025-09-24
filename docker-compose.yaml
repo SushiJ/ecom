@@ -13,27 +13,27 @@ services:
       - back
     restart: unless-stopped
 
-  server:
-    build:
-      context: ./sv
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    depends_on:
-      - mongo
-    environment:
-      - NODE_ENV=development
-      - MONGODB_URI=mongodb://mongo:mongo@mongo:27017/ecom?authSource=admin
-      - PORT=3000
-      # Add your other env vars here
-      # - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
-      # - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET}
-    networks:
-      - back
-    restart: unless-stopped
-    volumes:
-      - ./sv:/usr/src/app  # For development hot reload
-      - /usr/src/app/node_modules  # Prevent overwriting node_modules
+  # server:
+  #   build:
+  #     context: ./sv
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - mongo
+  #   environment:
+  #     - NODE_ENV=development
+  #     - MONGODB_URI=mongodb://mongo:mongo@mongo:27017/ecom?authSource=admin
+  #     - PORT=3000
+  #     # Add your other env vars here
+  #     # - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
+  #     # - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET}
+  #   networks:
+  #     - back
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./sv:/usr/src/app  # For development hot reload
+  #     - /usr/src/app/node_modules  # Prevent overwriting node_modules
 
 networks:
   back:
