@@ -69,7 +69,7 @@ export const productApiSlice = api.injectEndpoints({
 				method: "POST",
 				body: data,
 			}),
-			invalidatesTags: ["Product"],
+			invalidatesTags: (_result, _err, { id }) => [{ type: "Product", id }],
 		}),
 	}),
 });

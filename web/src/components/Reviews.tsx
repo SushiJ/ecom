@@ -29,6 +29,8 @@ import {
 	Select,
 	SelectItem,
 } from "@/components/ui/select";
+import { useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 type ReviewProps = {
 	id: string;
@@ -88,15 +90,25 @@ function Reviews(props: ReviewProps) {
 				<ul>
 					{props.reviews.map((review, idx) => (
 						<li key={idx}>
-							<strong>{review.user.name}</strong>
-							<Rating value={review.rating} />
-							<p>{review.createdAt?.substring(0, 10)}</p>
-							<p>{review.comment}</p>
+							<Card className="mb-4 rounded-2xl shadow-sm">
+								<CardHeader className="flex flex-col gap-1">
+									<CardTitle className="text-lg font-semibold">
+										{review.user.name}
+									</CardTitle>
+									<Rating value={review.rating} />
+									<p className="text-xs text-muted-foreground">
+										{review.createdAt?.substring(0, 10)}
+									</p>
+								</CardHeader>
+								<CardContent>
+									<p className="text-sm leading-relaxed">{review.comment}</p>
+								</CardContent>
+							</Card>
 						</li>
 					))}
 					<li>
 						<h2>Write a Customer Review</h2>
-						{user._id ? (
+						{user && user._id ? (
 							<Form {...form}>
 								<form onSubmit={form.handleSubmit(onSubmit)}>
 									<fieldset>

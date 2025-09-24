@@ -36,6 +36,7 @@ export const userApiSlice = api.injectEndpoints({
 				url: "users/logout",
 				method: "POST",
 			}),
+			invalidatesTags: ["User"],
 		}),
 		profile: builder.mutation({
 			query: (data) => ({

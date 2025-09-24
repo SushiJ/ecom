@@ -7,7 +7,7 @@ type initialState = {
 		name: string;
 		email: string;
 		role: string;
-	};
+	} | null;
 };
 
 const initialState: initialState = {
