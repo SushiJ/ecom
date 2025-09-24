@@ -1,17 +1,50 @@
 import { type FastifyInstance } from "fastify";
 import Product from "../controllers/products";
 import { isAdmin, protect } from "../utils/auth";
+import { mongoDBIdSchema } from "../schemas/userSchema";
+import { reviewSchema } from "../schemas/product";
 
 async function productRoutes(fastify: FastifyInstance) {
 	const product = new Product();
 	fastify.get("/", product.getProducts);
-	fastify.post("/", { onRequest: [protect, isAdmin] }, product.createProducts);
+	fastify.get(
+		"/:id",
+		{
+			schema: {
+				params: mongoDBIdSchema,
+			},
+		},
+		product.getProductsById,
+	);
 
-	fastify.get("/:id", product.getProductsById);
-	fastify.put("/:id", { onRequest: [protect, isAdmin] }, product.updateProduct);
+	fastify.post(
+		"/",
+		{
+			onRequest: protect,
+			preHandler: isAdmin,
+		},
+		product.createProduct,
+	);
+	fastify.put(
+		"/:id",
+		{
+			schema: {
+				params: mongoDBIdSchema,
+			},
+			onRequest: protect,
+			preHandler: isAdmin,
+		},
+		product.updateProduct,
+	);
 	fastify.delete(
 		"/:id",
-		{ onRequest: [protect, isAdmin] },
+		{
+			schema: {
+				params: mongoDBIdSchema,
+			},
+			onRequest: protect,
+			preHandler: isAdmin,
+		},
 		product.deleteProduct,
 	);
 
@@ -19,7 +52,13 @@ async function productRoutes(fastify: FastifyInstance) {
 
 	fastify.post(
 		"/reviews/:id",
-		{ onRequest: [protect] },
+		{
+			schema: {
+				params: mongoDBIdSchema,
+				body: reviewSchema,
+			},
+			onRequest: protect,
+		},
 		product.createProductReview,
 	);
 
@@ -27,3 +66,12 @@ async function productRoutes(fastify: FastifyInstance) {
 }
 
 export default productRoutes;
+
+// fastify.route({
+// 	method: "GET",
+// 	url: "/",
+// 	schema: {
+// 		response: {},
+// 	},
+// 	handler: () => {},
+// });

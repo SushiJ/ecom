@@ -7,7 +7,7 @@ import userModel from "../models/User";
 import { AdminUpdateUserInput, UpdateInfoInput } from "../schemas/userSchema";
 import { HttpError } from "./HttpErrors";
 
-// TODO: figure out better error mechanism
+// TODO: figure out way to make these generic or something
 export async function protectedNoBody(
 	req: FastifyRequest,
 	_reply: FastifyReply,
@@ -34,6 +34,7 @@ export async function protectedNoBody(
 		}
 
 		req.user = {
+			_id: user._id,
 			name: user.name,
 			email: user.email,
 			role: user.role,
@@ -46,8 +47,11 @@ export async function protectedNoBody(
 export async function protect(
 	req: FastifyRequest<{
 		Body: UpdateInfoInput;
+		Params: {
+			id: string;
+		};
 	}>,
-	reply: FastifyReply,
+	_reply: FastifyReply,
 ) {
 	const token = req.cookies["citrus"];
 
@@ -55,30 +59,24 @@ export async function protect(
 		throw HttpError.unauthorized("No token found");
 	}
 
-	try {
-		const decoded = await req.jwtDecode<{
-			userId: string;
-			iat: number;
-			exp: number;
-		}>();
+	const { userId } = await req.jwtDecode<{
+		userId: string;
+		iat: number;
+		exp: number;
+	}>();
 
-		const { userId } = decoded;
+	const user = await userModel.findById(userId).select("-password");
 
-		const user = await userModel.findById(userId).select("-password");
-
-		if (!user) {
-			reply.status(401);
-			throw new Error("User not found");
-		}
-
-		req.user = {
-			name: user.name,
-			email: user.email,
-			role: user.role,
-		};
-	} catch (e) {
-		console.log(e);
+	if (!user) {
+		throw HttpError.unauthorized("Not authorized");
 	}
+
+	req.user = {
+		_id: user._id,
+		name: user.name,
+		email: user.email,
+		role: user.role,
+	};
 }
 
 export function isAdmin(
@@ -90,7 +88,7 @@ export function isAdmin(
 	done: DoneFuncWithErrOrRes,
 ) {
 	// @ts-expect-error no user or is not admin
-	if (!req.user || !req.user.role == "admin") {
+	if (!req.user || req.user.role !== "admin") {
 		throw HttpError.forbidden("Not authorized");
 	}
 	done();

@@ -35,13 +35,16 @@ export function build() {
 	fastify.register(cors, {
 		// INFO: directly borrowed from cors doc
 		// Development mode only
-		origin: (origin, cb) => {
-			const { hostname } = new URL(origin!);
-			if (hostname === "localhost") {
-				cb(null, true);
-			}
-			// TODO: check hostname from the envs
-		},
+		origin:
+			process.env.NODE_ENV === "testing"
+				? ["*"]
+				: (origin, cb) => {
+						const { hostname } = new URL(origin!);
+						if (hostname === "localhost") {
+							cb(null, true);
+						}
+						// TODO: check hostname from the envs
+					},
 		credentials: true, // Needed for cors in browser
 		methods: ["GET", "POST", "DELETE"],
 		allowedHeaders: ["Content-Type", "Authorization"],
@@ -72,18 +75,15 @@ export function build() {
 	fastify.register(orderRoutes, { prefix: "/orders" });
 
 	fastify.setErrorHandler((error, request, reply) => {
-		fastify.log.error(
-			{
-				error,
-				request: {
-					method: request.method,
-					url: request.url,
-					query: request.query,
-					params: request.params,
-				},
+		fastify.log.error({
+			error,
+			request: {
+				method: request.method,
+				url: request.url,
+				query: request.query,
+				params: request.params,
 			},
-			"Unhandled error occurred",
-		);
+		});
 
 		// Zod validation errors
 		if (error.validation) {
@@ -101,7 +101,7 @@ export function build() {
 				details: validationErrors,
 			});
 		}
-
+		// HTTP Errors
 		if (HttpError.isHttpError(error)) {
 			return reply.status(error.statusCode).send({
 				error: error.name,

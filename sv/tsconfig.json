@@ -5,7 +5,7 @@
 		"skipLibCheck": true,
 		"strictNullChecks": true,
 		"noUncheckedIndexedAccess": true,
-		"allowJs": false,
+		"allowJs": true,
 		"strict": true,
 		"noImplicitAny": true,
 		"moduleResolution": "node",

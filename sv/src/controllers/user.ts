@@ -3,8 +3,8 @@ import { type FastifyReply, type FastifyRequest } from "fastify";
 import {
 	type RegisterInput,
 	type LoginInput,
-	type UpdateInfoInput,
 	AdminUpdateUserInput,
+	UpdateInfoInputWithPass,
 } from "../schemas/userSchema";
 import userModel from "../models/User";
 import { HttpError } from "../utils/HttpErrors";
@@ -100,13 +100,13 @@ class User {
 
 	async updateInfoHandler(
 		req: FastifyRequest<{
-			Body: UpdateInfoInput;
+			Body: UpdateInfoInputWithPass;
 		}>,
 		reply: FastifyReply,
 	) {
 		const decodedUser = req.user as { _id: string };
 
-		const { name, email } = req.body;
+		const { name, email, password } = req.body;
 
 		const user = await userModel.findById(decodedUser._id);
 
@@ -117,6 +117,7 @@ class User {
 
 		if (name !== undefined) user.name = name;
 		if (email !== undefined) user.email = email;
+		if (password !== undefined) user.password = password;
 
 		const updatedUser = await user.save();
 
@@ -207,9 +208,9 @@ class User {
 			throw HttpError.notFound("User not found");
 		}
 
-		user.name = name;
-		user.email = email;
-		user.role = role;
+		if (name !== undefined) user.name = name;
+		if (email !== undefined) user.email = email;
+		if (role !== undefined) user.role = role;
 
 		const updatedUser = await user.save();
 

@@ -4,11 +4,16 @@
 	"description": "",
 	"main": "dist/index.js",
 	"scripts": {
-		"dev": "nodemon",
+		"dev": "export NODE_ENV=development && nodemon",
 		"seed": "ts-node ./seed.ts",
 		"start": "ts-node ./src/index.ts",
+		"start:build": "node ./dist/index.js",
 		"lint": "eslint .",
-		"build": "tsc"
+		"build": "tsc",
+		"tp": "pnpm test:products",
+		"tu": "pnpm test:users",
+		"test:products": "export NODE_ENV=testing && jest --verbose ./tests/products.spec.ts",
+		"test:users": "export NODE_ENV=testing && jest --verbose ./tests/user.spec.ts"
 	},
 	"keywords": [],
 	"author": "",
@@ -20,12 +25,15 @@
 		"@fastify/jwt": "^10.0.0",
 		"@typegoose/typegoose": "^11.6.0",
 		"@types/bcrypt": "^6.0.0",
+		"@types/jest": "^30.0.0",
+		"@types/supertest": "^6.0.3",
 		"bcrypt": "^6.0.0",
 		"fastify": "^5.0.0",
 		"fastify-type-provider-zod": "^5.0.3",
 		"mongodb": "^6.3.0",
 		"mongoose": "7.6.1",
 		"pino-pretty": "^10.2.3",
+		"ts-jest": "^29.4.1",
 		"zod": "^4.0.17"
 	},
 	"devDependencies": {

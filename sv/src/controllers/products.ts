@@ -54,13 +54,10 @@ class Product {
 		return reply.status(200).send(product);
 	}
 
-	async createProducts(req: FastifyRequest, reply: FastifyReply) {
-		const { id } = req.user as { id: string };
-
+	async createProduct(_req: FastifyRequest, reply: FastifyReply) {
 		const product = new productModel({
 			name: "Sample name",
 			price: 0,
-			user: id,
 			image: "/images/sample.jpg",
 			brand: "Sample brand",
 			category: "Sample category",
@@ -70,18 +67,8 @@ class Product {
 			rating: 0,
 		});
 
-		let productCreated;
-
-		try {
-			productCreated = await product.save();
-		} catch (e) {
-			console.error("Something went wrong while saving the product", e);
-			throw HttpError.internalServerError("something went wrong");
-		}
-
-		reply.code(201);
-		reply.send(productCreated);
-		return reply;
+		const productCreated = await product.save();
+		reply.status(201).send(productCreated);
 	}
 
 	async updateProduct(
@@ -123,8 +110,15 @@ class Product {
 		return reply.status(200).send(updated);
 	}
 
-	async deleteProduct(req: FastifyRequest, reply: FastifyReply) {
-		const { id } = req.params as { id: string };
+	async deleteProduct(
+		req: FastifyRequest<{
+			Params: {
+				id: string;
+			};
+		}>,
+		reply: FastifyReply,
+	) {
+		const { id } = req.params;
 
 		const product = await productModel.findById(id);
 
@@ -137,8 +131,15 @@ class Product {
 		return reply.status(200).send("Resource deleted successfully");
 	}
 
-	async createProductReview(req: FastifyRequest, reply: FastifyReply) {
-		const { id } = req.params as { id: string };
+	async createProductReview(
+		req: FastifyRequest<{
+			Params: {
+				id: string;
+			};
+		}>,
+		reply: FastifyReply,
+	) {
+		const { id } = req.params;
 
 		const { rating, comment } = req.body as { rating: number; comment: string };
 
@@ -148,11 +149,19 @@ class Product {
 			throw HttpError.notFound("Product not found");
 		}
 
-		const user = req.user as { _id: string; name: string; email: string };
+		const user = req.user as {
+			_id: string;
+			name: string;
+			email: string;
+			role: string;
+		};
 
-		const alreadyReviewed = product.reviews.find((review) => {
-			return review.user._id.toString() === user._id.toString();
-		});
+		const alreadyReviewed = product.reviews.some(
+			(review) =>
+				review.user &&
+				review.user._id &&
+				review.user._id.toString() === user._id.toString(),
+		);
 
 		if (alreadyReviewed) {
 			throw HttpError.badRequest("Already reviewed");
@@ -175,8 +184,8 @@ class Product {
 
 		product.rating = totalRating / product.reviews.length;
 
-		await product.save();
-		return reply.status(201).send("Review added");
+		let updatedProduct = await product.save();
+		return reply.status(201).send(updatedProduct);
 	}
 
 	async getTopProducts(_: FastifyRequest, reply: FastifyReply) {
