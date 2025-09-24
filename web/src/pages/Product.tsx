@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,8 +38,10 @@ const FormSchema = z.object({
 
 export default function Product() {
 	const dispatch = useAppDispatch();
-	const { id } = useParams() as { id: string };
-	const { data, isError, isLoading, refetch } = useGetProductsByIdQuery(id);
+	const { id } = useParams<{
+		id: string;
+	}>();
+	const { data, isError, isLoading, refetch } = useGetProductsByIdQuery(id!);
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -153,7 +155,7 @@ export default function Product() {
 			</div>
 			<Reviews
 				isLoading={isLoading}
-				id={id}
+				id={id!}
 				reviews={data.reviews}
 				refetch={refetch}
 			/>
