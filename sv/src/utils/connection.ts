@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 // const MONGO_URL = "mongodb://mongo:27017/";
 
 const uri = "mongodb://mongo:mongo@localhost:27017/";
+
 export async function connect() {
 	return mongoose.connect(uri, {
 		dbName: "ecom",

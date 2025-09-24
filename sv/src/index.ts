@@ -101,7 +101,6 @@ export function build() {
 				details: validationErrors,
 			});
 		}
-
 		// HTTP Errors
 		if (HttpError.isHttpError(error)) {
 			return reply.status(error.statusCode).send({
