@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    container_name: mongo-ecom-dev
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=mongo
+    volumes:
+      - ./data:/data/db
+    networks:
+      - back
+    restart: unless-stopped
+
+  server:
+    build:
+      context: ./sv
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongo:mongo@mongo:27017/ecom?authSource=admin
+      - PORT=3000
+    networks:
+      - back
+    restart: unless-stopped
+    volumes:
+      - ./sv:/usr/src/app   # Code live reload
+      - /usr/src/app/node_modules
+
+networks:
+  back:
+    driver: bridge

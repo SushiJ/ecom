@@ -19,5 +19,4 @@ COPY . .
 
 EXPOSE 3000
 
-# Use development command (adjust if you use nodemon or similar)
 CMD ["pnpm", "dev"]

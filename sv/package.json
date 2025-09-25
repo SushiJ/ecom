@@ -7,7 +7,7 @@
 		"dev": "export NODE_ENV=development && nodemon",
 		"seed": "ts-node ./seed.ts",
 		"start": "ts-node ./src/index.ts",
-		"start:build": "node ./dist/index.js",
+		"start:build": "node ./dist/app.js",
 		"lint": "eslint .",
 		"build": "tsc",
 		"tp": "pnpm test:products",
