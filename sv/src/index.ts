@@ -1,7 +1,6 @@
 import Fastify, { type FastifyReply, type FastifyRequest } from "fastify";
 import cookie, { type FastifyCookieOptions } from "@fastify/cookie";
 import cors from "@fastify/cors";
-import env from "@fastify/env";
 import jwt from "@fastify/jwt";
 import {
 	ZodTypeProvider,
@@ -13,6 +12,7 @@ import productRoutes from "./routes/product";
 import userRoutes from "./routes/user";
 import orderRoutes from "./routes/order";
 import { HttpError } from "./utils/HttpErrors";
+import { config } from "./utils/envSchema";
 
 export function build() {
 	const fastify = Fastify({
@@ -26,17 +26,11 @@ export function build() {
 	fastify.setValidatorCompiler(validatorCompiler);
 	fastify.setSerializerCompiler(serializerCompiler);
 
-	// TODO: Figure out envs and schema
-	fastify.register(env, {
-		dotenv: true,
-		schema: {},
-	});
-
 	fastify.register(cors, {
 		// INFO: directly borrowed from cors doc
 		// Development mode only
 		origin:
-			process.env.NODE_ENV === "testing"
+			config.NODE_ENV === "testing"
 				? ["*"]
 				: (origin, cb) => {
 						const { hostname } = new URL(origin!);

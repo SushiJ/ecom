@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
+import { config } from "./envSchema";
 
-// mongodb://mongo:mongo@mongo:27017/ecom?authSource=admin
-const MONGO_URL = "mongodb://mongo:27017/";
-
-// const uri = "mongodb://mongo:mongo@localhost:27017/";
+const MONGO_URL =
+	config.NODE_ENV === "development" || "testing"
+		? config.MONGO_LOCAL_URI
+		: config.MONGODB_URI;
 
 export async function connect() {
 	return mongoose.connect(MONGO_URL, {
