@@ -51,11 +51,9 @@ export default function Home() {
 			<Title title="Latest Products" className="text-neutral-500 text-md" />
 			<ProductCarousel />
 			<Separator className="my-8" />
-			<div className="grid md:grid-cols-2 gap-2">
+			<div className="grid md:grid-cols-2 gap-2" data-cy="product-list">
 				{data.products.map((p) => (
-					<div key={p._id}>
-						<Product product={p} />
-					</div>
+					<Product product={p} />
 				))}
 			</div>
 			<Paginate pages={data.pages} page={data.page} keyword={keyword} />
@@ -65,7 +63,7 @@ export default function Home() {
 
 function Product(props: { product: Product }) {
 	return (
-		<Card className="shadow-none h-[450px]">
+		<Card className="shadow-none h-[450px]" key={props.product._id}>
 			<Link to={`/products/${props.product._id}`}>
 				<CardHeader className="flex flex-col items-center">
 					<img
