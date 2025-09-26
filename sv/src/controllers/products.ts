@@ -30,7 +30,7 @@ class Product {
 			.skip(pageSize * (page - 1));
 		if (!products) reply.status(200).send([]);
 
-		reply
+		return reply
 			.status(200)
 			.send({ products, page, pages: Math.ceil(count / pageSize) });
 	}

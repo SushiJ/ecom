@@ -36,7 +36,6 @@ const schema: JSONSchemaType<Env> = {
 		"MONGO_PASS",
 		"PORT",
 		"NODE_ENV",
-		"MONGO_LOCAL_URI",
 		"RUNNING_ENV",
 	],
 	properties: {

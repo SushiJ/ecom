@@ -13,6 +13,7 @@ fastify.listen({ port: 3000, host: "0.0.0.0" }, async (err, address) => {
 		fastify.log.info("CONNECTED TO MONGO");
 		fastify.log.info(`server listening on ${address}`);
 	} catch (e) {
+		fastify.log.error(e);
 		fastify.log.error("Failed to connect to server");
 	}
 });

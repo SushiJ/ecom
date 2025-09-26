@@ -2,9 +2,7 @@ import mongoose from "mongoose";
 import { config } from "./envSchema";
 
 const MONGO_URL =
-	config.NODE_ENV === "development" || "testing"
-		? config.MONGO_LOCAL_URI
-		: config.MONGODB_URI;
+	config.RUNNING_ENV === "docker" ? config.MONGODB_URI : config.MONGO_LOCAL_URI;
 
 export async function connect() {
 	return mongoose.connect(MONGO_URL, {

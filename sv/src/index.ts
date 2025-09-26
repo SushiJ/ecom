@@ -36,8 +36,9 @@ export function build() {
 						const { hostname } = new URL(origin!);
 						if (hostname === "localhost") {
 							cb(null, true);
+						} else {
+							cb(new Error(`${hostname} Not allowed`), false);
 						}
-						// TODO: check hostname from the envs
 					},
 		credentials: true, // Needed for cors in browser
 		methods: ["GET", "POST", "DELETE"],
