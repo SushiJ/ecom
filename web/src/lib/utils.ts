@@ -9,11 +9,14 @@ export function cn(...inputs: ClassValue[]) {
 type time = number;
 type ms = time;
 
-export function useDelay(time: ms) {
+export function useDelay(time: ms, skipDelay: boolean = false) {
+	if (skipDelay) {
+		return false;
+	} 
 	const [delay, setDelay] = useState(true);
 
 	useEffect(() => {
 		setTimeout(() => setDelay(false), time);
 	}, []);
-	return delay;
+	return delay
 }

@@ -20,28 +20,32 @@ import { useDelay } from "@/lib/utils";
 import Loader from "@/components/Loader";
 import { GoBack } from "@/components/ui/goback";
 
-export default function Home() {
+export default function Home({ skipDelay = false }: { skipDelay?: boolean }) {
 	const { pageNum, keyword } = useParams();
 	const { data, isError, isLoading } = useGetProductsQuery({
 		pageNum,
 		keyword,
 	});
 
-	const delay = useDelay(200);
+	const delay = useDelay(200, skipDelay);
 
 	if (isLoading || delay) {
 		return <Loader />;
 	}
 
 	if ((isError && !isLoading) || !data) {
-		return <p className="text-center text-lg">Something went wrong</p>;
+		return (
+			<p className="text-center text-lg" data-testid="error">
+				Something went wrong
+			</p>
+		);
 	}
 
 	if (data.products.length === 0) {
 		return (
-			<section className="space-y-4">
+			<section className="space-y-4" data-testid="empty">
 				<GoBack to="/" />
-				<p>Looks like that didn't match with any products</p>
+				<p>Looks like that didn&apos;t match with any products</p>
 			</section>
 		);
 	}
@@ -53,7 +57,7 @@ export default function Home() {
 			<Separator className="my-8" />
 			<div className="grid md:grid-cols-2 gap-2" data-cy="product-list">
 				{data.products.map((p) => (
-					<Product product={p} />
+					<Product product={p} key={p._id} />
 				))}
 			</div>
 			<Paginate pages={data.pages} page={data.page} keyword={keyword} />
@@ -63,7 +67,7 @@ export default function Home() {
 
 function Product(props: { product: Product }) {
 	return (
-		<Card className="shadow-none h-[450px]" key={props.product._id}>
+		<Card className="shadow-none h-[450px]">
 			<Link to={`/products/${props.product._id}`}>
 				<CardHeader className="flex flex-col items-center">
 					<img

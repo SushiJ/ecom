@@ -20,10 +20,10 @@
 		"noFallthroughCasesInSwitch": true,
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["src/*"]
 		}
 	},
-	"include": ["src"],
+	"include": ["src", "tests"],
 	"exclude": ["cypress.config.ts", "cypress", "node_modules"],
 	"references": [
 		{
