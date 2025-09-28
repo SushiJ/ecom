@@ -2,29 +2,22 @@ import { MemoryRouter } from "react-router-dom";
 import { render, screen } from "@testing-library/react";
 import { vi, beforeEach, type Mock } from "vitest";
 import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
 import Home from "@/pages/Home";
-import authReducer from "@/features/auth/slice";
-
-// Mock the API hook
-vi.mock("@/features/products/slice", () => ({
-	useGetProductsQuery: vi.fn(),
-	useGetTopProductsQuery: vi.fn(),
-}));
-
+import { store } from "@/store";
 import {
 	useGetProductsQuery,
 	useGetTopProductsQuery,
 } from "@/features/products/slice";
 
-// Minimal Redux store for testing
-const store = configureStore({
-	reducer: {
-		auth: authReducer,
-	},
-});
+vi.mock("@/features/products/slice", () => ({
+	useGetProductsQuery: vi.fn(),
+	useGetTopProductsQuery: vi.fn(),
+}));
 
-// Optional: a wrapper for Provider
+const mockGetProductsQuery = (ReturnValue: any) => {
+	(useGetProductsQuery as unknown as Mock).mockReturnValue(ReturnValue);
+};
+
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
 	<Provider store={store}>
 		<MemoryRouter>{children}</MemoryRouter>
@@ -36,41 +29,41 @@ describe("Home component", () => {
 		vi.clearAllMocks();
 	});
 
-	it("renders loader when loading", () => {
-		(useGetProductsQuery as unknown as Mock).mockReturnValue({
+	it("renders loader when state is loading", () => {
+		mockGetProductsQuery({
 			data: null,
 			isLoading: true,
 			isError: false,
 		});
 
 		render(<Home skipDelay />, { wrapper: Wrapper });
-		expect(screen.getByTestId("loading")).toBeInTheDocument();
+		expect(screen.getByRole("loading")).toBeInTheDocument();
 	});
 
 	it("renders error message on failure", () => {
-		(useGetProductsQuery as unknown as Mock).mockReturnValue({
+		mockGetProductsQuery({
 			data: null,
 			isLoading: false,
 			isError: true,
 		});
 
 		render(<Home skipDelay />, { wrapper: Wrapper });
-		expect(screen.getByTestId("error")).toBeInTheDocument();
+		expect(screen.getByRole("alert")).toBeInTheDocument();
 	});
 
 	it("renders empty message when no products", () => {
-		(useGetProductsQuery as unknown as Mock).mockReturnValue({
+		mockGetProductsQuery({
 			data: { products: [], pages: 1, page: 1 },
 			isLoading: false,
 			isError: false,
 		});
 
 		render(<Home skipDelay />, { wrapper: Wrapper });
-		expect(screen.getByTestId("empty")).toBeInTheDocument();
+		expect(screen.getByRole("empty")).toBeInTheDocument();
 	});
 
 	it("renders product list when data exists", () => {
-		(useGetProductsQuery as unknown as Mock).mockReturnValue({
+		mockGetProductsQuery({
 			data: {
 				products: [
 					{

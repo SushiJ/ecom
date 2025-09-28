@@ -1,5 +1,11 @@
 import { Link, useParams } from "react-router-dom";
 
+import { useGetProductsQuery } from "../features/products/slice";
+
+import { Product } from "../types/product";
+import truncate from "../lib/truncate";
+import { useDelay } from "@/lib/utils";
+
 import { Separator } from "@/components/ui/separator";
 import { Rating } from "@/components/Rating";
 import { Title } from "@/components/Title";
@@ -12,11 +18,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-
-import { Product } from "../types/product";
-import { useGetProductsQuery } from "../features/products/slice";
-import truncate from "../lib/truncate";
-import { useDelay } from "@/lib/utils";
 import Loader from "@/components/Loader";
 import { GoBack } from "@/components/ui/goback";
 
@@ -35,15 +36,15 @@ export default function Home({ skipDelay = false }: { skipDelay?: boolean }) {
 
 	if ((isError && !isLoading) || !data) {
 		return (
-			<p className="text-center text-lg" data-testid="error">
+			<p className="text-center text-lg" role="alert">
 				Something went wrong
 			</p>
 		);
 	}
 
-	if (data.products.length === 0) {
+	if (!data.products.length) {
 		return (
-			<section className="space-y-4" data-testid="empty">
+			<section className="space-y-4" role="empty">
 				<GoBack to="/" />
 				<p>Looks like that didn&apos;t match with any products</p>
 			</section>

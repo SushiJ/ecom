@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import {
 	Carousel,
 	CarouselContent,
@@ -7,7 +8,7 @@ import {
 } from "@/components/ui/carousel";
 
 import { useGetTopProductsQuery } from "../features/products/slice";
-import { Link } from "react-router-dom";
+
 import Loader from "./Loader";
 import { Card } from "./ui/card";
 
@@ -26,7 +27,7 @@ function ProductCarousel() {
 		);
 	}
 
-	if (!products) {
+	if (!products || !products.length) {
 		return <>No Products</>;
 	}
 
