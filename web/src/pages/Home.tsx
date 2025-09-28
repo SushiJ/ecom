@@ -2,7 +2,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { useGetProductsQuery } from "../features/products/slice";
 
-import { Product } from "../types/product";
+import { type Product } from "../types/product";
 import truncate from "../lib/truncate";
 import { useDelay } from "@/lib/utils";
 
