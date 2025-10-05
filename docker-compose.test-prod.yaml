@@ -1,11 +1,10 @@
-name: mongo-prod
+name: mongo-test
 services:
   mongo:
     image: mongo:6.0
     ports:
       - "27017:27017"
-    container_name: mongo-ecom-prod
-    env_file: .env.prod
+    container_name: mongo-ecom-test
     environment:
       - MONGO_INITDB_ROOT_USERNAME={MONGO_USER}
       - MONGO_INITDB_ROOT_PASSWORD={MONGO_PASS}
@@ -23,7 +22,7 @@ services:
       - "3000:3000"
     depends_on:
       - mongo
-    env_file: .env.prod
+    env_file: .env.test_prod
     networks:
       - back
     restart: unless-stopped
