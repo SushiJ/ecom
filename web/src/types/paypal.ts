@@ -9,7 +9,7 @@ export type CreateOrderActions = Pick<CreateOrderBraintreeActions, "order">;
 
 export type OnApproveData = {
 	billingToken?: string | null;
-	facilitatorAccessToken: string;
+	facilitatorAccessToken?: string;
 	orderID: string;
 	payerID?: string | null;
 	paymentID?: string | null;

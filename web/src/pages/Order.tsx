@@ -3,6 +3,7 @@ import { Fragment, useCallback, useEffect } from "react";
 import { toast } from "react-toastify";
 
 import {
+	DISPATCH_ACTION,
 	PayPalButtons,
 	SCRIPT_LOADING_STATE,
 	usePayPalScriptReducer,
@@ -51,7 +52,7 @@ const OrderScreen = () => {
 	const loadPayPalScript = useCallback(() => {
 		return async function () {
 			paypalDispatch({
-				type: "resetOptions",
+				type: DISPATCH_ACTION.RESET_OPTIONS,
 				value: {
 					...options,
 					clientId: paypal_id!.clientId,
@@ -60,7 +61,7 @@ const OrderScreen = () => {
 				},
 			});
 			paypalDispatch({
-				type: "setLoadingStatus",
+				type: DISPATCH_ACTION.LOADING_STATUS,
 				value: {
 					state: SCRIPT_LOADING_STATE.PENDING,
 					message: "pending",
@@ -83,14 +84,13 @@ const OrderScreen = () => {
 		}
 	}, [order, errorPaypalId, loadPayPalScript, loadingPaypalId, paypal_id]);
 
-	async function onApprove(_: OnApproveData, actions: OnApproveActions) {
+	async function onApprove(_data: OnApproveData, actions: OnApproveActions) {
 		return actions.order?.capture().then(async function (details) {
 			try {
 				console.log({ orderId, details });
 				await payOrder({ orderId, details });
 				refetch();
 				toast.success("Order is paid");
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			} catch (err: any) {
 				toast.error(err?.data?.message || err.error);
 			}
@@ -104,9 +104,13 @@ const OrderScreen = () => {
 	async function createOrder(_: any, actions: CreateOrderActions) {
 		return actions.order
 			.create({
+				intent: "AUTHORIZE",
 				purchase_units: [
 					{
-						amount: { value: order!.totalAmount.toString() },
+						amount: {
+							value: order!.totalAmount.toString(),
+							currency_code: "USD",
+						},
 					},
 				],
 			})
@@ -298,7 +302,7 @@ const OrderScreen = () => {
 								</div>
 							)}
 							{userInfo &&
-								userInfo.isAdmin &&
+								userInfo.role === "admin" &&
 								order.isPaid &&
 								!order.isDelivered && (
 									<Button onClick={deliverHandler}>Mark As Delivered</Button>

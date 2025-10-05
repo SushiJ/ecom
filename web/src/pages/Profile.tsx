@@ -72,8 +72,8 @@ const Profile = () => {
 		resolver: zodResolver(formSchema),
 		reValidateMode: "onChange",
 		defaultValues: {
-			name: userInfo.name,
-			email: userInfo.email,
+			name: userInfo?.name ?? "",
+			email: userInfo?.email ?? "",
 			confirm: "",
 			password: "",
 		},
@@ -81,7 +81,7 @@ const Profile = () => {
 
 	useEffect(() => {
 		form.setFocus("name");
-	}, [form.setFocus]);
+	}, [form, form.setFocus]);
 
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		try {
@@ -91,7 +91,6 @@ const Profile = () => {
 				password: values.password,
 			}).unwrap();
 			toast.success("Updated successfully");
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			console.log("ERROR:::", error);
 			toast(error.data.error, {

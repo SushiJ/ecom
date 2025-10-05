@@ -47,13 +47,13 @@ const Shipping = () => {
 
 	useEffect(() => {
 		form.setFocus("address");
-	}, [form.setFocus]);
+	}, [form, form.setFocus]);
 
 	useEffect(() => {
 		if (shippingAddress && shippingAddress.address) {
 			form.reset({ ...shippingAddress });
 		}
-	}, []);
+	}, [form, shippingAddress]);
 
 	const onSubmit = (values: z.infer<typeof formSchema>) => {
 		dispatch(saveShippingAddress({ ...values }));

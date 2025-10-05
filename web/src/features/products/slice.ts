@@ -1,5 +1,6 @@
 import {
 	CreateProductReviewMutation,
+	ErrorResponse,
 	Product,
 	ProductApiResponse,
 	ProductsPaginated,
@@ -14,7 +15,7 @@ export const productApiSlice = api.injectEndpoints({
 			{ pageNum: string | undefined; keyword: string | undefined }
 		>({
 			query: ({ pageNum, keyword }) => ({
-				url: `products`,
+				url: "products",
 				params: {
 					pageNum,
 					keyword,
@@ -26,6 +27,12 @@ export const productApiSlice = api.injectEndpoints({
 		getProductsById: builder.query<ProductApiResponse, string>({
 			query: (id: string) => `products/${id}`,
 			keepUnusedDataFor: 5,
+			transformErrorResponse: (response: ErrorResponse, _meta, arg) => {
+				return {
+					message: response.data.message ?? "Something went wrong",
+					path: arg,
+				};
+			},
 		}),
 		createProduct: builder.mutation<void, void>({
 			query: () => ({

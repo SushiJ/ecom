@@ -41,6 +41,8 @@ const UserEdit = () => {
 	const navigate = useNavigate();
 
 	const { data, isLoading, refetch, error } = useGetUserDetailsQuery(userId);
+	const [updateUser, { isLoading: loadingUpdate }] = useUpdateUserMutation();
+	let role = data ? data.user.role : "user";
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -49,13 +51,9 @@ const UserEdit = () => {
 	useEffect(() => {
 		if (!data) return;
 		form.reset({ ...data.user, role });
-	}, [isLoading]);
+	}, [data, form, isLoading, role]);
 
 	const delay = useDelay(400);
-
-	const [updateUser, { isLoading: loadingUpdate }] = useUpdateUserMutation();
-
-	let role = data ? data.user.role : "user";
 
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		try {
@@ -68,7 +66,6 @@ const UserEdit = () => {
 			toast.success("Updated successfully");
 			refetch();
 			navigate("/admin/users");
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			console.log("ERROR:::", error);
 			toast(error.data.error, {
