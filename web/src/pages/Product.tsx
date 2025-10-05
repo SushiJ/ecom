@@ -31,17 +31,24 @@ import Loader from "@/components/Loader";
 
 import { useDelay } from "@/lib/utils";
 import { GoBack } from "@/components/ui/goback";
+import ErrorComponent from "@/components/ErrorComponent";
 
 const FormSchema = z.object({
 	qty: z.string().default("1"),
 });
 
-export default function Product() {
+export default function Product({
+	skipDelay = false,
+}: {
+	skipDelay?: boolean;
+}) {
 	const dispatch = useAppDispatch();
 	const { id } = useParams<{
 		id: string;
 	}>();
-	const { data, isError, isLoading, refetch } = useGetProductsByIdQuery(id!);
+	const { data, isError, isLoading, refetch, error } = useGetProductsByIdQuery(
+		id!,
+	);
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -50,7 +57,7 @@ export default function Product() {
 		},
 	});
 
-	const delay = useDelay(200);
+	const delay = useDelay(200, skipDelay);
 
 	if (isLoading || delay) {
 		return <Loader />;
@@ -59,7 +66,7 @@ export default function Product() {
 	if (isError && !isLoading) {
 		return (
 			<>
-				<GoBack to="/" />
+				<ErrorComponent error={error as any} />
 			</>
 		);
 	}
