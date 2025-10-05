@@ -4,13 +4,12 @@
 	"description": "",
 	"main": "dist/index.js",
 	"scripts": {
-		"dev": "export NODE_ENV=development && nodemon",
+		"dev": "nodemon",
 		"seed": "ts-node ./seed.ts",
 		"start": "ts-node ./src/index.ts",
 		"start:build": "node ./dist/app.js",
 		"build": "tsc",
-		"tp": "pnpm test:products",
-		"tu": "pnpm test:users",
+		"test":"pnpm test:products && pnpm test:users",
 		"test:products": "export NODE_ENV=testing && jest --verbose ./tests/products.spec.ts",
 		"test:users": "export NODE_ENV=testing && jest --verbose ./tests/user.spec.ts"
 	},
