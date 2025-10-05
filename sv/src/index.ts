@@ -30,7 +30,7 @@ export function build() {
 		// INFO: directly borrowed from cors doc
 		// Development mode only
 		origin:
-			config.NODE_ENV === "testing"
+			config.NODE_ENV === ("testing" || "development")
 				? ["*"]
 				: (origin, cb) => {
 						const { hostname } = new URL(origin!);

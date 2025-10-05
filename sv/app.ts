@@ -1,5 +1,6 @@
 import { build } from "./src/index";
-import { connect } from "./src/utils/connection";
+import { connect, connectTestDb } from "./src/utils/connection";
+import { config } from "./src/utils/envSchema";
 
 const fastify = build();
 
@@ -9,12 +10,17 @@ fastify.listen({ port: 3000, host: "0.0.0.0" }, async (err, address) => {
 		process.exit(1);
 	}
 	try {
-		await connect();
+		console.log(config);
+		"development" === config.NODE_ENV || config.NODE_ENV === "testing"
+			? await connectTestDb()
+			: await connect();
+
 		fastify.log.info("CONNECTED TO MONGO");
 		fastify.log.info(`server listening on ${address}`);
 	} catch (e) {
 		fastify.log.error(e);
 		fastify.log.error("Failed to connect to server");
+		process.exit(1);
 	}
 });
 

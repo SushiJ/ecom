@@ -1,22 +1,4 @@
 import envSchema, { JSONSchemaType } from "env-schema";
-// import { z } from "zod";
-//
-// const envSchema = z.object({
-// 	MONGO_LOCAL_URI: z.string(),
-// 	MONGODB_URI: z.string(),
-// 	MONGODB_TEST_URI: z.string(),
-// 	MONGO_USER: z.string(),
-// 	MONGO_PASS: z.string(),
-// 	PORT: z.coerce.number().default(3000),
-// 	RUNNING_ENV: z.enum(["local", "docker"]).default("local"),
-// 	NODE_ENV: z
-// 		.enum(["development", "production", "test"])
-// 		.default("development"),
-// });
-//
-// export default function getEnv() {
-// 	return envSchema.parse(process.env);
-// }
 
 interface Env {
 	PORT: number;
@@ -26,6 +8,7 @@ interface Env {
 	NODE_ENV: string;
 	MONGO_LOCAL_URI: string;
 	RUNNING_ENV: string;
+	MONGO_DATABASE_NAME: string;
 }
 
 const schema: JSONSchemaType<Env> = {
@@ -37,6 +20,7 @@ const schema: JSONSchemaType<Env> = {
 		"PORT",
 		"NODE_ENV",
 		"RUNNING_ENV",
+		"MONGO_DATABASE_NAME",
 	],
 	properties: {
 		MONGO_LOCAL_URI: { type: "string" },
@@ -44,6 +28,11 @@ const schema: JSONSchemaType<Env> = {
 			type: "string",
 			enum: ["local", "docker"],
 			default: "local",
+		},
+		MONGO_DATABASE_NAME: {
+			type: "string",
+			enum: ["test_db", "production_db", "dev_db"],
+			default: "dev_db",
 		},
 		MONGODB_URI: { type: "string" },
 		MONGO_USER: { type: "string" },
