@@ -17,7 +17,7 @@ const formSchema = z.object({
 	keyword: z.optional(z.string()),
 });
 
-export function SearchBox() {
+function SearchBox() {
 	const navigate = useNavigate();
 
 	const form = useForm<z.infer<typeof formSchema>>({

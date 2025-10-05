@@ -65,7 +65,7 @@ const Login = () => {
 
 	useEffect(() => {
 		form.setFocus("email");
-	}, [form.setFocus]);
+	}, [form, form.setFocus]);
 
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		try {
@@ -77,7 +77,6 @@ const Login = () => {
 			dispatch(setCredentials(res.user));
 			navigate(redirect);
 			toast.success("Logged in successfully");
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			console.log("ERROR:::", error);
 			toast(error.data.message, {

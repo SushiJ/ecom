@@ -1,5 +1,11 @@
 import { Link, useParams } from "react-router-dom";
 
+import { useGetProductsQuery } from "../features/products/slice";
+
+import { type Product } from "../types/product";
+import truncate from "../lib/truncate";
+import { useDelay } from "@/lib/utils";
+
 import { Separator } from "@/components/ui/separator";
 import { Rating } from "@/components/Rating";
 import { Title } from "@/components/Title";
@@ -12,36 +18,35 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-
-import { Product } from "../types/product";
-import { useGetProductsQuery } from "../features/products/slice";
-import truncate from "../lib/truncate";
-import { useDelay } from "@/lib/utils";
 import Loader from "@/components/Loader";
 import { GoBack } from "@/components/ui/goback";
 
-export default function Home() {
+export default function Home({ skipDelay = false }: { skipDelay?: boolean }) {
 	const { pageNum, keyword } = useParams();
 	const { data, isError, isLoading } = useGetProductsQuery({
 		pageNum,
 		keyword,
 	});
 
-	const delay = useDelay(200);
+	const delay = useDelay(200, skipDelay);
 
 	if (isLoading || delay) {
 		return <Loader />;
 	}
 
 	if ((isError && !isLoading) || !data) {
-		return <p className="text-center text-lg">Something went wrong</p>;
+		return (
+			<p className="text-center text-lg" role="alert">
+				Something went wrong
+			</p>
+		);
 	}
 
-	if (data.products.length === 0) {
+	if (!data.products.length) {
 		return (
-			<section className="space-y-4">
+			<section className="space-y-4" role="empty">
 				<GoBack to="/" />
-				<p>Looks like that didn't match with any products</p>
+				<p>Looks like that didn&apos;t match with any products</p>
 			</section>
 		);
 	}
@@ -51,11 +56,9 @@ export default function Home() {
 			<Title title="Latest Products" className="text-neutral-500 text-md" />
 			<ProductCarousel />
 			<Separator className="my-8" />
-			<div className="grid md:grid-cols-2 gap-2">
+			<div className="grid md:grid-cols-2 gap-2" data-cy="product-list">
 				{data.products.map((p) => (
-					<div key={p._id}>
-						<Product product={p} />
-					</div>
+					<Product product={p} key={p._id} />
 				))}
 			</div>
 			<Paginate pages={data.pages} page={data.page} keyword={keyword} />

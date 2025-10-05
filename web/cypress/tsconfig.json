@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "module": "ESNext", // or "NodeNext"
+    "moduleResolution": "Node", // important for ESM packages
+    "target": "ES2020",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": [
+      "es6",
+      "dom"
+    ],
+    "sourceMap": true,
+    "types": [
+      "cypress",
+      "node"
+    ]
+  },
+  "include": [
+    "**/*.ts"
+  ]
+}
