@@ -10,13 +10,16 @@ type time = number;
 type ms = time;
 
 export function useDelay(time: ms, skipDelay: boolean = false) {
-	if (skipDelay) {
-		return false;
-	} 
 	const [delay, setDelay] = useState(true);
 
 	useEffect(() => {
+		if (skipDelay) {
+			return;
+		}
 		setTimeout(() => setDelay(false), time);
-	}, []);
-	return delay
+	}, [skipDelay, time]);
+	if (skipDelay) {
+		false;
+	}
+	return delay;
 }
