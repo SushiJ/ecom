@@ -9,7 +9,7 @@ export interface LoginMutationResponse extends GetUsersByIdResponse {}
 
 export type GetUsersResponse = {
 	message: string;
-	users: Array<LoginMutationResponse>;
+	users: Array<User>;
 };
 
 export type GetUsersByIdResponse = {
