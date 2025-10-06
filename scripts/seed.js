@@ -72,24 +72,3 @@ db.products.insertMany([
 		numReviews: 12,
 	},
 ]);
-
-db.users.insertMany([
-	{
-		name: "Admin User",
-		email: "admin@email.com",
-		password: "",
-		role: "admin",
-	},
-	{
-		name: "John Doe",
-		email: "john@email.com",
-		password: "",
-		role: "user",
-	},
-	{
-		name: "Jane Doe",
-		email: "jane@email.com",
-		password: "",
-		role: "user",
-	},
-]);
