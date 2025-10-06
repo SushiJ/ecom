@@ -28,7 +28,6 @@ const UsersList = () => {
 			try {
 				await deleteUser(id);
 				refetch();
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			} catch (err: any) {
 				toast.error(err);
 			}
@@ -65,7 +64,7 @@ const UsersList = () => {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{data.users.map(({ user }) => (
+						{data.users.map((user) => (
 							<TableRow key={user._id}>
 								<TableCell>{user._id}</TableCell>
 								<TableCell>{user.name}</TableCell>

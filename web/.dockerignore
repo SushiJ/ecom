@@ -1,0 +1,38 @@
+# Node modules and logs
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local env and secrets
+.env
+.env.*.local
+.env.local
+*.pem
+
+# Build outputs and caches
+dist
+build
+.cache
+.vite
+.vscode
+.idea
+
+# Test artifacts
+coverage
+.cypress
+cypress/videos
+cypress/screenshots
+*.lcov
+
+# Git and editor files
+.git
+.gitignore
+.DS_Store
+*.swp
+
+# OS / tooling
+tmp
+temp
+.cache-loader
