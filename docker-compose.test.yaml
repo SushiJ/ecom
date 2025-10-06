@@ -1,0 +1,47 @@
+name: mongo-prod
+services:
+  frontend:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    image: shop/ecom-frontend:latest
+    ports:
+      - "5173:80"
+    depends_on:
+      - server
+    networks:
+      - back
+
+  server:
+    build:
+      context: ./sv
+      dockerfile: Dockerfile.prod
+    image: shop/ecom-backend:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    env_file: ${ENV_FILE}
+    networks:
+      - back
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    container_name: mongo-ecom-prod
+    env_file: ${ENV_FILE}
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME={MONGO_USER}
+      - MONGO_INITDB_ROOT_PASSWORD={MONGO_PASS}
+      - MONGO_INITDB_DATABASE={MONGO_DATABASE_NAME}
+    volumes:
+      - ./data:/data/db
+    networks:
+      - back
+    restart: unless-stopped
+
+networks:
+  back:
+    driver: bridge
