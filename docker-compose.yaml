@@ -1,14 +1,14 @@
-name: mongo-db-dev
+name: mongo-db-dev-test
 services:
   mongo:
     image: mongo:6.0
     ports:
       - "27017:27017"
-    container_name: mongo-dev
+    container_name: mongo-dev-test
     environment:
       - MONGO_INITDB_ROOT_USERNAME=mongo
       - MONGO_INITDB_ROOT_PASSWORD=mongo
-      - MONGO_INITDB_DATABASE=test_db
+      - MONGO_INITDB_DATABASE=dev_db
     volumes:
       - ./data_dev:/data/db
       - ./scripts:/docker-entrypoint-initdb.d

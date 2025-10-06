@@ -18,8 +18,8 @@ describe("Login page", () => {
 	});
 	it("should error out when user doesn't exist", () => {
 		const wrong_email_user = {
-			email: "testing123@email.com"
-		}
+			email: "testing123@email.com",
+		};
 		cy.findByLabelText(/email/i).type(wrong_email_user.email);
 		cy.findByLabelText(/password/i).type(testUser.password);
 		cy.findByText(/sign in/i).click();
@@ -29,8 +29,8 @@ describe("Login page", () => {
 	});
 	it("should error out when user doesn't exist", () => {
 		const wrong_pass_user = {
-			password: "1234566788"
-		}
+			password: "1234566788",
+		};
 		cy.findByLabelText(/email/i).type(testUser.email);
 		cy.findByLabelText(/password/i).type(wrong_pass_user.password);
 		cy.findByText(/sign in/i).click();

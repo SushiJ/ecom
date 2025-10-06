@@ -1,5 +1,18 @@
 import { UserWithReview } from "./user";
 
+type ValidationErrorDetails = {
+	field: string;
+	message: string;
+};
+
+export type ErrorResponse = {
+	status: number;
+	data: {
+		error: string;
+		message: string;
+		details?: Array<ValidationErrorDetails>;
+	};
+};
 export type Review = {
 	_id: string;
 	user: UserWithReview;

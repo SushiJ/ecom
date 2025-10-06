@@ -29,7 +29,6 @@ import {
 	Select,
 	SelectItem,
 } from "@/components/ui/select";
-import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 type ReviewProps = {

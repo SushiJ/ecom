@@ -17,7 +17,7 @@ export type GetUsersByIdResponse = {
 	user: User;
 };
 
-export type UpdateUserInfoMutation = Omit<LoginMutationResponse, "_id"> & {
+export type UpdateUserInfoMutation = Omit<User, "_id"> & {
 	id: string;
 };
 
