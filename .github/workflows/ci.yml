@@ -47,9 +47,6 @@ jobs:
         working-directory: sv
         run: pnpm install --frozen-lockfile
 
-      - name: Install tsx globally
-        run: pnpm add -g tsx
-
       - name: Run tests
         run: pnpm test
 
