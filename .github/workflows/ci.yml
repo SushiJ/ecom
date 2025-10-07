@@ -31,7 +31,6 @@ jobs:
       MONGO_USER: mongo
       MONGO_PASS: mongo
       PORT: 3000
-      NODE_ENV: testing
 
     steps:
       - uses: actions/checkout@v4
