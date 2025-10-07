@@ -12,7 +12,7 @@ import productRoutes from "./routes/product";
 import userRoutes from "./routes/user";
 import orderRoutes from "./routes/order";
 import { HttpError } from "./utils/HttpErrors";
-// import'docker' { config } from "./utils/envSchema";
+import { config } from "./utils/envSchema";
 
 export function build() {
 	const fastify = Fastify({
@@ -29,14 +29,17 @@ export function build() {
 	fastify.register(cors, {
 		// INFO: directly borrowed from cors doc
 		// Development mode only
-		origin: (origin, cb) => {
-			const { hostname } = new URL(origin!);
-			if (hostname === "localhost") {
-				cb(null, true);
-			} else {
-				cb(new Error(`${hostname} Not allowed`), false);
-			}
-		},
+		origin:
+			config.NODE_ENV === "testing" // Need this for locally testing it
+				? ["*"]
+				: (origin, cb) => {
+						const { hostname } = new URL(origin!);
+						if (hostname === "localhost") {
+							cb(null, true);
+						} else {
+							cb(new Error(`${hostname} Not allowed`), false);
+						}
+					},
 		credentials: true, // Needed for cors in browser
 		methods: ["GET", "POST", "DELETE"],
 		allowedHeaders: ["Content-Type", "Authorization"],
