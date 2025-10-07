@@ -21,17 +21,17 @@ jobs:
           --health-retries 5
 
     env:
-      PAYPAL_CLIENT_ID=""
-      PAYPAL_CLIENT_SECRET=""
-      NODE_ENV=testing
-      RUNNING_ENV=local
-      MONGO_DATABASE_NAME=test_db
-      MONGO_LOCAL_URI=mongodb://mongo:mongo@localhost:27017/
-      MONGODB_URI=mongodb://mongo:27017/
-      MONGO_USER=mongo
-      MONGO_PASS=mongo
-      PORT=3000
-      NODE_ENV=test
+      PAYPAL_CLIENT_ID: ""
+      PAYPAL_CLIENT_SECRET: ""
+      NODE_ENV: testing
+      RUNNING_ENV: local
+      MONGO_DATABASE_NAME: test_db
+      MONGO_LOCAL_URI: mongodb://mongo:mongo@localhost:27017/
+      MONGODB_URI: mongodb://mongo:27017/
+      MONGO_USER: mongo
+      MONGO_PASS: mongo
+      PORT: 3000
+      NODE_ENV: testing
 
     steps:
       - uses: actions/checkout@v4
