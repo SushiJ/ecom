@@ -5,13 +5,12 @@ import cartSliceReducer from "./features/cart/slice";
 import authSliceReducer from "./features/auth/slice";
 
 export const store = configureStore({
-	reducer: {
-		[api.reducerPath]: api.reducer,
-		cart: cartSliceReducer,
-		auth: authSliceReducer,
-	},
-	middleware: (getDefaultMiddleware) =>
-		getDefaultMiddleware().concat(api.middleware),
+  reducer: {
+    [api.reducerPath]: api.reducer,
+    cart: cartSliceReducer,
+    auth: authSliceReducer,
+  },
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(api.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

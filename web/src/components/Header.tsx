@@ -26,8 +26,8 @@ export function Header() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const totalItems = useAppSelector((state) => state.cart.products.length);
-  const { userInfo } = useAppSelector((state) => state.auth);
+  const totalItems = useAppSelector(state => state.cart.products.length);
+  const { userInfo } = useAppSelector(state => state.auth);
 
   const [logout] = useLogoutMutation();
 
@@ -51,10 +51,7 @@ export function Header() {
   return (
     <header>
       <nav className="sticky top-0 min-h-16 flex items-center justify-between max-w-screen-2xl mx-auto w-full">
-        <Link
-          to="/"
-          className="hidden md:block md:text-2xl lg:font-bold hover:text-neutral-700/80"
-        >
+        <Link to="/" className="hidden md:block md:text-2xl lg:font-bold hover:text-neutral-700/80">
           Shoppy
         </Link>
         <Link
@@ -93,10 +90,7 @@ export function Header() {
   );
 }
 
-function AdminMenu(props: {
-  userInfo: any;
-  handleLogout: () => Promise<void>;
-}) {
+function AdminMenu(props: { userInfo: any; handleLogout: () => Promise<void> }) {
   const navigate = useNavigate();
 
   return (
@@ -107,30 +101,18 @@ function AdminMenu(props: {
             {props.userInfo.name}
           </Button>
           <Button className="lg:hidden" variant="outline" size="sm">
-            <Icon
-              icon="solar:hamburger-menu-line-duotone"
-              width="32"
-              height="32"
-            />
+            <Icon icon="solar:hamburger-menu-line-duotone" width="32" height="32" />
           </Button>
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => navigate("/profile")}>
-            Profile
-          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/profile")}>Profile</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => navigate("/admin/products")}>
-            Products
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate("/admin/orders")}>
-            Orders
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate("/admin/users")}>
-            Users
-          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/admin/products")}>Products</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/admin/orders")}>Orders</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/admin/users")}>Users</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={props.handleLogout}>
@@ -155,14 +137,10 @@ function Menu(props: { userInfo: any; handleLogout: () => Promise<void> }) {
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => navigate("/profile")}>
-            Profile
-          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/profile")}>Profile</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={props.handleLogout}>
-          Log out
-        </DropdownMenuItem>
+        <DropdownMenuItem onClick={props.handleLogout}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
