@@ -1,7 +1,8 @@
 export function Footer() {
-	return (
-		<footer className="text-center">
-			<p>Shop cc 2024</p>
-		</footer>
-	);
+  const ccDate = new Date().getFullYear();
+  return (
+    <footer className="text-center">
+      <p>Shoppy cc {ccDate}</p>
+    </footer>
+  );
 }
