@@ -1,22 +1,24 @@
-# Development Dockerfile
-FROM node:lts-alpine
-
+FROM node:lts-alpine AS base
 WORKDIR /usr/src/app
-
-# Enable pnpm
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-# Copy package files first for better caching
+FROM base AS deps
 COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --prod
 
-# Install dependencies
+FROM base AS build
+COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
-
-# Copy source code
 COPY . .
+RUN pnpm build
 
+FROM base AS prod
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/dist ./dist
+COPY package.json ./
+
+ENV NODE_ENV=production
 EXPOSE 3000
-
-CMD ["pnpm", "dev"]
+CMD ["node", "dist/app.js"]
