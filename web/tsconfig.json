@@ -34,13 +34,13 @@
 		]
 	},
 	"include": [
-		"src"
+		"src",
+		"cypress.config.ts",
+		"cypress/**/*.ts",
+		"tests"
 	],
 	"exclude": [
-		"tests",
-		"cypress.config.ts",
-		"node_modules",
-		"cypress/**/*.ts"
+		"node_modules"
 	],
 	"references": [
 		{

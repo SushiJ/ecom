@@ -1,4 +1,5 @@
 # Node modules and logs
+examples
 node_modules
 npm-debug.log*
 yarn-debug.log*
