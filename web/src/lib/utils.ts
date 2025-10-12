@@ -19,7 +19,7 @@ export function useDelay(time: ms, skipDelay: boolean = false) {
 		setTimeout(() => setDelay(false), time);
 	}, [skipDelay, time]);
 	if (skipDelay) {
-		false;
+		return false;
 	}
 	return delay;
 }
